@@ -8,8 +8,6 @@ import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
-import static guru.qa.niffler.page.interaction.ElementAction.clickElement;
-import static guru.qa.niffler.page.interaction.ElementCondition.checkElementVisible;
 
 public class MainPage {
 
@@ -37,14 +35,14 @@ public class MainPage {
   }
 
   public MainPage checkMainPageEssentialInfo() {
-    checkElementVisible(spendingBlock);
-    checkElementVisible(statisticsBlock);
+    spendingBlock.shouldBe(visible);
+    statisticsBlock.shouldBe(visible);
     return new MainPage();
   }
 
   public ProfilePage openProfile() {
-    clickElement(profileIcon);
-    clickElement(dropdownMenu.$("a[href='/profile']"));
+    profileIcon.shouldBe(visible).click();
+    dropdownMenu.$("a[href='/profile']").click();
     return new ProfilePage();
   }
 }

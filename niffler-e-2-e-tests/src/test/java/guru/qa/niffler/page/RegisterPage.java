@@ -3,10 +3,9 @@ package guru.qa.niffler.page;
 import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.SelenideElement;
 
+import static com.codeborne.selenide.Condition.text;
+import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
-import static guru.qa.niffler.page.interaction.ElementAction.clickElement;
-import static guru.qa.niffler.page.interaction.ElementAction.setElementValue;
-import static guru.qa.niffler.page.interaction.ElementCondition.checkElementText;
 
 public class RegisterPage {
 
@@ -30,42 +29,42 @@ public class RegisterPage {
 
 
     public RegisterPage setUsername(String username) {
-        setElementValue(usernameInput, username);
+        usernameInput.shouldBe(visible).setValue(username);
         return this;
     }
 
     public RegisterPage setPassword(String password) {
-        setElementValue(passwordInput, password);
+        passwordInput.shouldBe(visible).setValue(password);
         return this;
     }
 
     public RegisterPage setPasswordSubmit(String submitPassword) {
-        setElementValue(passwordSubmitInput, submitPassword);
+        passwordSubmitInput.shouldBe(visible).setValue(submitPassword);
         return this;
     }
 
     public RegisterPage submitRegistration() {
-        clickElement(signUpBtn);
+        signUpBtn.click();
         return new RegisterPage();
     }
 
     public RegisterPage checkSuccessfulRegistrationMessage() {
-        checkElementText(successfulRegistrationNotification, "Congratulations! You've registered!");
+        successfulRegistrationNotification.shouldHave(text("Congratulations! You've registered!"));
         return this;
     }
 
     public LoginPage clickSingInButton() {
-        clickElement(signInBtn);
+        signInBtn.click();
         return new LoginPage();
     }
 
     public RegisterPage checkUsernameAlreadyExistMessage(String userName) {
-        checkElementText(errorMessage, "Username `%s` already exists".formatted(userName));
+        errorMessage.shouldHave(text("Username `%s` already exists".formatted(userName)));
         return this;
     }
 
     public RegisterPage checkPasswordNotEqualsError() {
-        checkElementText(errorMessage, "Passwords should be equal");
+        errorMessage.shouldHave(text("Passwords should be equal"));
         return this;
     }
 }

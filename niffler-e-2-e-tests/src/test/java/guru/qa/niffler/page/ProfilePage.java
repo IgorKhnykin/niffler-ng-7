@@ -4,11 +4,9 @@ import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.SelenideElement;
 
-import static com.codeborne.selenide.Condition.text;
+import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$x;
-import static guru.qa.niffler.page.interaction.ElementAction.clickElement;
-import static guru.qa.niffler.page.interaction.ElementCondition.checkElementVisible;
 
 public class ProfilePage {
     public static ProfilePage initPage() {
@@ -22,19 +20,19 @@ public class ProfilePage {
     private final ElementsCollection notArchiveCategories = $$x(".//button[@aria-label='Archive category']/../..");
 
     public ProfilePage showArchivedCategories() {
-        clickElement(switcher);
+        switcher.click();
         return this;
     }
 
     public ProfilePage checkCategoryIsArchived(String categoryName) {
         var archiveCategory =  archiveCategories.findBy(text("%s".formatted(categoryName)));
-        checkElementVisible(archiveCategory);
+        archiveCategory.shouldBe(visible);
         return this;
     }
 
     public ProfilePage checkCategoryIsNotArchived(String categoryName) {
         var activeCategory =  notArchiveCategories.findBy(text("%s".formatted(categoryName)));
-        checkElementVisible(activeCategory);
+        activeCategory.shouldBe(visible);
         return this;
     }
 }
