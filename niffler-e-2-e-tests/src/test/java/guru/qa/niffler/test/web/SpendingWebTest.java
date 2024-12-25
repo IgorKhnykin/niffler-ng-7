@@ -1,37 +1,37 @@
 package guru.qa.niffler.test.web;
 
-import com.codeborne.selenide.Selenide;
-import guru.qa.niffler.config.Config;
 import guru.qa.niffler.jupiter.BrowserExtension;
 import guru.qa.niffler.jupiter.Spending;
 import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.MainPage;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+
+import static guru.qa.niffler.utils.TestData.passwordMain;
+import static guru.qa.niffler.utils.TestData.usernameMain;
 
 @ExtendWith(BrowserExtension.class)
 public class SpendingWebTest {
 
-  private static final Config CFG = Config.getInstance();
+    @Test
+    @DisplayName("Обновление описания траты")
+    @Spending(
+            category = "Обучение",
+            description = "new description",
+            username = usernameMain,
+            amount = 845444.0)
+    void categoryDescriptionShouldBeEditedByCategoryAction(SpendJson spend) {
+        final String newSpendingName = "Машина edited";
+        LoginPage.open()
+                .inputUsernameAndPassword(spend.username(), passwordMain)
+                .clickLoginBtn()
+                .editSpending(spend.description())
+                .editSpendingDescription(newSpendingName)
+                .save();
 
-  @Spending(
-      username = "duck",
-      category = "Обучение",
-      description = "Обучение Advanced 2.0",
-      amount = 79990
-  )
-  @Test
-  void categoryDescriptionShouldBeChangedFromTable(SpendJson spend) {
-    final String newDescription = "Обучение Niffler Next Generation";
-
-    Selenide.open(CFG.frontUrl(), LoginPage.class)
-        .login("duck", "12345")
-        .editSpending(spend.description())
-        .setNewSpendingDescription(newDescription)
-        .save();
-
-    new MainPage().checkThatTableContainsSpending(newDescription);
-  }
+        MainPage.initPage().checkThatTableContainsSpending(newSpendingName);
+    }
 }
 
