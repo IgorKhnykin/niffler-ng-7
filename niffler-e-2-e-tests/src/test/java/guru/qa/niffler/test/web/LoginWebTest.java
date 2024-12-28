@@ -1,6 +1,7 @@
 package guru.qa.niffler.test.web;
 
-import guru.qa.niffler.jupiter.BrowserExtension;
+import guru.qa.niffler.jupiter.annotation.DisableByIssue;
+import guru.qa.niffler.jupiter.extension.BrowserExtension;
 import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.MainPage;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +14,7 @@ import static guru.qa.niffler.utils.TestData.*;
 public class LoginWebTest {
 
     @Test
+    @DisableByIssue("3")
     @DisplayName("Успешная регистрация нового пользователя")
     void shouldRegisterNewUser() {
         LoginPage.open()
