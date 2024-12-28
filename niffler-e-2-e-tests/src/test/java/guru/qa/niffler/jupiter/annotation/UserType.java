@@ -12,5 +12,12 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @ExtendWith(UserQueueExtension.class)
 public @interface UserType {
-    boolean empty() default false;
+    Type value() default Type.EMPTY;
+
+    enum Type {
+        EMPTY,
+        WITH_FRIEND,
+        WITH_INCOME_REQUEST,
+        WITH_OUTCOME_REQUEST
+    }
 }

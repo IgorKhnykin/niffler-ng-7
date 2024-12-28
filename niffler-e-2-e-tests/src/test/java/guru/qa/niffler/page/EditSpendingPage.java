@@ -6,6 +6,7 @@ import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 
 public class EditSpendingPage {
+
   private final SelenideElement descriptionInput = $("#description");
   private final SelenideElement saveBtn = $("#save");
 
