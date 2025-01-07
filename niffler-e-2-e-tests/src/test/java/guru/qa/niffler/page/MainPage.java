@@ -45,4 +45,16 @@ public class MainPage {
     dropdownMenu.$("a[href='/profile']").click();
     return new ProfilePage();
   }
+
+  public FriendsPage openFriends() {
+    profileIcon.shouldBe(visible).click();
+    dropdownMenu.$("a[href='/people/friends']").click();
+    return new FriendsPage();
+  }
+
+  public AllPeoplePage openAllPeople() {
+    profileIcon.shouldBe(visible).click();
+    dropdownMenu.$("a[href='/people/all']").click();
+    return new AllPeoplePage();
+  }
 }
