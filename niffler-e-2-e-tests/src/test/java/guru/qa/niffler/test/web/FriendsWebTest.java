@@ -51,5 +51,4 @@ public class FriendsWebTest {
                 .openAllPeople()
                 .checkOutcomeInvitationInPeopleList(user.outcome());
     }
-
 }

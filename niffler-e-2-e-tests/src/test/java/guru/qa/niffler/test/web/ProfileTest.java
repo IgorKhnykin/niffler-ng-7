@@ -1,9 +1,7 @@
 package guru.qa.niffler.test.web;
 
 import guru.qa.niffler.jupiter.annotation.Category;
-import guru.qa.niffler.jupiter.annotation.UserType;
 import guru.qa.niffler.jupiter.extension.BrowserExtension;
-import guru.qa.niffler.jupiter.extension.UserQueueExtension;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.page.LoginPage;
 import org.junit.jupiter.api.DisplayName;
