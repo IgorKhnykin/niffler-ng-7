@@ -1,6 +1,7 @@
 package guru.qa.niffler.test.web;
 
 import guru.qa.niffler.jupiter.annotation.DisableByIssue;
+import guru.qa.niffler.jupiter.annotation.meta.WebTest;
 import guru.qa.niffler.jupiter.extension.BrowserExtension;
 import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.MainPage;
@@ -10,7 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import static guru.qa.niffler.utils.TestData.*;
 
-@ExtendWith(BrowserExtension.class)
+@WebTest
 public class LoginWebTest {
 
     @Test

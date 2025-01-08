@@ -42,14 +42,15 @@ public class UserQueueExtension implements
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void beforeEach(ExtensionContext context) {
         Arrays.stream(context.getRequiredTestMethod().getParameters())
-                .filter(param -> AnnotationSupport.isAnnotated(param, UserType.class))
+                .filter(param -> AnnotationSupport.isAnnotated(param, UserType.class) && param.getType().isAssignableFrom(StaticUser.class))
                 .map(p -> p.getAnnotation(UserType.class))
                 .forEach(ut -> {
                     Optional<StaticUser> user = Optional.empty();
                     StopWatch sw = StopWatch.createStarted();
-                    while (user.isEmpty() && sw.getTime(TimeUnit.SECONDS) < 10) {
+                    while (user.isEmpty() && sw.getTime(TimeUnit.SECONDS) < 30) {
                         user = getUserFromQueueByType(ut.value());
                     }
 
@@ -67,8 +68,10 @@ public class UserQueueExtension implements
     @Override
     public void afterEach(ExtensionContext context) {
         Map<UserType, StaticUser> map = context.getStore(NAMESPACE).get(context.getUniqueId(), Map.class);
-        for (Map.Entry<UserType, StaticUser> e : map.entrySet()) {
-            addUserToQueue(e);
+        if (map != null) {
+            for (Map.Entry<UserType, StaticUser> e : map.entrySet()) {
+                addUserToQueue(e);
+            }
         }
     }
 

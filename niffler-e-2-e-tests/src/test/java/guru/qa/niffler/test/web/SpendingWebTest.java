@@ -1,7 +1,8 @@
 package guru.qa.niffler.test.web;
 
-import guru.qa.niffler.jupiter.annotation.Spending;
+import guru.qa.niffler.jupiter.annotation.meta.WebTest;
 import guru.qa.niffler.jupiter.extension.BrowserExtension;
+import guru.qa.niffler.jupiter.annotation.Spending;
 import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.MainPage;
@@ -12,7 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import static guru.qa.niffler.utils.TestData.passwordMain;
 import static guru.qa.niffler.utils.TestData.usernameMain;
 
-@ExtendWith(BrowserExtension.class)
+@WebTest
 public class SpendingWebTest {
 
     @Test
