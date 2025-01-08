@@ -2,11 +2,13 @@ package guru.qa.niffler.jupiter.extension;
 
 import guru.qa.niffler.api.SpendApiClient;
 import guru.qa.niffler.jupiter.annotation.Category;
+import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.CategoryJson;
+import org.apache.commons.lang3.ArrayUtils;
 import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
 
-import java.util.Random;
+import static guru.qa.niffler.utils.RandomDataUtils.randomCategoryName;
 
 public class CategoryExtension implements BeforeEachCallback, ParameterResolver, AfterTestExecutionCallback {
 
@@ -16,15 +18,15 @@ public class CategoryExtension implements BeforeEachCallback, ParameterResolver,
 
     @Override
     public void beforeEach(ExtensionContext context) {
-        String randomCategoryName = "randomCategory" + new Random().nextInt(1_000_000);
-
-        AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), Category.class)
-                .ifPresent(anno -> {
-                            String categoryTestName = anno.categoryName().isBlank() ? randomCategoryName : anno.categoryName();
+        AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), User.class)
+                .filter(anno -> ArrayUtils.isNotEmpty(anno.category()))
+                .ifPresent(userAnno -> {
+                            Category anno = userAnno.category()[0];
+                            String categoryTestName = anno.categoryName().isBlank() ? randomCategoryName() : anno.categoryName();
                             CategoryJson categoryJson = new CategoryJson(
                                     null,
                                     categoryTestName,
-                                    anno.username(),
+                                    userAnno.username(),
                                     false
                             );
                             CategoryJson createdCategory = client.createCategory(categoryJson);
@@ -32,7 +34,7 @@ public class CategoryExtension implements BeforeEachCallback, ParameterResolver,
                                 CategoryJson archivedCategoryJson = new CategoryJson(
                                         createdCategory.id(),
                                         createdCategory.name(),
-                                        anno.username(),
+                                        userAnno.username(),
                                         true
                                 );
                                 createdCategory = client.updateCategory(archivedCategoryJson);
@@ -56,7 +58,8 @@ public class CategoryExtension implements BeforeEachCallback, ParameterResolver,
 
     @Override
     public void afterTestExecution(ExtensionContext context) {
-        AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), Category.class)
+        AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), User.class)
+                .filter(anno -> ArrayUtils.isNotEmpty(anno.category()))
                 .ifPresent(anno -> {
                     CategoryJson categoryJsonFromContext = context.getStore(NAMESPACE).get(context.getUniqueId(), CategoryJson.class);
 
