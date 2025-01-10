@@ -1,23 +1,24 @@
 package guru.qa.niffler.test.web;
 
 import guru.qa.niffler.jupiter.annotation.Category;
-import guru.qa.niffler.jupiter.extension.BrowserExtension;
+import guru.qa.niffler.jupiter.annotation.User;
+import guru.qa.niffler.jupiter.annotation.meta.WebTest;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.page.LoginPage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
-import static guru.qa.niffler.utils.TestData.passwordMain;
-import static guru.qa.niffler.utils.TestData.usernameMain;
+import static guru.qa.niffler.utils.RandomDataUtils.passwordMain;
+import static guru.qa.niffler.utils.RandomDataUtils.usernameMain;
 
-@ExtendWith(BrowserExtension.class)
+@WebTest
 public class ProfileTest {
 
     @Test
-    @Category(
-            username = usernameMain,
-            archived = true)
+    @User(username = usernameMain,
+            category = @Category(
+                    archived = true)
+    )
     @DisplayName("Проверка отображения архивной категории")
     void archiveCategoryShouldPresentInCategoriesList(CategoryJson categoryJson) {
         LoginPage.open()
@@ -30,9 +31,10 @@ public class ProfileTest {
     }
 
     @Test
-    @Category(
-            username = usernameMain,
-            archived = false)
+    @User(username = usernameMain,
+            category = @Category(
+                    archived = false)
+    )
     @DisplayName("Проверка отображения не архивной категории")
     void activeCategoryShouldPresentInCategoriesList(CategoryJson categoryJson) {
         LoginPage.open()

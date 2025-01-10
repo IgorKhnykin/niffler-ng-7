@@ -1,16 +1,15 @@
 package guru.qa.niffler.test.web;
 
 import guru.qa.niffler.jupiter.annotation.DisableByIssue;
-import guru.qa.niffler.jupiter.extension.BrowserExtension;
+import guru.qa.niffler.jupiter.annotation.meta.WebTest;
 import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.MainPage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
-import static guru.qa.niffler.utils.TestData.*;
+import static guru.qa.niffler.utils.RandomDataUtils.*;
 
-@ExtendWith(BrowserExtension.class)
+@WebTest
 public class LoginWebTest {
 
     @Test
@@ -19,13 +18,13 @@ public class LoginWebTest {
     void shouldRegisterNewUser() {
         LoginPage.open()
                 .clickCreateNewAccountBtn()
-                .setUsername(randomUsername)
+                .setUsername(randomUsername())
                 .setPassword(passwordMain)
                 .setPasswordSubmit(passwordMain)
                 .submitRegistration()
                 .checkSuccessfulRegistrationMessage()
                 .clickSingInButton()
-                .inputUsernameAndPassword(randomUsername, passwordMain)
+                .inputUsernameAndPassword(randomUsername(), passwordMain)
                 .clickLoginBtn();
 
         MainPage.initPage().checkMainPageEssentialInfo();
@@ -48,7 +47,7 @@ public class LoginWebTest {
     void shouldShowErrorIfPasswordAndConfirmPasswordAreNotEqual() {
         LoginPage.open()
                 .clickCreateNewAccountBtn()
-                .setUsername(randomUsername)
+                .setUsername(randomUsername())
                 .setPassword(passwordMain)
                 .setPasswordSubmit("12345")
                 .submitRegistration()
