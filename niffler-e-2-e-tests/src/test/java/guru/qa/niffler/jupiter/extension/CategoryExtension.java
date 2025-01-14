@@ -4,6 +4,7 @@ import guru.qa.niffler.api.SpendApiClient;
 import guru.qa.niffler.jupiter.annotation.Category;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.CategoryJson;
+import guru.qa.niffler.service.CategoryDbClient;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
@@ -11,6 +12,8 @@ import org.junit.platform.commons.support.AnnotationSupport;
 import static guru.qa.niffler.utils.RandomDataUtils.randomCategoryName;
 
 public class CategoryExtension implements BeforeEachCallback, ParameterResolver, AfterTestExecutionCallback {
+
+    private final CategoryDbClient dbClient = new CategoryDbClient();
 
     private final SpendApiClient client = new SpendApiClient();
 
@@ -29,7 +32,7 @@ public class CategoryExtension implements BeforeEachCallback, ParameterResolver,
                                     userAnno.username(),
                                     false
                             );
-                            CategoryJson createdCategory = client.createCategory(categoryJson);
+                            CategoryJson createdCategory = dbClient.createCategory(categoryJson);
                             if (anno.archived()) {
                                 CategoryJson archivedCategoryJson = new CategoryJson(
                                         createdCategory.id(),
@@ -62,12 +65,7 @@ public class CategoryExtension implements BeforeEachCallback, ParameterResolver,
                 .filter(anno -> ArrayUtils.isNotEmpty(anno.category()))
                 .ifPresent(anno -> {
                     CategoryJson categoryJsonFromContext = context.getStore(NAMESPACE).get(context.getUniqueId(), CategoryJson.class);
-
-                    CategoryJson archivedCategoryJson = new CategoryJson(categoryJsonFromContext.id(),
-                            categoryJsonFromContext.name(),
-                            categoryJsonFromContext.username(),
-                            true);
-                    client.updateCategory(archivedCategoryJson);
+                    dbClient.deleteCategory(categoryJsonFromContext);
                 });
     }
 }
