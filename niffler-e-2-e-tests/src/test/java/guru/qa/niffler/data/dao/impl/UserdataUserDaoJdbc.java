@@ -18,7 +18,7 @@ public class UserdataUserDaoJdbc implements UserdataUserDao {
     public UserEntity createUser(UserEntity user) {
         try (Connection connection = DataBases.connection(CFG.userdataJdbcUrl())) {
             try (PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO user (username, currency, firstname, surname, photo, photo_small, full_name)" +
+                    "INSERT INTO \"user\" (username, currency, firstname, surname, photo, photo_small, full_name)" +
                             "VALUES (?, ?, ?, ?, ?, ?, ?)",
                     Statement.RETURN_GENERATED_KEYS)) {
                 ps.setString(1, user.getUsername());
@@ -50,7 +50,7 @@ public class UserdataUserDaoJdbc implements UserdataUserDao {
     @Override
     public Optional<UserEntity> findById(UUID id) {
         try (Connection connection = DataBases.connection(CFG.userdataJdbcUrl())) {
-            try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM user WHERE id = ?")) {
+            try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM \"user\" WHERE id = ?")) {
                 ps.setObject(1, id);
                 ps.execute();
 
@@ -79,7 +79,7 @@ public class UserdataUserDaoJdbc implements UserdataUserDao {
     @Override
     public Optional<UserEntity> findByUsername(String username) {
         try (Connection connection = DataBases.connection(CFG.userdataJdbcUrl())) {
-            try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM user WHERE username = ?")) {
+            try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM \"user\" WHERE username = ?")) {
                 ps.setObject(1, username);
                 ps.execute();
 
@@ -108,7 +108,7 @@ public class UserdataUserDaoJdbc implements UserdataUserDao {
     @Override
     public void delete(UserEntity user) {
         try (Connection connection = DataBases.connection(CFG.userdataJdbcUrl())) {
-            try (PreparedStatement ps = connection.prepareStatement("DELETE FROM user WHERE id = ?")) {
+            try (PreparedStatement ps = connection.prepareStatement("DELETE FROM \"user\" WHERE id = ?")) {
                 ps.setObject(1, user.getId());
                 ps.execute();
             }
