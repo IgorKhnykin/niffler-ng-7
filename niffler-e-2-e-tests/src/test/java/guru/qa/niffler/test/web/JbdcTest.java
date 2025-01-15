@@ -23,13 +23,13 @@ public class JbdcTest {
                         new Date(),
                         new CategoryJson(
                                 null,
-                                "test-cat-name",
+                                "test-cat-name-2",
                                 "igorKhn",
                                 false),
                         CurrencyValues.EUR,
                         100.0,
                         "test desc",
-                        "igorKhn"
+                        null
                 )
         );
         System.out.println(sj);
