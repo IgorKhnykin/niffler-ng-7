@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-
 import static guru.qa.niffler.data.DataBases.transaction;
 
 public class UserDbClient {
@@ -20,14 +19,14 @@ public class UserDbClient {
         return transaction(connection -> {
             UserEntity ue = new UserdataUserDaoJdbc(connection).createUser(UserEntity.fromJson(user));
             return UserJson.fromEntity(ue);
-        }, CFG.userdataJdbcUrl());
+        }, CFG.userdataJdbcUrl(), 2);
     }
 
     public Optional<UserJson> findUserById(UUID id) {
         return transaction(connection -> {
             Optional<UserEntity> se = new UserdataUserDaoJdbc(connection).findById(id);
             return se.map(UserJson::fromEntity);
-        }, CFG.userdataJdbcUrl());
+        }, CFG.userdataJdbcUrl(), 2);
     }
 
     public List<UserJson> findAllByUsername(String username) {
@@ -36,13 +35,13 @@ public class UserDbClient {
                     .stream()
                     .map(UserJson::fromEntity)
                     .toList();
-        }, CFG.userdataJdbcUrl());
+        }, CFG.userdataJdbcUrl(), 2);
     }
 
     public void deleteUser(UserJson UserJson) {
         transaction(connection -> {
             UserEntity spendEntity = UserEntity.fromJson(UserJson);
             new UserdataUserDaoJdbc(connection).delete(spendEntity);
-        }, CFG.userdataJdbcUrl());
+        }, CFG.userdataJdbcUrl(), 2);
     }
 }

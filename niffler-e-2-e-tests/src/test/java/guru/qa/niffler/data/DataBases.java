@@ -27,13 +27,14 @@ public class DataBases {
 
     public record XaFunction<T>(Function<Connection, T> function, String jdbcUrl) {
     }
+
     public record XaConsumer(Consumer<Connection> function, String jdbcUrl) {
     }
 
-    public static <T> T transaction(Function<Connection, T> function, String jdbcUrl) {
+    public static <T> T transaction(Function<Connection, T> function, String jdbcUrl, int transactionLevel) {
         Connection connection = null;
         try {
-            connection = connection(jdbcUrl);
+            connection = connection(jdbcUrl, transactionLevel);
             connection.setAutoCommit(false);
             T result = function.apply(connection);
             connection.commit();
@@ -51,10 +52,10 @@ public class DataBases {
         }
     }
 
-    public static void transaction(Consumer<Connection> consumer, String jdbcUrl) {
+    public static void transaction(Consumer<Connection> consumer, String jdbcUrl, int transactionLevel) {
         Connection connection = null;
         try {
-            connection = connection(jdbcUrl);
+            connection = connection(jdbcUrl, transactionLevel);
             connection.setAutoCommit(false);
             consumer.accept(connection);
             connection.commit();
@@ -71,13 +72,15 @@ public class DataBases {
         }
     }
 
-    public static <T> T xaTransaction(XaFunction<T>... actions) {
+    public static <T> T xaTransaction(int transactionLvl, XaFunction<T>... actions) {
         UserTransaction ut = new UserTransactionImp();
         try {
             ut.begin();
             T result = null;
             for (XaFunction<T> action : actions) {
-                result = action.function.apply(connection(action.jdbcUrl()));
+                Connection connect = connection((action.jdbcUrl), transactionLvl);
+                result = action.function.apply(connect);
+
             }
             ut.commit();
             return result;
@@ -91,12 +94,14 @@ public class DataBases {
         }
     }
 
-    public static void xaTransaction(XaConsumer... actions) {
+    public static void xaTransaction(int transactionLvl, XaConsumer... actions) {
         UserTransaction ut = new UserTransactionImp();
         try {
             ut.begin();
             for (XaConsumer action : actions) {
-                action.function.accept(connection(action.jdbcUrl()));
+                Connection connect = connection(action.jdbcUrl, transactionLvl);
+
+                action.function.accept(connect);
             }
             ut.commit();
         } catch (Exception e) {
@@ -128,7 +133,7 @@ public class DataBases {
         );
     }
 
-    private static Connection connection(String jdbcUrl) throws SQLException {
+    private static Connection connection(String jdbcUrl,int transactionLvl) throws SQLException {
         return threadConnections.computeIfAbsent(
                 Thread.currentThread().threadId(),
                 key -> {
@@ -145,6 +150,7 @@ public class DataBases {
                 jdbcUrl,
                 key -> {
                     try {
+                        dataSource(jdbcUrl).getConnection().setTransactionIsolation(transactionLvl);
                         return dataSource(jdbcUrl).getConnection();
                     } catch (SQLException e) {
                         throw new RuntimeException(e);
@@ -166,6 +172,5 @@ public class DataBases {
             }
 
         }
-
     }
 }

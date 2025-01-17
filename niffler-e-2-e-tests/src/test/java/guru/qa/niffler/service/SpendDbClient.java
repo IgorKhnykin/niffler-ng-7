@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-
 import static guru.qa.niffler.data.DataBases.transaction;
 
 public class SpendDbClient {
@@ -26,26 +25,26 @@ public class SpendDbClient {
                 spendEntity.setCategory(categoryEntity);
             }
             return SpendJson.fromEntity(new SpendDaoJdbc(connection).create(spendEntity));
-        }, CFG.spendJdbcUrl());
+        }, CFG.spendJdbcUrl(), 2);
     }
 
     public Optional<SpendJson> findSpendById(UUID id) {
         return transaction(connection -> {
             Optional<SpendEntity> se = new SpendDaoJdbc(connection).findSpendById(id);
             return se.map(SpendJson::fromEntity);
-        }, CFG.spendJdbcUrl());
+        }, CFG.spendJdbcUrl(), 2);
     }
 
     public List<SpendJson> findAllByUsername(String username) {
         return transaction(connection -> {
             return new SpendDaoJdbc(connection).findAllByUsername(username).stream().map(SpendJson::fromEntity).toList();
-        }, CFG.spendJdbcUrl());
+        }, CFG.spendJdbcUrl(), 2);
     }
 
     public void deleteSpend(SpendJson spendJson) {
         transaction(connection -> {
             SpendEntity spendEntity = SpendEntity.fromJson(spendJson);
             new SpendDaoJdbc(connection).deleteSpend(spendEntity);
-        }, CFG.spendJdbcUrl());
+        }, CFG.spendJdbcUrl(), 2);
     }
 }

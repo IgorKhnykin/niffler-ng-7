@@ -20,14 +20,14 @@ public class CategoryDbClient {
         return transaction(connection -> {
             CategoryEntity ce = CategoryEntity.fromJson(category);
             return CategoryJson.fromEntity(new CategoryDaoJdbc(connection).create(ce));
-        }, CFG.spendJdbcUrl());
+        }, CFG.spendJdbcUrl(), 2);
     }
 
     public Optional<CategoryJson> findCategoryById(UUID id) {
         return transaction(connection -> {
             Optional<CategoryEntity> ce = new CategoryDaoJdbc(connection).findCategoryById(id);
             return ce.map(CategoryJson::fromEntity);
-        }, CFG.spendJdbcUrl());
+        }, CFG.spendJdbcUrl(), 2);
     }
 
     public List<CategoryJson> findAllByUsername(String username) {
@@ -36,21 +36,21 @@ public class CategoryDbClient {
                     .stream()
                     .map(CategoryJson::fromEntity)
                     .toList();
-        }, CFG.spendJdbcUrl());
+        }, CFG.spendJdbcUrl(), 2);
     }
 
     public Optional<CategoryJson> findCategoryByUsernameAndCategoryName(String username, String categoryName) {
         return transaction(connection -> {
             Optional<CategoryEntity> ce = new CategoryDaoJdbc(connection).findCategoryByUsernameAndCategoryName(username, categoryName);
             return ce.map(CategoryJson::fromEntity);
-        }, CFG.spendJdbcUrl());
+        }, CFG.spendJdbcUrl(), 2);
     }
 
     public void deleteCategory(CategoryJson categoryJson) {
         transaction(connection -> {
             CategoryEntity categoryEntity = CategoryEntity.fromJson(categoryJson);
             new CategoryDaoJdbc(connection).deleteCategory(categoryEntity);
-        }, CFG.spendJdbcUrl());
+        }, CFG.spendJdbcUrl(), 2);
 
 
     }
