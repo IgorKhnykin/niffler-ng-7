@@ -13,10 +13,10 @@ public class AuthAuthorityDbClient {
 
     public static final Config CFG = Config.getInstance();
 
-    public AuthAuthorityJson addAuthority(AuthAuthorityJson authorityJson) {
-        return transaction(connection -> {
+    public void addAuthority(AuthAuthorityJson authorityJson) {
+        transaction(connection -> {
             AuthAuthorityEntity authorityEntity = AuthAuthorityEntity.fromJson(authorityJson);
-            return AuthAuthorityJson.fromEntity(new AuthAuthorityDaoJdbc(connection).addAuthority(authorityEntity));
+            new AuthAuthorityDaoJdbc(connection).addAuthority(authorityEntity);
         }, CFG.authJdbcUrl(), TRANSACTION_READ_COMMITTED);
     }
 }

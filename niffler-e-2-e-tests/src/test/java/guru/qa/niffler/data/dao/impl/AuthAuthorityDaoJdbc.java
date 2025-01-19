@@ -14,33 +14,16 @@ public class AuthAuthorityDaoJdbc implements AuthAuthorityDao {
     }
 
     @Override
-    public AuthAuthorityEntity addAuthority(AuthAuthorityEntity authorityEntity) {
-        try (PreparedStatement ps = connection.prepareStatement("INSERT INTO authority (user_id, authority) VALUES (?, ?)",
-                Statement.RETURN_GENERATED_KEYS)) {
-            ps.setObject(1, authorityEntity.getUser().getId());
-            ps.setString(2, authorityEntity.getAuthority().name());
-            ps.executeUpdate();
-
-            final UUID generatedKey;
-            try (ResultSet rs = ps.getGeneratedKeys()) {
-                if (rs.next()) {
-                    generatedKey = rs.getObject(1, UUID.class);
-                } else {
-                    throw new SQLException("Can`t find id in ResultSet");
-                }
-                authorityEntity.setId(generatedKey);
-                return authorityEntity;
+    public void addAuthority(AuthAuthorityEntity... authorityEntity) {
+        try (PreparedStatement ps = connection.prepareStatement("INSERT INTO authority (user_id, authority) VALUES (?, ?)")) {
+            for (AuthAuthorityEntity auth : authorityEntity) {
+                ps.setObject(1, auth.getUser().getId());
+                ps.setString(2, auth.getAuthority().name());
+                ps.addBatch();
+                ps.clearParameters();
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
-    @Override
-    public void deleteAuthority(AuthAuthorityEntity authorityEntity) {
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM authority WHERE id = ?")) {
-            ps.setObject(1, authorityEntity.getId());
-            ps.execute();
+            ps.executeBatch();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

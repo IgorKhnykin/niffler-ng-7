@@ -96,10 +96,25 @@ public class JbdcTest {
                 true,
                 true,
                 true
-                );
+        );
 
         AuthAuthorityJson authorityJson = new AuthAuthorityJson(null, auth, Authority.read);
         authUserDbClient.createClient(authorityJson);
 
+    }
+
+    @Test
+    void test10() {
+        UserDbClient userDbClient = new UserDbClient();
+        UserJson userJson = new UserJson(null,
+                "valentin-2",
+                null,
+                 null,
+                null,
+                CurrencyValues.EUR,
+                null,
+                null);
+        userDbClient.createUserSpringJdbc(userJson);
+        System.out.println(userJson);
     }
 }
