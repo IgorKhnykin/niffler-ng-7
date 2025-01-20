@@ -1,9 +1,7 @@
 package guru.qa.niffler.test.web;
 
-import guru.qa.niffler.model.CategoryJson;
-import guru.qa.niffler.model.CurrencyValues;
-import guru.qa.niffler.model.SpendJson;
-import guru.qa.niffler.model.UserJson;
+import guru.qa.niffler.model.*;
+import guru.qa.niffler.service.AuthUserDbClient;
 import guru.qa.niffler.service.CategoryDbClient;
 import guru.qa.niffler.service.SpendDbClient;
 import guru.qa.niffler.service.UserDbClient;
@@ -23,13 +21,13 @@ public class JbdcTest {
                         new Date(),
                         new CategoryJson(
                                 null,
-                                "test-cat-name",
+                                "test-cat-name-2",
                                 "igorKhn",
                                 false),
                         CurrencyValues.EUR,
                         100.0,
                         "test desc",
-                        "igorKhn"
+                        null
                 )
         );
         System.out.println(sj);
@@ -85,5 +83,23 @@ public class JbdcTest {
         CategoryDbClient categoryDbClient = new CategoryDbClient();
         CategoryJson dbClient = categoryDbClient.findCategoryById(UUID.fromString("bdca84a8-d254-11ef-9adb-0242ac110004")).get();
         categoryDbClient.deleteCategory(dbClient);
+    }
+
+    @Test
+    void test9() {
+        AuthUserDbClient authUserDbClient = new AuthUserDbClient();
+        AuthUserJson auth = new AuthUserJson(
+                null,
+                "AuthTestUser999",
+                "qwert",
+                true,
+                true,
+                true,
+                true
+                );
+
+        AuthAuthorityJson authorityJson = new AuthAuthorityJson(null, auth, Authority.read);
+        authUserDbClient.createClient(authorityJson);
+
     }
 }
