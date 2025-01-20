@@ -2,7 +2,10 @@ package guru.qa.niffler.service;
 
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.DataBases;
-import guru.qa.niffler.data.dao.impl.*;
+import guru.qa.niffler.data.dao.impl.AuthAuthorityDaoSpringJdbc;
+import guru.qa.niffler.data.dao.impl.AuthUserDaoSpringJdbc;
+import guru.qa.niffler.data.dao.impl.UserdataUserDaoJdbc;
+import guru.qa.niffler.data.dao.impl.UserdataUserDaoSpringJdbc;
 import guru.qa.niffler.data.entity.auth.AuthAuthorityEntity;
 import guru.qa.niffler.data.entity.auth.AuthUserEntity;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
@@ -11,7 +14,6 @@ import guru.qa.niffler.model.UserJson;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import javax.sql.DataSource;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -81,6 +83,10 @@ public class UserDbClient {
 
         return UserJson.fromEntity(new UserdataUserDaoSpringJdbc(DataBases.dataSource(CFG.userdataJdbcUrl()))
                 .createUser(UserEntity.fromJson(user)));
+    }
 
+    public List<UserJson> findAll() {
+        UserdataUserDaoSpringJdbc userDaoSpringJdbc = new UserdataUserDaoSpringJdbc(DataBases.dataSource(CFG.userdataJdbcUrl()));
+        return userDaoSpringJdbc.findAll().stream().map(UserJson::fromEntity).toList();
     }
 }

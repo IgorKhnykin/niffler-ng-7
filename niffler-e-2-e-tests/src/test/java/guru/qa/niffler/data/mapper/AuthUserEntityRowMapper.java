@@ -10,10 +10,7 @@ import java.util.UUID;
 
 public class AuthUserEntityRowMapper implements RowMapper<AuthUserEntity> {
 
-    public static AuthUserEntityRowMapper instance = new AuthUserEntityRowMapper();
-
-    private AuthUserEntityRowMapper() {
-    }
+    public static final AuthUserEntityRowMapper instance = new AuthUserEntityRowMapper();
 
     @Override
     public AuthUserEntity mapRow(ResultSet rs, int rowNum) throws SQLException {

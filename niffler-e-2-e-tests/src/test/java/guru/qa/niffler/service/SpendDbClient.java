@@ -1,8 +1,10 @@
 package guru.qa.niffler.service;
 
 import guru.qa.niffler.config.Config;
+import guru.qa.niffler.data.DataBases;
 import guru.qa.niffler.data.dao.impl.CategoryDaoJdbc;
 import guru.qa.niffler.data.dao.impl.SpendDaoJdbc;
+import guru.qa.niffler.data.dao.impl.SpendDaoSpringJdbc;
 import guru.qa.niffler.data.entity.spend.CategoryEntity;
 import guru.qa.niffler.data.entity.spend.SpendEntity;
 import guru.qa.niffler.model.SpendJson;
@@ -48,5 +50,9 @@ public class SpendDbClient {
             SpendEntity spendEntity = SpendEntity.fromJson(spendJson);
             new SpendDaoJdbc(connection).deleteSpend(spendEntity);
         }, CFG.spendJdbcUrl(), TRANSACTION_READ_COMMITTED);
+    }
+
+    public List<SpendJson> findAll() {
+        return new SpendDaoSpringJdbc(DataBases.dataSource(CFG.spendJdbcUrl())).findAll().stream().map(SpendJson::fromEntity).toList();
     }
 }

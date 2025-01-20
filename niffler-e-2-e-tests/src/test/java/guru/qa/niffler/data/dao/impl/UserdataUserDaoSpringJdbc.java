@@ -10,12 +10,13 @@ import org.springframework.jdbc.support.KeyHolder;
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public class UserdataUserDaoSpringJdbc implements UserdataUserDao {
 
-    DataSource dataSource;
+    private final DataSource dataSource;
 
     public UserdataUserDaoSpringJdbc(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -69,5 +70,11 @@ public class UserdataUserDaoSpringJdbc implements UserdataUserDao {
             ps.setObject(1, user.getId());
             return ps;
         });
+    }
+
+    @Override
+    public List<UserEntity> findAll() {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        return jdbcTemplate.query("SELECT * FROM \"user\"", UserdataUserEntityRowManager.instance);
     }
 }

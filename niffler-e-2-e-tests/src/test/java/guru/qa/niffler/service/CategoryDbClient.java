@@ -1,7 +1,9 @@
 package guru.qa.niffler.service;
 
 import guru.qa.niffler.config.Config;
+import guru.qa.niffler.data.DataBases;
 import guru.qa.niffler.data.dao.impl.CategoryDaoJdbc;
+import guru.qa.niffler.data.dao.impl.CategoryDaoSpringJdbc;
 import guru.qa.niffler.data.entity.spend.CategoryEntity;
 import guru.qa.niffler.model.CategoryJson;
 
@@ -53,5 +55,10 @@ public class CategoryDbClient {
             CategoryEntity categoryEntity = CategoryEntity.fromJson(categoryJson);
             new CategoryDaoJdbc(connection).deleteCategory(categoryEntity);
         }, CFG.spendJdbcUrl(), TRANSACTION_READ_COMMITTED);
+    }
+
+    public List<CategoryJson> findAll() {
+        CategoryDaoSpringJdbc categoryDaoSpringJdbc = new CategoryDaoSpringJdbc(DataBases.dataSource(CFG.spendJdbcUrl()));
+        return categoryDaoSpringJdbc.findAll().stream().map(CategoryJson::fromEntity).toList();
     }
 }

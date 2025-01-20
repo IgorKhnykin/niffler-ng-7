@@ -6,11 +6,15 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public class AuthUserDaoJdbc implements AuthUserDao {
+
     private static final PasswordEncoder pe = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+
     private final Connection connection;
 
     public AuthUserDaoJdbc(Connection connection) {
@@ -106,6 +110,32 @@ public class AuthUserDaoJdbc implements AuthUserDao {
         try (PreparedStatement ps = connection.prepareStatement("DELETE FROM \"user\" WHERE id = ?")) {
             ps.setObject(1, authUser.getId());
             ps.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<AuthUserEntity> findAll() {
+        try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM \"user\"")) {
+            ps.execute();
+
+            List<AuthUserEntity> authUserEntityList = new ArrayList<>();
+            try (ResultSet rs = ps.getResultSet()) {
+                while (rs.next()) {
+                    AuthUserEntity au = new AuthUserEntity();
+                    au.setId(rs.getObject("id", UUID.class));
+                    au.setUsername(rs.getString("username"));
+                    au.setPassword(rs.getString("password"));
+                    au.setEnabled(rs.getBoolean("enabled"));
+                    au.setAccountNonExpired(rs.getBoolean("account_non_expired"));
+                    au.setAccountNonLocked(rs.getBoolean("account_non_locked"));
+                    au.setCredentialsNonExpired(rs.getBoolean("credentials_non_expired"));
+                    authUserEntityList.add(au);
+                }
+                return authUserEntityList;
+            }
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
