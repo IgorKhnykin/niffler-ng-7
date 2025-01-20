@@ -33,6 +33,5 @@ public record AuthUserJson(
                 entity.getAccountNonExpired(),
                 entity.getAccountNonLocked(),
                 entity.getCredentialsNonExpired());
-//                entity.getAuthorities().stream().map(AuthAuthorityJson::fromEntity).toList());
     }
 }

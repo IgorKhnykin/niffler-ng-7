@@ -17,7 +17,6 @@ public class AuthUserEntity implements Serializable {
     private Boolean accountNonExpired;
     private Boolean accountNonLocked;
     private Boolean credentialsNonExpired;
-//    private List<AuthAuthorityEntity> authorities = new ArrayList<>();
 
     public static AuthUserEntity fromJson(AuthUserJson authUser) {
         AuthUserEntity authUserEntity = new AuthUserEntity();
@@ -28,7 +27,6 @@ public class AuthUserEntity implements Serializable {
         authUserEntity.setAccountNonExpired(authUser.accountNonExpired());
         authUserEntity.setAccountNonLocked(authUser.accountNonLocked());
         authUserEntity.setCredentialsNonExpired(authUser.credentialsNonExpired());
-//        authUserEntity.setAuthorities(authUser.authorities().stream().map(AuthAuthorityEntity::fromJson).toList());
         return authUserEntity;
     }
 }

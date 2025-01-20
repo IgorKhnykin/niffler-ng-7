@@ -13,7 +13,7 @@ import java.util.UUID;
 
 public class SpendDaoJdbc implements SpendDao {
 
-    Connection connection;
+    private final Connection connection;
 
     public SpendDaoJdbc(Connection connection) {
         this.connection = connection;

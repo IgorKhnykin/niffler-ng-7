@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public class AuthUserDaoJdbc implements AuthUserDao {
     private static final PasswordEncoder pe = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    Connection connection;
+    private final Connection connection;
 
     public AuthUserDaoJdbc(Connection connection) {
         this.connection = connection;
@@ -62,7 +62,7 @@ public class AuthUserDaoJdbc implements AuthUserDao {
                     se.setEnabled(rs.getBoolean("enabled"));
                     se.setAccountNonExpired(rs.getBoolean("account_non_expired"));
                     se.setAccountNonLocked(rs.getBoolean("account_non_locked"));
-                    se.setCredentialsNonExpired(rs.getBoolean("enabcredentials_non_expiredled"));
+                    se.setCredentialsNonExpired(rs.getBoolean("credentials_non_expired"));
 
                     return Optional.of(se);
                 } else {
@@ -76,7 +76,7 @@ public class AuthUserDaoJdbc implements AuthUserDao {
 
     @Override
     public Optional<AuthUserEntity> findUserByUsername(String username) {
-        try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM \"user\" WHERE id = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM \"user\" WHERE username = ?")) {
             ps.setObject(1, username);
             ps.execute();
 
@@ -89,7 +89,7 @@ public class AuthUserDaoJdbc implements AuthUserDao {
                     se.setEnabled(rs.getBoolean("enabled"));
                     se.setAccountNonExpired(rs.getBoolean("account_non_expired"));
                     se.setAccountNonLocked(rs.getBoolean("account_non_locked"));
-                    se.setCredentialsNonExpired(rs.getBoolean("enabcredentials_non_expiredled"));
+                    se.setCredentialsNonExpired(rs.getBoolean("credentials_non_expired"));
 
                     return Optional.of(se);
                 } else {

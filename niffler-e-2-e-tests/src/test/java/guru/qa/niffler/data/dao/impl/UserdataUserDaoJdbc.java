@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class UserdataUserDaoJdbc implements UserdataUserDao {
-    Connection connection;
+    private final Connection connection;
 
     public UserdataUserDaoJdbc(Connection connection) {
         this.connection = connection;

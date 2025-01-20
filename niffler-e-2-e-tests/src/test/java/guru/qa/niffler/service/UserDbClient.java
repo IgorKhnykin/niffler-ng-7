@@ -13,20 +13,22 @@ import static guru.qa.niffler.data.DataBases.transaction;
 
 public class UserDbClient {
 
+    private static final int TRANSACTION_READ_COMMITTED = 2;
+
     private static final Config CFG = Config.getInstance();
 
     public UserJson createUser(UserJson user) {
         return transaction(connection -> {
             UserEntity ue = new UserdataUserDaoJdbc(connection).createUser(UserEntity.fromJson(user));
             return UserJson.fromEntity(ue);
-        }, CFG.userdataJdbcUrl(), 2);
+        }, CFG.userdataJdbcUrl(), TRANSACTION_READ_COMMITTED);
     }
 
     public Optional<UserJson> findUserById(UUID id) {
         return transaction(connection -> {
             Optional<UserEntity> se = new UserdataUserDaoJdbc(connection).findById(id);
             return se.map(UserJson::fromEntity);
-        }, CFG.userdataJdbcUrl(), 2);
+        }, CFG.userdataJdbcUrl(), TRANSACTION_READ_COMMITTED);
     }
 
     public List<UserJson> findAllByUsername(String username) {
@@ -35,13 +37,13 @@ public class UserDbClient {
                     .stream()
                     .map(UserJson::fromEntity)
                     .toList();
-        }, CFG.userdataJdbcUrl(), 2);
+        }, CFG.userdataJdbcUrl(), TRANSACTION_READ_COMMITTED);
     }
 
     public void deleteUser(UserJson UserJson) {
         transaction(connection -> {
             UserEntity spendEntity = UserEntity.fromJson(UserJson);
             new UserdataUserDaoJdbc(connection).delete(spendEntity);
-        }, CFG.userdataJdbcUrl(), 2);
+        }, CFG.userdataJdbcUrl(), TRANSACTION_READ_COMMITTED);
     }
 }

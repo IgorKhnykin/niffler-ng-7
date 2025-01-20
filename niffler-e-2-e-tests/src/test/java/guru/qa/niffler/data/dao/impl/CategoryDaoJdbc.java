@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public class CategoryDaoJdbc implements CategoryDao {
 
-    Connection connection;
+    private final Connection connection;
 
     public CategoryDaoJdbc(Connection connection) {
         this.connection = connection;
