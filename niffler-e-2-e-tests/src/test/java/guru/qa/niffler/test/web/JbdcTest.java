@@ -1,10 +1,7 @@
 package guru.qa.niffler.test.web;
 
 import guru.qa.niffler.model.*;
-import guru.qa.niffler.service.AuthUserDbClient;
-import guru.qa.niffler.service.CategoryDbClient;
-import guru.qa.niffler.service.SpendDbClient;
-import guru.qa.niffler.service.UserDbClient;
+import guru.qa.niffler.service.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.Date;
@@ -96,10 +93,55 @@ public class JbdcTest {
                 true,
                 true,
                 true
-                );
+        );
 
         AuthAuthorityJson authorityJson = new AuthAuthorityJson(null, auth, Authority.read);
-        authUserDbClient.createClient(authorityJson);
+        authUserDbClient.createUser(authorityJson);
 
+    }
+
+    @Test
+    void test10() {
+        UserDbClient userDbClient = new UserDbClient();
+        UserJson userJson = new UserJson(null,
+                "valentin-3",
+                null,
+                 null,
+                null,
+                CurrencyValues.EUR,
+                null,
+                null);
+        userDbClient.createUserSpringJdbc(userJson);
+        System.out.println(userJson);
+    }
+
+    @Test
+    void test11() {
+        SpendDbClient spendDbClient = new SpendDbClient();
+        System.out.println(spendDbClient.findAll());
+    }
+
+    @Test
+    void test12() {
+        UserDbClient userDbClient = new UserDbClient();
+        userDbClient.findAll().forEach(System.out::println);
+    }
+
+    @Test
+    void test13() {
+        AuthAuthorityDbClient authAuthorityDbClient = new AuthAuthorityDbClient();
+        authAuthorityDbClient.findAll().forEach(System.out::println);
+    }
+
+    @Test
+    void test14() {
+        UserDbClient userDbClient = new UserDbClient();
+        userDbClient.findAll().forEach(System.out::println);
+    }
+
+    @Test
+    void test15() {
+        CategoryDbClient categoryDbClient = new CategoryDbClient();
+        categoryDbClient.findAll().forEach(System.out::println);
     }
 }
