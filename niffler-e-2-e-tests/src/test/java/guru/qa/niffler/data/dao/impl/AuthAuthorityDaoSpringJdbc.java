@@ -1,27 +1,26 @@
 package guru.qa.niffler.data.dao.impl;
 
+import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.dao.AuthAuthorityDao;
 import guru.qa.niffler.data.entity.auth.AuthAuthorityEntity;
+import guru.qa.niffler.data.entity.auth.AuthUserEntity;
 import guru.qa.niffler.data.mapper.AutorityEntityRowMapper;
+import guru.qa.niffler.data.tpl.DataSources;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
 public class AuthAuthorityDaoSpringJdbc implements AuthAuthorityDao {
 
-    private final DataSource dataSource;
+    private static final Config CFG = Config.getInstance();
 
-    public AuthAuthorityDaoSpringJdbc(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
 
     @Override
     public void addAuthority(AuthAuthorityEntity... authorityEntity) {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
         jdbcTemplate.batchUpdate("INSERT INTO authority (user_id, authority) VALUES (?, ?)",
                 new BatchPreparedStatementSetter() {
                     @Override
@@ -38,7 +37,17 @@ public class AuthAuthorityDaoSpringJdbc implements AuthAuthorityDao {
 
     @Override
     public List<AuthAuthorityEntity> findAll() {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
         return jdbcTemplate.query("SELECT * FROM authority", AutorityEntityRowMapper.instance);
+    }
+
+    @Override
+    public void deleteAuthority(AuthUserEntity authUserEntity) {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
+        jdbcTemplate.update(con -> {
+            PreparedStatement ps = con.prepareStatement("DELETE FROM authority WHERE user_id = ?");
+            ps.setObject(1, authUserEntity.getId());
+            return ps;
+        });
     }
 }
