@@ -39,8 +39,7 @@ public class XaTransactionTemplate {
                 throw new RuntimeException(ex);
             }
             throw new RuntimeException(e);
-        }
-        finally {
+        } finally {
             if (closeAfterAction.get()) {
                 holders.close();
             }

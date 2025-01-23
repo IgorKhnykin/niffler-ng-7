@@ -1,6 +1,9 @@
 package guru.qa.niffler.test.web;
 
-import guru.qa.niffler.model.*;
+import guru.qa.niffler.model.CategoryJson;
+import guru.qa.niffler.model.CurrencyValues;
+import guru.qa.niffler.model.SpendJson;
+import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.service.AuthUserDbClient;
 import guru.qa.niffler.service.CategoryDbClient;
 import guru.qa.niffler.service.SpendDbClient;
@@ -17,7 +20,7 @@ public class JbdcTest {
 
         CategoryJson category = categoryDbClient.createCategory(new CategoryJson(
                 null,
-                "r2121",
+                "r21221",
                 "igorKhn",
                 false));
 
@@ -46,7 +49,7 @@ public class JbdcTest {
                         new Date(),
                         new CategoryJson(
                                 null,
-                                "test-cat-name-3",
+                                "test-cat-name-4",
                                 "igorKhn",
                                 false),
                         CurrencyValues.EUR,
@@ -76,20 +79,17 @@ public class JbdcTest {
         UserDbClient userDbClient = new UserDbClient();
 
         UserJson userJson = new UserJson(null,
-                "valentin-8",
+                "valentin-27",
                 null,
                 null,
                 null,
                 CurrencyValues.EUR,
                 null,
                 null);
+
         UserJson userFromDb = userDbClient.createUserSpringJdbc(userJson);
 
-        System.out.println(userJson);
-
-        AuthUserJson authUserJson = authUserDbClient.findUserByUsername(userJson.username()).get();
-
-        System.out.println(authUserDbClient.findUserById(authUserJson.id()));
+        authUserDbClient.findUserByUsername(userJson.username()).get();
 
         userDbClient.deleteUserSpringJdbc(userFromDb);
     }

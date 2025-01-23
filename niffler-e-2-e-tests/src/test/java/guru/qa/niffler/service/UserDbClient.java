@@ -4,9 +4,9 @@ import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.dao.AuthAuthorityDao;
 import guru.qa.niffler.data.dao.AuthUserDao;
 import guru.qa.niffler.data.dao.UserdataUserDao;
-import guru.qa.niffler.data.dao.impl.AuthAuthorityDaoSpringJdbc;
-import guru.qa.niffler.data.dao.impl.AuthUserDaoSpringJdbc;
-import guru.qa.niffler.data.dao.impl.UserdataUserDaoSpringJdbc;
+import guru.qa.niffler.data.dao.impl.AuthAuthorityDaoJdbc;
+import guru.qa.niffler.data.dao.impl.AuthUserDaoJdbc;
+import guru.qa.niffler.data.dao.impl.UserdataUserDaoJdbc;
 import guru.qa.niffler.data.entity.auth.AuthAuthorityEntity;
 import guru.qa.niffler.data.entity.auth.AuthUserEntity;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
@@ -27,9 +27,9 @@ import java.util.UUID;
 
 public class UserDbClient {
 
-    private final AuthAuthorityDao authAuthorityDao = new AuthAuthorityDaoSpringJdbc();
-    private final AuthUserDao authUserDaoJdbc = new AuthUserDaoSpringJdbc();
-    private final UserdataUserDao userdataUserDao = new UserdataUserDaoSpringJdbc();
+    private final AuthAuthorityDao authAuthorityDao = new AuthAuthorityDaoJdbc();
+    private final AuthUserDao authUserDaoJdbc = new AuthUserDaoJdbc();
+    private final UserdataUserDao userdataUserDao = new UserdataUserDaoJdbc();
 
     private final JdbcTransactionTemplate jdbcTxTemplate = new JdbcTransactionTemplate(CFG.userdataJdbcUrl());
 
@@ -75,7 +75,7 @@ public class UserDbClient {
         return userdataUserDao.findAll().stream().map(UserJson::fromEntity).toList();
     }
 
-    public UserJson createUserSpringJdbc(UserJson user) { //todo c 60 минуты посмотреть как проверить
+    public UserJson createUserSpringJdbc(UserJson user) {
         return xaTransactionTemplate.execute(() -> {
             AuthUserEntity authUserEntity = new AuthUserEntity();
             authUserEntity.setUsername(user.username());
@@ -95,15 +95,15 @@ public class UserDbClient {
             }).toArray(AuthAuthorityEntity[]::new);
 
             authAuthorityDao.addAuthority(authAuthorityEntities);
+            xaTransactionTemplate.holdConnectionAfterAction();
             return UserJson.fromEntity(userdataUserDao.createUser(UserEntity.fromJson(user)));
         });
-
     }
 
     public void deleteUserSpringJdbc(UserJson userJson) {
         xaTransactionTemplate.execute(() -> {
-            userdataUserDao.delete(userdataUserDao.findByUsername(userJson.username()).get());
             AuthUserEntity authUser = authUserDaoJdbc.findUserByUsername(userJson.username()).get();
+            userdataUserDao.delete(userdataUserDao.findByUsername(userJson.username()).get());
             authAuthorityDao.deleteAuthority(authUser);
             authUserDaoJdbc.deleteUser(authUser);
 
