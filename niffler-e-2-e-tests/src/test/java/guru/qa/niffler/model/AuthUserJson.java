@@ -3,6 +3,7 @@ package guru.qa.niffler.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import guru.qa.niffler.data.entity.auth.AuthUserEntity;
 
+import java.util.List;
 import java.util.UUID;
 
 public record AuthUserJson(
@@ -19,9 +20,9 @@ public record AuthUserJson(
         @JsonProperty("accountNonLocked")
         Boolean accountNonLocked,
         @JsonProperty("credentialsNonExpired")
-        Boolean credentialsNonExpired
-//        @JsonProperty("credentialsNonExpired")
-//        List<AuthAuthorityJson> authorities
+        Boolean credentialsNonExpired,
+        @JsonProperty("authorities")
+        List<AuthAuthorityJson> authorities
 ) {
 
     public static AuthUserJson fromEntity(AuthUserEntity entity) {
@@ -32,6 +33,7 @@ public record AuthUserJson(
                 entity.getEnabled(),
                 entity.getAccountNonExpired(),
                 entity.getAccountNonLocked(),
-                entity.getCredentialsNonExpired());
+                entity.getCredentialsNonExpired(),
+                entity.getAuthorities().stream().map(AuthAuthorityJson::fromEntity).toList());
     }
 }
