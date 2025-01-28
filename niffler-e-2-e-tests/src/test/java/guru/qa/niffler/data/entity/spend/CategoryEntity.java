@@ -4,7 +4,6 @@ import guru.qa.niffler.model.CategoryJson;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.checkerframework.checker.units.qual.C;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.io.Serializable;

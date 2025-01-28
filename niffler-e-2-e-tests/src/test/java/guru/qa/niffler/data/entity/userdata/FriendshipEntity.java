@@ -1,6 +1,7 @@
 package guru.qa.niffler.data.entity.userdata;
 
 
+import guru.qa.niffler.model.FriendshipStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,9 +15,8 @@ import java.util.Objects;
 @Setter
 @Entity
 @Table(name = "friendship")
-@IdClass(FriendShipId.class)
+@IdClass(FriendshipId.class)
 public class FriendshipEntity implements Serializable {
-
   @Id
   @ManyToOne
   @JoinColumn(name = "requester_id", referencedColumnName = "id")

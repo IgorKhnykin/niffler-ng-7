@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class FriendShipId implements Serializable {
+public class FriendshipId implements Serializable {
 
   private UUID requester;
   private UUID addressee;
@@ -18,7 +18,7 @@ public class FriendShipId implements Serializable {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    FriendShipId friendsId = (FriendShipId) o;
+    FriendshipId friendsId = (FriendshipId) o;
     return Objects.equals(requester, friendsId.requester) && Objects.equals(addressee, friendsId.addressee);
   }
 

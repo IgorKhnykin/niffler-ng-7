@@ -1,11 +1,9 @@
 package guru.qa.niffler.data.entity.auth;
 
-import guru.qa.niffler.model.AuthAuthorityJson;
 import guru.qa.niffler.model.AuthUserJson;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.checkerframework.checker.units.qual.C;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.io.Serializable;
@@ -46,6 +44,18 @@ public class AuthUserEntity implements Serializable {
 
     @OneToMany(fetch = EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
     private List<AuthAuthorityEntity> authorities = new ArrayList<>();
+
+    public void addAuthorities(AuthAuthorityEntity... authorities) {
+        for (AuthAuthorityEntity authority : authorities) {
+            this.authorities.add(authority);
+            authority.setUser(this);
+        }
+    }
+
+    public void removeAuthority(AuthAuthorityEntity authority) {
+        this.authorities.remove(authority);
+        authority.setUser(null);
+    }
 
     @Override
     public final boolean equals(Object o) {

@@ -5,11 +5,15 @@ import guru.qa.niffler.data.dao.AuthAuthorityDao;
 import guru.qa.niffler.data.dao.AuthUserDao;
 import guru.qa.niffler.data.dao.UserdataUserDao;
 import guru.qa.niffler.data.dao.impl.AuthAuthorityDaoJdbc;
-import guru.qa.niffler.data.dao.impl.AuthUserDaoJdbc;
+import guru.qa.niffler.data.dao.impl.AuthUserDaoSpringJdbc;
 import guru.qa.niffler.data.dao.impl.UserdataUserDaoJdbc;
 import guru.qa.niffler.data.entity.auth.AuthAuthorityEntity;
 import guru.qa.niffler.data.entity.auth.AuthUserEntity;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
+import guru.qa.niffler.data.repository.AuthUserRepository;
+import guru.qa.niffler.data.repository.UserRepository;
+import guru.qa.niffler.data.repository.impl.AuthUserRepositorySpringJdbc;
+import guru.qa.niffler.data.repository.impl.UserRepositoryJdbc;
 import guru.qa.niffler.data.tpl.DataSources;
 import guru.qa.niffler.data.tpl.JdbcTransactionTemplate;
 import guru.qa.niffler.data.tpl.XaTransactionTemplate;
@@ -28,16 +32,20 @@ import java.util.UUID;
 public class UserDbClient {
 
     private final AuthAuthorityDao authAuthorityDao = new AuthAuthorityDaoJdbc();
-    private final AuthUserDao authUserDaoJdbc = new AuthUserDaoJdbc();
+    private final AuthUserDao authUserDaoJdbc = new AuthUserDaoSpringJdbc();
     private final UserdataUserDao userdataUserDao = new UserdataUserDaoJdbc();
 
     private final JdbcTransactionTemplate jdbcTxTemplate = new JdbcTransactionTemplate(CFG.userdataJdbcUrl());
+
+    private final AuthUserRepository authUserRepository = new AuthUserRepositorySpringJdbc();
 
     private final XaTransactionTemplate xaTransactionTemplate = new XaTransactionTemplate(CFG.authJdbcUrl(), CFG.userdataJdbcUrl());
 
     private final TransactionTemplate txTemplate = new TransactionTemplate(new JdbcTransactionManager(DataSources.dataSource(CFG.authJdbcUrl())));
 
     private static final PasswordEncoder pe = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+
+    private final UserRepository userRepository = new UserRepositoryJdbc();
 
     private static final Config CFG = Config.getInstance();
 
@@ -109,6 +117,60 @@ public class UserDbClient {
 
             return null;
         });
+    }
 
+    public UserJson createUserRepositoryJdbc(UserJson user) {
+        return xaTransactionTemplate.execute(() -> {
+            AuthUserEntity authUserEntity = new AuthUserEntity();
+            authUserEntity.setUsername(user.username());
+            authUserEntity.setPassword(pe.encode("1234"));
+            authUserEntity.setEnabled(true);
+            authUserEntity.setAccountNonExpired(true);
+            authUserEntity.setAccountNonLocked(true);
+            authUserEntity.setCredentialsNonExpired(true);
+
+            List<AuthAuthorityEntity> authAuthorityEntities = Arrays.stream(Authority.values()).map(e -> {
+                AuthAuthorityEntity authorityEntity = new AuthAuthorityEntity();
+                authorityEntity.setUser(authUserEntity);
+                authorityEntity.setAuthority(e);
+                return authorityEntity;
+            }).toList();
+
+            authUserEntity.setAuthorities(authAuthorityEntities);
+
+            AuthUserEntity userEntity =  authUserRepository.create(authUserEntity);
+
+            authUserRepository.findUserById(userEntity.getId());
+
+            authUserRepository.findUserByUsername(userEntity.getUsername());
+
+            return UserJson.fromEntity(userdataUserDao.createUser(UserEntity.fromJson(user)));
+        });
+    }
+
+    public void deleteUserRepositoryJdbc(UserJson userJson) {
+        xaTransactionTemplate.execute(() -> {
+            AuthUserEntity authUser = authUserRepository.findUserByUsername(userJson.username()).get();
+            authUserRepository.deleteUser(authUser);
+            authUserDaoJdbc.deleteUser(authUser);
+            return null;
+        });
+    }
+
+    public void sendFriendship(UserJson requester, UserJson addressee) {
+        jdbcTxTemplate.execute(() -> {
+            UserEntity requesterEntity = UserEntity.fromJson(requester);
+            UserEntity addresseeEntity = UserEntity.fromJson(addressee);
+            userRepository.updateUsers(requesterEntity, addresseeEntity);
+            return null;
+        });
+    }
+
+    public Optional<AuthUserEntity> findUserByName(String username) {
+        return authUserRepository.findUserByUsername(username);
+    }
+
+    public List<AuthUserEntity> findUAllSpring() {
+        return authUserRepository.findAll();
     }
 }

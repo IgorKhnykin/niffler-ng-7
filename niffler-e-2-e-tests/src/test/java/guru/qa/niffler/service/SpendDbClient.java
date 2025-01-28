@@ -7,6 +7,9 @@ import guru.qa.niffler.data.dao.impl.CategoryDaoSpringJdbc;
 import guru.qa.niffler.data.dao.impl.SpendDaoSpringJdbc;
 import guru.qa.niffler.data.entity.spend.CategoryEntity;
 import guru.qa.niffler.data.entity.spend.SpendEntity;
+import guru.qa.niffler.data.repository.SpendRepository;
+import guru.qa.niffler.data.repository.impl.SpendRepositoryJdbc;
+import guru.qa.niffler.data.repository.impl.SpendRepositorySpringJdbc;
 import guru.qa.niffler.data.tpl.JdbcTransactionTemplate;
 import guru.qa.niffler.model.SpendJson;
 
@@ -21,6 +24,10 @@ public class SpendDbClient {
     private final JdbcTransactionTemplate jdbcTxTemplate = new JdbcTransactionTemplate(CFG.spendJdbcUrl());
 
     private final CategoryDao categoryDao = new CategoryDaoSpringJdbc();
+
+    private final SpendRepository spendRepository = new SpendRepositoryJdbc();
+
+    private final SpendRepository spendRepositorySpringJdbc = new SpendRepositorySpringJdbc();
 
     private static final Config CFG = Config.getInstance();
 
@@ -60,5 +67,10 @@ public class SpendDbClient {
         return jdbcTxTemplate.execute(() -> spendDao.findAll().stream()
                 .map(SpendJson::fromEntity)
                 .toList());
+    }
+
+    public SpendJson createSpendRepository(SpendJson spend) {
+        return jdbcTxTemplate.execute(() ->
+                SpendJson.fromEntity(spendRepository.create(SpendEntity.fromJson(spend))));
     }
 }
