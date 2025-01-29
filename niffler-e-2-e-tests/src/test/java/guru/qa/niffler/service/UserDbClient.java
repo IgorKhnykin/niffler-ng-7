@@ -1,92 +1,114 @@
 package guru.qa.niffler.service;
 
 import guru.qa.niffler.config.Config;
-import guru.qa.niffler.data.DataBases;
-import guru.qa.niffler.data.dao.impl.AuthAuthorityDaoSpringJdbc;
-import guru.qa.niffler.data.dao.impl.AuthUserDaoSpringJdbc;
+import guru.qa.niffler.data.dao.AuthAuthorityDao;
+import guru.qa.niffler.data.dao.AuthUserDao;
+import guru.qa.niffler.data.dao.UserdataUserDao;
+import guru.qa.niffler.data.dao.impl.AuthAuthorityDaoJdbc;
+import guru.qa.niffler.data.dao.impl.AuthUserDaoJdbc;
 import guru.qa.niffler.data.dao.impl.UserdataUserDaoJdbc;
-import guru.qa.niffler.data.dao.impl.UserdataUserDaoSpringJdbc;
 import guru.qa.niffler.data.entity.auth.AuthAuthorityEntity;
 import guru.qa.niffler.data.entity.auth.AuthUserEntity;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
+import guru.qa.niffler.data.tpl.DataSources;
+import guru.qa.niffler.data.tpl.JdbcTransactionTemplate;
+import guru.qa.niffler.data.tpl.XaTransactionTemplate;
 import guru.qa.niffler.model.Authority;
 import guru.qa.niffler.model.UserJson;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static guru.qa.niffler.data.DataBases.transaction;
-
 public class UserDbClient {
 
-    private static final int TRANSACTION_READ_COMMITTED = 2;
+    private final AuthAuthorityDao authAuthorityDao = new AuthAuthorityDaoJdbc();
+    private final AuthUserDao authUserDaoJdbc = new AuthUserDaoJdbc();
+    private final UserdataUserDao userdataUserDao = new UserdataUserDaoJdbc();
+
+    private final JdbcTransactionTemplate jdbcTxTemplate = new JdbcTransactionTemplate(CFG.userdataJdbcUrl());
+
+    private final XaTransactionTemplate xaTransactionTemplate = new XaTransactionTemplate(CFG.authJdbcUrl(), CFG.userdataJdbcUrl());
+
+    private final TransactionTemplate txTemplate = new TransactionTemplate(new JdbcTransactionManager(DataSources.dataSource(CFG.authJdbcUrl())));
 
     private static final PasswordEncoder pe = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
     private static final Config CFG = Config.getInstance();
 
+
     public UserJson createUser(UserJson user) {
-        return transaction(connection -> {
-            UserEntity ue = new UserdataUserDaoJdbc(connection).createUser(UserEntity.fromJson(user));
+        return jdbcTxTemplate.execute(() -> {
+            UserEntity ue = userdataUserDao.createUser(UserEntity.fromJson(user));
             return UserJson.fromEntity(ue);
-        }, CFG.userdataJdbcUrl(), TRANSACTION_READ_COMMITTED);
+        });
     }
 
     public Optional<UserJson> findUserById(UUID id) {
-        return transaction(connection -> {
-            Optional<UserEntity> se = new UserdataUserDaoJdbc(connection).findById(id);
+        return jdbcTxTemplate.execute(() -> {
+            Optional<UserEntity> se = userdataUserDao.findById(id);
             return se.map(UserJson::fromEntity);
-        }, CFG.userdataJdbcUrl(), TRANSACTION_READ_COMMITTED);
+        });
     }
 
     public List<UserJson> findAllByUsername(String username) {
-        return transaction(connection -> {
-            return new UserdataUserDaoJdbc(connection).findByUsername(username)
-                    .stream()
-                    .map(UserJson::fromEntity)
-                    .toList();
-        }, CFG.userdataJdbcUrl(), TRANSACTION_READ_COMMITTED);
+        return jdbcTxTemplate.execute(() -> userdataUserDao.findByUsername(username)
+                .stream()
+                .map(UserJson::fromEntity)
+                .toList());
     }
 
     public void deleteUser(UserJson UserJson) {
-        transaction(connection -> {
+        jdbcTxTemplate.execute(() -> {
             UserEntity spendEntity = UserEntity.fromJson(UserJson);
-            new UserdataUserDaoJdbc(connection).delete(spendEntity);
-        }, CFG.userdataJdbcUrl(), TRANSACTION_READ_COMMITTED);
-    }
-
-    public UserJson createUserSpringJdbc(UserJson user) {
-        AuthUserEntity authUserEntity = new AuthUserEntity();
-        authUserEntity.setUsername(user.username());
-        authUserEntity.setPassword(pe.encode("1234"));
-        authUserEntity.setEnabled(true);
-        authUserEntity.setAccountNonExpired(true);
-        authUserEntity.setAccountNonLocked(true);
-        authUserEntity.setCredentialsNonExpired(true);
-
-        AuthUserEntity createdAuthUser = new AuthUserDaoSpringJdbc(DataBases.dataSource(CFG.authJdbcUrl()))
-                .create(authUserEntity);
-
-        AuthAuthorityEntity[] authAuthorityEntities = Arrays.stream(Authority.values()).map(e -> {
-            AuthAuthorityEntity authorityEntity = new AuthAuthorityEntity();
-            authorityEntity.setUser(createdAuthUser);
-            authorityEntity.setAuthority(e);
-            return authorityEntity;
-        }).toArray(AuthAuthorityEntity[]::new);
-
-        new AuthAuthorityDaoSpringJdbc(DataBases.dataSource(CFG.authJdbcUrl()))
-                .addAuthority(authAuthorityEntities);
-
-        return UserJson.fromEntity(new UserdataUserDaoSpringJdbc(DataBases.dataSource(CFG.userdataJdbcUrl()))
-                .createUser(UserEntity.fromJson(user)));
+            userdataUserDao.delete(spendEntity);
+            return null;
+        });
     }
 
     public List<UserJson> findAll() {
-        UserdataUserDaoSpringJdbc userDaoSpringJdbc = new UserdataUserDaoSpringJdbc(DataBases.dataSource(CFG.userdataJdbcUrl()));
-        return userDaoSpringJdbc.findAll().stream().map(UserJson::fromEntity).toList();
+        return userdataUserDao.findAll().stream().map(UserJson::fromEntity).toList();
+    }
+
+    public UserJson createUserSpringJdbc(UserJson user) {
+        return xaTransactionTemplate.execute(() -> {
+            AuthUserEntity authUserEntity = new AuthUserEntity();
+            authUserEntity.setUsername(user.username());
+            authUserEntity.setPassword(pe.encode("1234"));
+            authUserEntity.setEnabled(true);
+            authUserEntity.setAccountNonExpired(true);
+            authUserEntity.setAccountNonLocked(true);
+            authUserEntity.setCredentialsNonExpired(true);
+
+            AuthUserEntity createdAuthUser = authUserDaoJdbc.create(authUserEntity);
+
+            AuthAuthorityEntity[] authAuthorityEntities = Arrays.stream(Authority.values()).map(e -> {
+                AuthAuthorityEntity authorityEntity = new AuthAuthorityEntity();
+                authorityEntity.setUser(createdAuthUser);
+                authorityEntity.setAuthority(e);
+                return authorityEntity;
+            }).toArray(AuthAuthorityEntity[]::new);
+
+            authAuthorityDao.addAuthority(authAuthorityEntities);
+            xaTransactionTemplate.holdConnectionAfterAction();
+            return UserJson.fromEntity(userdataUserDao.createUser(UserEntity.fromJson(user)));
+        });
+    }
+
+    public void deleteUserSpringJdbc(UserJson userJson) {
+        xaTransactionTemplate.execute(() -> {
+            AuthUserEntity authUser = authUserDaoJdbc.findUserByUsername(userJson.username()).get();
+            userdataUserDao.delete(userdataUserDao.findByUsername(userJson.username()).get());
+            authAuthorityDao.deleteAuthority(authUser);
+            authUserDaoJdbc.deleteUser(authUser);
+
+            return null;
+        });
+
     }
 }
