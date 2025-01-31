@@ -99,4 +99,61 @@ public class JbdcTest {
         AuthUserDbClient authUserDbClient = new AuthUserDbClient();
         System.out.println(authUserDbClient.findAll());
     }
+
+    @Test
+    void createUserViaRepository() {
+        UserJson userJson = new UserJson(null,
+                "valentina-7",
+                null,
+                null,
+                null,
+                CurrencyValues.EUR,
+                null,
+                null);
+        UserDbClient userDbClient = new UserDbClient();
+        userDbClient.createUserRepositoryJdbc(userJson);
+    }
+
+    @Test
+    void spendFromRepository() {
+        SpendDbClient spendDbClient = new SpendDbClient();
+
+        SpendJson response = spendDbClient.createSpendRepository(new SpendJson(
+                null,
+                new Date(),
+                new CategoryJson(
+                        null,
+                        "test-cat-name-4",
+                        "igorKhn",
+                        false),
+                CurrencyValues.EUR,
+                22888888999.0,
+                "test desc",
+                "igorKhn"
+        ));
+    }
+
+    @Test
+    void sendFriendshipRequestTest() {
+        UserJson requester = new UserJson(null,
+                "valentin-2",
+                null,
+                null,
+                null,
+                CurrencyValues.EUR,
+                null,
+                null);
+
+        UserJson addressee = new UserJson(null,
+                "valentin-3",
+                null,
+                null,
+                null,
+                CurrencyValues.EUR,
+                null,
+                null);
+
+        UserDbClient userDbClient = new UserDbClient();
+        userDbClient.sendFriendship(requester, addressee);
+    }
 }

@@ -17,4 +17,8 @@ public interface UserdataUserDao {
     void delete(UserEntity user);
 
     List<UserEntity> findAll();
+
+    void sendFriendshipRequest(UserEntity requester, UserEntity addressee);
+
+    void createFriendship(UserEntity requester, UserEntity addressee);
 }
