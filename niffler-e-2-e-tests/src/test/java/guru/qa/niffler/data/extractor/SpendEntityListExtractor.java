@@ -21,7 +21,7 @@ public class SpendEntityListExtractor implements ResultSetExtractor<List<SpendEn
     public List<SpendEntity> extractData(ResultSet rs) throws SQLException, DataAccessException {
         Map<UUID, SpendEntity> spendMap = new ConcurrentHashMap<>();
         List<SpendEntity> spendEntityList = new ArrayList<>();
-        UUID id = null;
+        UUID id;
         while (rs.next()) {
             id = rs.getObject("id", UUID.class);
             SpendEntity se = spendMap.computeIfAbsent(id, uuid -> {

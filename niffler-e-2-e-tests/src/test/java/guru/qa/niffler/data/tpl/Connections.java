@@ -15,7 +15,7 @@ public class Connections {
     public static JdbcConnectionHolder holder(String jdbcUrl) {
         return holders.computeIfAbsent(
                 jdbcUrl,
-                key -> new JdbcConnectionHolder(DataSources.dataSource(key)));
+                key -> new JdbcConnectionHolder(DataSources.dataSource(jdbcUrl)));
     }
 
     public static JdbcConnectionHolders holders(String... jdbcUrl) {

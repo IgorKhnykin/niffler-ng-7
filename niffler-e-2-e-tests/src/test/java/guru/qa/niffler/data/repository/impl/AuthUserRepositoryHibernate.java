@@ -6,23 +6,28 @@ import guru.qa.niffler.data.repository.AuthUserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static guru.qa.niffler.data.jpa.EntityManagers.em;
 
-public class AuthUserRepositoryHebirnate implements AuthUserRepository {
+public class AuthUserRepositoryHibernate implements AuthUserRepository {
 
     private static final Config CFG = Config.getInstance();
 
     private final EntityManager entityManager = em(CFG.authJdbcUrl());
 
-
     @Override
     public AuthUserEntity create(AuthUserEntity authUser) {
         entityManager.joinTransaction();
         entityManager.persist(authUser);
+        return authUser;
+    }
+
+    @Override
+    public AuthUserEntity update(AuthUserEntity authUser) {
+        entityManager.joinTransaction();
+        entityManager.persist(entityManager.contains(authUser) ? authUser : entityManager.merge(authUser));
         return authUser;
     }
 
@@ -43,12 +48,8 @@ public class AuthUserRepositoryHebirnate implements AuthUserRepository {
     }
 
     @Override
-    public void deleteUser(AuthUserEntity authUser) {
-
-    }
-
-    @Override
-    public List<AuthUserEntity> findAll() {
-        return List.of();
+    public void remove(AuthUserEntity authUser) {
+        entityManager.joinTransaction();
+        entityManager.remove(entityManager.contains(authUser) ? authUser : entityManager.merge(authUser));
     }
 }

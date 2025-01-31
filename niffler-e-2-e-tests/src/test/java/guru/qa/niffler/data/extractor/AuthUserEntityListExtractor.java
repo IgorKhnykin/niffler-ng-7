@@ -22,7 +22,7 @@ public class AuthUserEntityListExtractor implements ResultSetExtractor<List<Auth
     @Override
     public List<AuthUserEntity> extractData(ResultSet rs) throws SQLException, DataAccessException {
         Map<UUID, AuthUserEntity> userMap = new ConcurrentHashMap<>();
-        UUID userId = null;
+        UUID userId;
         List<AuthUserEntity> authUserEntityList = new ArrayList<>();
         while (rs.next()) {
             userId = rs.getObject("id", UUID.class);

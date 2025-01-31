@@ -9,7 +9,6 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,6 +35,9 @@ public class AuthUserEntityExtractor implements ResultSetExtractor<AuthUserEntit
             authorityEntity.setUser(user);
             authorityEntity.setAuthority(Authority.valueOf(rs.getString("authority")));
             user.getAuthorities().add(authorityEntity);
+        }
+        if (userMap.isEmpty()) {
+            return null;
         }
         return userMap.get(userId);
     }

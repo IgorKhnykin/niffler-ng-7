@@ -3,7 +3,6 @@ package guru.qa.niffler.data.repository.impl;
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.data.repository.UserRepository;
-import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.FriendshipStatus;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -14,16 +13,11 @@ import java.util.UUID;
 
 import static guru.qa.niffler.data.jpa.EntityManagers.em;
 
-public class UserRepositoryHebirnate implements UserRepository {
+public class UserRepositoryHibernate implements UserRepository {
 
     private static final Config CFG = Config.getInstance();
 
     EntityManager entityManager = em(CFG.userdataJdbcUrl());
-
-    @Override
-    public void updateUsers(UserEntity requester, UserEntity addressee) {
-
-    }
 
     @Override
     public UserEntity createUser(UserEntity user) {
@@ -49,17 +43,19 @@ public class UserRepositoryHebirnate implements UserRepository {
     }
 
     @Override
-    public void delete(UserEntity user) {
-
+    public UserEntity updateUser(UserEntity user) {
+        entityManager.joinTransaction();
+        entityManager.persist(entityManager.contains(user) ? user : entityManager.merge(user));
+        return user;
     }
 
     @Override
     public List<UserEntity> findAll() {
-        return List.of();
+        return entityManager.createQuery("select u from UserEntity u", UserEntity.class).getResultList();
     }
 
     @Override
-    public void sendFriendshipRequest(UserEntity requester, UserEntity addressee) {
+    public void sendInvitation(UserEntity requester, UserEntity addressee) {
         entityManager.joinTransaction();
         requester.addFriends(FriendshipStatus.PENDING, addressee);
     }
@@ -67,8 +63,13 @@ public class UserRepositoryHebirnate implements UserRepository {
     @Override
     public void addFriend(UserEntity requester, UserEntity addressee) {
         entityManager.joinTransaction();
-        requester.addFriends(FriendshipStatus.ACCEPTED, addressee); //todo надо разобраться как работает и переопределение метода equals
+        requester.addFriends(FriendshipStatus.ACCEPTED, addressee);
         addressee.addFriends(FriendshipStatus.ACCEPTED, requester);
+    }
 
+    @Override
+    public void remove(UserEntity user) {
+        entityManager.joinTransaction();
+        entityManager.persist(entityManager.contains(user) ? user : entityManager.merge(user));
     }
 }

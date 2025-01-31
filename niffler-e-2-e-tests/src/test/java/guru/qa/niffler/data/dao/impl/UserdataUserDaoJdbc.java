@@ -49,6 +49,24 @@ public class UserdataUserDaoJdbc implements UserdataUserDao {
     }
 
     @Override
+    public UserEntity update(UserEntity user) {
+        try (PreparedStatement ps = holder(CFG.userdataJdbcUrl()).connection().prepareStatement(
+                "update \"user\" set currency = ?, firstname = ?, surname = ?, photo = ?, photo_small = ?, full_name = ? where id = ?")) {
+            ps.setString(1, user.getCurrency().name());
+            ps.setString(2, user.getFirstname());
+            ps.setString(3, user.getSurname());
+            ps.setBytes(4, user.getPhoto());
+            ps.setBytes(5, user.getPhotoSmall());
+            ps.setString(6, user.getFullname());
+            ps.setObject(7, user.getId());
+            ps.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return user;
+    }
+
+    @Override
     public Optional<UserEntity> findById(UUID id) {
         try (PreparedStatement ps = holder(CFG.userdataJdbcUrl()).connection().prepareStatement("SELECT * FROM \"user\" WHERE id = ?")) {
             ps.setObject(1, id);
@@ -158,7 +176,7 @@ public class UserdataUserDaoJdbc implements UserdataUserDao {
     @Override
     public void createFriendship(UserEntity requester, UserEntity addressee) {
         try (PreparedStatement ps = holder(CFG.userdataJdbcUrl()).connection().prepareStatement("INSERT INTO friendship (requester_id, addressee_id, status, created_date) " +
-                "VALUES (?, ?, ?, ?")) {
+                "VALUES (?, ?, ?, ?)")) {
             ps.setObject(1, requester.getId());
             ps.setObject(2, addressee.getId());
             ps.setString(3, FriendshipStatus.ACCEPTED.name());

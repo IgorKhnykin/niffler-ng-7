@@ -8,19 +8,19 @@ import java.util.UUID;
 
 public interface UserRepository {
 
-    void updateUsers(UserEntity requester, UserEntity addressee);
-
     UserEntity createUser(UserEntity user);
 
     Optional<UserEntity> findById(UUID id);
 
     Optional<UserEntity> findByUsername(String username);
 
-    void delete(UserEntity user);
+    UserEntity updateUser(UserEntity user);
 
     List<UserEntity> findAll();
 
-    void sendFriendshipRequest(UserEntity requester, UserEntity addressee);
+    void sendInvitation(UserEntity requester, UserEntity addressee);
 
     void addFriend(UserEntity requester, UserEntity addressee);
+
+    void remove(UserEntity user);
 }

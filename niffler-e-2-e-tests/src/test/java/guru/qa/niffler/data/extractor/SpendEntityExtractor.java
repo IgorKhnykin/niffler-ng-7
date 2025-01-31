@@ -35,6 +35,9 @@ public class SpendEntityExtractor implements ResultSetExtractor<SpendEntity> {
             ce.setArchived(rs.getBoolean("archived"));
             se.setCategory(ce);
         }
-    return spendMap.get(id);
+        if (spendMap.isEmpty()) {
+            return null;
+        }
+        return spendMap.get(id);
     }
 }

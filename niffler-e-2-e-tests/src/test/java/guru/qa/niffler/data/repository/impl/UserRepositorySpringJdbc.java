@@ -1,8 +1,7 @@
 package guru.qa.niffler.data.repository.impl;
 
-import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.dao.UserdataUserDao;
-import guru.qa.niffler.data.dao.impl.UserdataUserDaoJdbc;
+import guru.qa.niffler.data.dao.impl.UserdataUserDaoSpringJdbc;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.data.repository.UserRepository;
 
@@ -10,14 +9,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class UserRepositoryJdbc implements UserRepository {
+public class UserRepositorySpringJdbc implements UserRepository {
 
-    private final UserdataUserDao userdataUserDao = new UserdataUserDaoJdbc();
-
-    private static final Config CFG = Config.getInstance();
+    private final UserdataUserDao userdataUserDao = new UserdataUserDaoSpringJdbc();
 
     @Override
-    public UserEntity createUser(UserEntity user) {  //+
+    public UserEntity createUser(UserEntity user) {
         return userdataUserDao.createUser(user);
     }
 
@@ -27,18 +24,13 @@ public class UserRepositoryJdbc implements UserRepository {
     }
 
     @Override
-    public Optional<UserEntity> findByUsername(String username) {  //+
+    public Optional<UserEntity> findByUsername(String username) {
         return userdataUserDao.findByUsername(username);
     }
 
     @Override
-    public UserEntity updateUser(UserEntity user) { //+
+    public UserEntity updateUser(UserEntity user) {
         return userdataUserDao.update(user);
-    }
-
-    @Override
-    public void remove(UserEntity user) {  //+
-        userdataUserDao.delete(user);
     }
 
     @Override
@@ -47,18 +39,22 @@ public class UserRepositoryJdbc implements UserRepository {
     }
 
     @Override
-    public void sendInvitation(UserEntity requester, UserEntity addressee) { //+
+    public void sendInvitation(UserEntity requester, UserEntity addressee) {
         UserEntity requesterEntity = userdataUserDao.findByUsername(requester.getUsername()).get();
         UserEntity addresseeEntity = userdataUserDao.findByUsername(addressee.getUsername()).get();
         userdataUserDao.sendFriendshipRequest(requesterEntity, addresseeEntity);
-
     }
 
     @Override
-    public void addFriend(UserEntity requester, UserEntity addressee) { //+
+    public void addFriend(UserEntity requester, UserEntity addressee) {
         UserEntity requesterEntity = userdataUserDao.findByUsername(requester.getUsername()).get();
         UserEntity addresseeEntity = userdataUserDao.findByUsername(addressee.getUsername()).get();
         userdataUserDao.createFriendship(requesterEntity, addresseeEntity);
-        userdataUserDao.createFriendship(addresseeEntity, requesterEntity);
+        userdataUserDao.createFriendship(addressee, requesterEntity);
+    }
+
+    @Override
+    public void remove(UserEntity user) {
+        userdataUserDao.delete(user);
     }
 }

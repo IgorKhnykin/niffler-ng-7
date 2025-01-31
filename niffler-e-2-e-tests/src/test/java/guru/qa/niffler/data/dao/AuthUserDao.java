@@ -10,6 +10,8 @@ public interface AuthUserDao {
 
     AuthUserEntity create(AuthUserEntity authUser);
 
+    AuthUserEntity update(AuthUserEntity authUser);
+
     Optional<AuthUserEntity> findUserById(UUID id);
 
     Optional<AuthUserEntity> findUserByUsername(String username);

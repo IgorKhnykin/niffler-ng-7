@@ -1,16 +1,19 @@
 package guru.qa.niffler.data.repository.impl;
 
 import guru.qa.niffler.config.Config;
+import guru.qa.niffler.data.dao.CategoryDao;
+import guru.qa.niffler.data.dao.SpendDao;
+import guru.qa.niffler.data.dao.impl.CategoryDaoJdbc;
+import guru.qa.niffler.data.dao.impl.SpendDaoJdbc;
 import guru.qa.niffler.data.entity.spend.CategoryEntity;
 import guru.qa.niffler.data.entity.spend.SpendEntity;
+import guru.qa.niffler.data.extractor.SpendEntityExtractor;
+import guru.qa.niffler.data.extractor.SpendEntityListExtractor;
 import guru.qa.niffler.data.repository.SpendRepository;
-import guru.qa.niffler.model.CurrencyValues;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -21,59 +24,43 @@ public class SpendRepositoryJdbc implements SpendRepository {
 
     private static final Config CFG = Config.getInstance();
 
+    SpendDao spendDao = new SpendDaoJdbc();
+
+    CategoryDao categoryDao = new CategoryDaoJdbc();
+
     @Override
-    public SpendEntity create(SpendEntity spend) {
-        try (PreparedStatement CreateSpendPs = holder(CFG.spendJdbcUrl()).connection().prepareStatement(
-                "INSERT INTO spend (username, spend_date, currency, amount, description, category_id)" +
-                        "VALUES (?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-
-             PreparedStatement findCategoryPs = holder(CFG.spendJdbcUrl()).connection().prepareStatement(
-                     "SELECT * FROM category where name = ?");
-
-             PreparedStatement CreateCategoryPs = holder(CFG.spendJdbcUrl()).connection().prepareStatement(
-                     "INSERT INTO category (name, username, archived) VALUES(?, ?, ?)"
-        )) {
-
-            findCategoryPs.setObject(1, spend.getCategory().getName());
-            findCategoryPs.execute();
-            UUID categoryId = null;
-            try(ResultSet rsFindCategory = findCategoryPs.getResultSet()) {
-                if (rsFindCategory.next()) {
-                    categoryId = rsFindCategory.getObject(1, UUID.class);
-                }
-                else {
-                    CreateCategoryPs.setString(1, spend.getCategory().getName());
-                    CreateCategoryPs.setString(2, spend.getCategory().getUsername());
-                    CreateCategoryPs.setBoolean(3, spend.getCategory().isArchived());
-                    CreateCategoryPs.executeUpdate();
-                    ResultSet rs = CreateCategoryPs.getResultSet();
-                    if (rs.next()) {
-                        categoryId = rs.getObject(1, UUID.class);
-                    }
-                }
-            }
-
-            CreateSpendPs.setString(1, spend.getUsername());
-            CreateSpendPs.setDate(2, new java.sql.Date(spend.getSpendDate().getTime()));
-            CreateSpendPs.setString(3, spend.getCurrency().name());
-            CreateSpendPs.setDouble(4, spend.getAmount());
-            CreateSpendPs.setString(5, spend.getDescription());
-            CreateSpendPs.setObject(6, categoryId);
-            CreateSpendPs.executeUpdate();
-
-            final UUID generatedKey;
-            try (ResultSet rs = CreateSpendPs.getGeneratedKeys()) {
-                if (rs.next()) {
-                    generatedKey = rs.getObject(1, UUID.class);
-                } else {
-                    throw new SQLException("Can`t find id in ResultSet");
-                }
-                spend.setId(generatedKey);
-                return spend;
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+    public SpendEntity createSpend(SpendEntity spend) { //+
+        Optional<CategoryEntity> category = categoryDao.findCategoryByUsernameAndCategoryName(spend.getUsername(), spend.getCategory().getName());
+        if (category.isPresent()) {
+            spend.setCategory(category.get());
+            return spendDao.create(spend);
         }
+        else {
+            categoryDao.create(spend.getCategory());
+            return spendDao.create(spend);
+        }
+    }
+
+    @Override
+    public SpendEntity update(SpendEntity spend) {
+        spendDao.update(spend);
+        categoryDao.update(spend.getCategory());
+        return spend;
+    }
+
+    @Override
+    public CategoryEntity createCategory(CategoryEntity category) { //+
+        return categoryDao.create(category);
+    }
+
+    @Override
+    public Optional<CategoryEntity> findCategoryById(UUID id) { //+
+        return categoryDao.findCategoryById(id);
+    }
+
+    @Override
+    public Optional<CategoryEntity> findCategoryByUsernameAndCategoryName(String username, String categoryName) { //+
+        return categoryDao.findCategoryByUsernameAndCategoryName(username, categoryName);
     }
 
     @Override
@@ -84,22 +71,7 @@ public class SpendRepositoryJdbc implements SpendRepository {
             ps.execute();
 
             try (ResultSet rs = ps.getResultSet()) {
-                if (rs.next()) {
-                    SpendEntity se = new SpendEntity();
-                    se.setId(rs.getObject("id", UUID.class));
-                    se.setUsername(rs.getString("username"));
-                    se.setSpendDate(rs.getDate("spend_date"));
-                    se.setCurrency(CurrencyValues.valueOf(rs.getString("currency")));
-                    se.setAmount(rs.getDouble("amount"));
-                    se.setDescription(rs.getString("description"));
-                    CategoryEntity ce = new CategoryEntity();
-                    ce.setName(rs.getString("name"));
-                    ce.setId(rs.getObject("id", UUID.class));
-                    se.setCategory(ce);
-                    return Optional.of(se);
-                } else {
-                    return Optional.empty();
-                }
+                return Optional.ofNullable(SpendEntityExtractor.instance.extractData(rs));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -107,69 +79,42 @@ public class SpendRepositoryJdbc implements SpendRepository {
     }
 
     @Override
-    public List<SpendEntity> findAllByUsername(String username) {
+    public List<SpendEntity> findByUsernameAndSpendDescription(String username, String spendDescription) { //+
         try (PreparedStatement ps = holder(CFG.spendJdbcUrl()).connection().prepareStatement(
-                "SELECT * FROM spend s join category c on s.category_id = c.id  WHERE s.username = ?")) {
-            ps.setObject(1, username);
+                "SELECT * FROM spend s join category c on s.category_id = c.id where s.username = ? and description = ?")) {
+            ps.setString(1, username);
+            ps.setString(2, spendDescription);
             ps.execute();
-            List<SpendEntity> spendEntities = new ArrayList<>();
+
             try (ResultSet rs = ps.getResultSet()) {
-                while (rs.next()) {
-                    SpendEntity se = new SpendEntity();
-                    se.setId(rs.getObject("id", UUID.class));
-                    se.setUsername(rs.getString("username"));
-                    se.setSpendDate(rs.getDate("spend_date"));
-                    se.setCurrency(CurrencyValues.valueOf(rs.getString("currency")));
-                    se.setAmount(rs.getDouble("amount"));
-                    se.setDescription(rs.getString("description"));
-                    CategoryEntity ce = new CategoryEntity();
-                    ce.setName(rs.getString("name"));
-                    ce.setId(rs.getObject("category_id", UUID.class));
-                    se.setCategory(ce);
-                    spendEntities.add(se);
-                }
+                return SpendEntityListExtractor.instance.extractData(rs);
             }
-            return spendEntities;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public void deleteSpend(SpendEntity spend) {
-        try (PreparedStatement ps = holder(CFG.spendJdbcUrl()).connection().prepareStatement("DELETE FROM spend WHERE id = ?")) {
-            ps.setObject(1, spend.getId());
-            ps.execute();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+    public void removeSpend(SpendEntity spend) { //+
+        spendDao.deleteSpend(spend);
     }
 
     @Override
-    public List<SpendEntity> findAll() {
-        try (PreparedStatement ps = holder(CFG.spendJdbcUrl()).connection().prepareStatement("SELECT * FROM spend s join category c on s.category_id = c.id  ")) {
+    public void removeCategory(CategoryEntity category) { //+
+        List<SpendEntity> spendEntityList;
+        try (PreparedStatement ps = holder(CFG.spendJdbcUrl()).connection().prepareStatement(
+                "SELECT * FROM spend s join category c on s.category_id = c.id where c.name = ?")) {
+            ps.setString(1, category.getName());
             ps.execute();
 
-            List<SpendEntity> spendEntities = new ArrayList<>();
             try (ResultSet rs = ps.getResultSet()) {
-                while (rs.next()) {
-                    SpendEntity se = new SpendEntity();
-                    se.setId(rs.getObject("id", UUID.class));
-                    se.setUsername(rs.getString("username"));
-                    se.setSpendDate(rs.getDate("spend_date"));
-                    se.setCurrency(CurrencyValues.valueOf(rs.getString("currency")));
-                    se.setAmount(rs.getDouble("amount"));
-                    se.setDescription(rs.getString("description"));
-                    CategoryEntity ce = new CategoryEntity();
-                    ce.setName(rs.getString("name"));
-                    ce.setId(rs.getObject("category_id", UUID.class));
-                    se.setCategory(ce);
-                    spendEntities.add(se);
-                }
+                spendEntityList = SpendEntityListExtractor.instance.extractData(rs);
             }
-            return spendEntities;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+        spendEntityList.forEach(spendDao::deleteSpend);
+        categoryDao.deleteCategory(category);
     }
 }

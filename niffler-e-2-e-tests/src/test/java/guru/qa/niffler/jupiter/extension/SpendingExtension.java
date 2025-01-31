@@ -6,7 +6,6 @@ import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.SpendJson;
-import guru.qa.niffler.service.CategoryDbClient;
 import guru.qa.niffler.service.SpendDbClient;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.jupiter.api.extension.*;
@@ -23,7 +22,7 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
 
     private final SpendDbClient spendDbClient = new SpendDbClient();
 
-    private final CategoryDbClient categoryDbClient = new CategoryDbClient();
+
 
     @Override
     public void beforeEach(ExtensionContext context) {
@@ -31,8 +30,8 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
                 .filter(anno -> ArrayUtils.isNotEmpty(anno.spending()))
                 .ifPresent(userAnno -> {
                     Spending anno = userAnno.spending()[0];
-                    Optional<CategoryJson> categoryJson = categoryDbClient.findCategoryByUsernameAndCategoryName(userAnno.username(), anno.category());
-
+//                    Optional<CategoryJson> categoryJson = spendDbClient.findCategoryByUsernameAndCategoryName(userAnno.username(), anno.category());
+                    Optional<CategoryJson> categoryJson = Optional.empty();
                     CategoryJson cj = categoryJson.orElseGet(() -> new CategoryJson(null, anno.category(), userAnno.username(), false));
 
                     SpendJson spend = new SpendJson(
