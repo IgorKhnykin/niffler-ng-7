@@ -102,16 +102,8 @@ public class JbdcTest {
 
     @Test
     void createUserViaRepository() {
-        UserJson userJson = new UserJson(null,
-                "valentina-7",
-                null,
-                null,
-                null,
-                CurrencyValues.EUR,
-                null,
-                null);
         UserDbClient userDbClient = new UserDbClient();
-        userDbClient.createUserRepositoryJdbc(userJson);
+        userDbClient.createUserRepositoryJdbc("valentina-7", "12345");
     }
 
     @Test
@@ -154,6 +146,5 @@ public class JbdcTest {
                 null);
 
         UserDbClient userDbClient = new UserDbClient();
-        userDbClient.sendFriendship(requester, addressee);
     }
 }
