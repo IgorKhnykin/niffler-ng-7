@@ -21,8 +21,8 @@ public class CategoryDaoJdbc implements CategoryDao {
 
     @Override
     public CategoryEntity create(CategoryEntity category) {
-        try (PreparedStatement ps = holder(CFG.spendJdbcUrl()).connection().prepareStatement("INSERT INTO category (name, username, archived)" +
-                        " VALUES(?, ?, ?)",
+        try (PreparedStatement ps = holder(CFG.spendJdbcUrl()).connection().prepareStatement(
+                "INSERT INTO category (name, username, archived) VALUES(?, ?, ?)",
                 Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, category.getName());
             ps.setString(2, category.getUsername());
@@ -39,6 +39,22 @@ public class CategoryDaoJdbc implements CategoryDao {
                 }
             }
             category.setId(generatedKey);
+            return category;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public CategoryEntity update(CategoryEntity category) {
+        try (PreparedStatement ps = holder(CFG.spendJdbcUrl()).connection().prepareStatement(
+                "update category set name = ?, username = ?, archived = ? where id = ?")) {
+            ps.setString(1, category.getName());
+            ps.setString(2, category.getUsername());
+            ps.setBoolean(3, category.isArchived());
+            ps.setObject(4, category.getId());
+
+            ps.executeUpdate();
             return category;
         } catch (SQLException e) {
             throw new RuntimeException(e);

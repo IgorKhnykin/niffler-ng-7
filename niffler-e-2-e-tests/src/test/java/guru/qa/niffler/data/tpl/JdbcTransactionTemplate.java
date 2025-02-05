@@ -34,17 +34,16 @@ public class JdbcTransactionTemplate {
             if (connection != null)
                 try {
                     connection.rollback();
-                    connection.setAutoCommit(false);
+                    connection.setAutoCommit(true);
                 } catch (SQLException ex) {
                     throw new RuntimeException(ex);
                 }
-                finally {
-                    if (closeAfterAction.get()) {
-                        holder.close();
-                    }
-                }
-
             throw new RuntimeException(e);
+        }
+        finally {
+            if (closeAfterAction.get()) {
+                holder.close();
+            }
         }
     }
 

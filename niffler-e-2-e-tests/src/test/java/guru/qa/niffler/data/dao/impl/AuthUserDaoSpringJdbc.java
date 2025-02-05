@@ -8,6 +8,8 @@ import guru.qa.niffler.data.tpl.DataSources;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
@@ -19,6 +21,9 @@ public class AuthUserDaoSpringJdbc implements AuthUserDao {
 
     private static final Config CFG = Config.getInstance();
 
+    private static final PasswordEncoder pe = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+
+
     @Override
     public AuthUserEntity create(AuthUserEntity authUser) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
@@ -27,17 +32,35 @@ public class AuthUserDaoSpringJdbc implements AuthUserDao {
                     PreparedStatement ps = con.prepareStatement("INSERT INTO \"user\" (username, password, enabled, account_non_expired, account_non_locked, credentials_non_expired)" +
                                     "VALUES (?, ?, ?, ?, ?, ?)",
                             Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, authUser.getUsername());
-            ps.setString(2, authUser.getPassword());
-            ps.setBoolean(3, authUser.getEnabled());
-            ps.setBoolean(4, authUser.getAccountNonExpired());
-            ps.setBoolean(5, authUser.getAccountNonLocked());
-            ps.setBoolean(6, authUser.getCredentialsNonExpired());
+                    ps.setString(1, authUser.getUsername());
+                    ps.setString(2, pe.encode(authUser.getPassword()));
+                    ps.setBoolean(3, authUser.getEnabled());
+                    ps.setBoolean(4, authUser.getAccountNonExpired());
+                    ps.setBoolean(5, authUser.getAccountNonLocked());
+                    ps.setBoolean(6, authUser.getCredentialsNonExpired());
                     return ps;
                 }, keyHolder
         );
         final UUID generatedId = (UUID) keyHolder.getKeys().get("id");
         authUser.setId(generatedId);
+        return authUser;
+    }
+
+    @Override
+    public AuthUserEntity update(AuthUserEntity authUser) {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
+        jdbcTemplate.update(con -> {
+            PreparedStatement ps = con.prepareStatement(
+                    "update \"user\" set username = ?, password = ?, enabled = ?, account_non_expired = ?, account_non_locked = ?, credentials_non_expired = ? where id = ?");
+                ps.setString(1, authUser.getUsername());
+                ps.setString(2, pe.encode(authUser.getPassword()));
+                ps.setBoolean(3, authUser.getEnabled());
+                ps.setBoolean(4, authUser.getAccountNonExpired());
+                ps.setBoolean(5, authUser.getAccountNonLocked());
+                ps.setBoolean(6, authUser.getCredentialsNonExpired());
+                ps.setObject(7, authUser.getId());
+            return ps;
+        });
         return authUser;
     }
 

@@ -4,7 +4,7 @@ import guru.qa.niffler.api.SpendApiClient;
 import guru.qa.niffler.jupiter.annotation.Category;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.CategoryJson;
-import guru.qa.niffler.service.CategoryDbClient;
+import guru.qa.niffler.service.SpendDbClient;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
@@ -13,7 +13,7 @@ import static guru.qa.niffler.utils.RandomDataUtils.randomCategoryName;
 
 public class CategoryExtension implements BeforeEachCallback, ParameterResolver, AfterTestExecutionCallback {
 
-    private final CategoryDbClient dbClient = new CategoryDbClient();
+    private final SpendDbClient dbClient = new SpendDbClient();
 
     private final SpendApiClient client = new SpendApiClient();
 

@@ -63,7 +63,8 @@ public class AuthAuthorityDaoJdbc implements AuthAuthorityDao {
     public void deleteAuthority(AuthUserEntity authUserEntity) {
         try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
                 "DELETE FROM authority WHERE user_id = ?")){
-            ps.setObject(1, authUserEntity.getUsername());
+            ps.setObject(1, authUserEntity.getId());
+            ps.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
