@@ -9,8 +9,6 @@ import guru.qa.niffler.data.entity.auth.AuthAuthorityEntity;
 import guru.qa.niffler.data.entity.auth.AuthUserEntity;
 import guru.qa.niffler.data.extractor.AuthUserEntityExtractor;
 import guru.qa.niffler.data.repository.AuthUserRepository;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,8 +19,6 @@ import java.util.UUID;
 import static guru.qa.niffler.data.tpl.Connections.holder;
 
 public class AuthUserRepositoryJdbc implements AuthUserRepository {
-
-    private static final PasswordEncoder pe = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
     private static final Config CFG = Config.getInstance();
 

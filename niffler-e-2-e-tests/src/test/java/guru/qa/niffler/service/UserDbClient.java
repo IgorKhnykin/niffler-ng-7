@@ -151,7 +151,7 @@ public class UserDbClient implements UserClient{
     private AuthUserEntity authUserEntity(String username, String password) {
         AuthUserEntity authUserEntity = new AuthUserEntity();
         authUserEntity.setUsername(username);
-        authUserEntity.setPassword(password);
+        authUserEntity.setPassword(pe.encode(password));
         authUserEntity.setEnabled(true);
         authUserEntity.setAccountNonExpired(true);
         authUserEntity.setAccountNonLocked(true);
