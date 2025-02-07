@@ -3,6 +3,8 @@ package guru.qa.niffler.page;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 
+import java.util.List;
+
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
@@ -22,9 +24,17 @@ public class FriendsPage {
 
     private final ElementsCollection requestsRows = requestsTable.$$("tr");
 
-    public FriendsPage checkFriendExist(String friendName) {
-        friendsRows.findBy(text(friendName))
-                .shouldHave(text("Unfriend"));
+    private final SelenideElement searchInput = $("input[placeholder='Search']");
+
+    public FriendsPage checkFriendExist(List<String> friendsName) {
+        friendsName.forEach(friendName -> friendsRows.findBy(text(friendName))
+                .shouldHave(text("Unfriend")));
+        return this;
+    }
+
+    public FriendsPage searchFriendInAFriendsList(String username) {
+        searchInput.clear();
+        searchInput.setValue(username).pressEnter();
         return this;
     }
 
@@ -34,9 +44,11 @@ public class FriendsPage {
         return this;
     }
 
-    public FriendsPage checkIncomeRequestExist(String whoRequestName) {
-        requestsRows.findBy(text(whoRequestName))
-                .shouldHave(text("Accept"));
+    public FriendsPage checkIncomeRequestExist(List<String> requestersNames) {
+        requestersNames.forEach(requesterName -> {
+            searchFriendInAFriendsList(requesterName);
+            requestsRows.findBy(text(requesterName)).shouldHave(text("waiting"));
+        });
         return this;
     }
 

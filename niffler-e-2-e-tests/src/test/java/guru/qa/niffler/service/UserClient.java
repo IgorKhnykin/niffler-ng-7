@@ -12,9 +12,11 @@ public interface UserClient {
 
     void deleteUser(String username);
 
-    void sendInvitation(UserJson targetUser, int count);
+    List<String> sendInvitation(UserJson targetUser, int count);
 
-    void addFriend(UserJson targetUser, int count);
+    List<String> getInvitation(UserJson targetUser, int count);
+
+    List<String> addFriend(UserJson targetUser, int count);
 
     UserJson updateUser(UserJson user);
 

@@ -47,11 +47,10 @@ public class SpendApiClient {
         return response.body();
     }
 
-    public SpendJson getSpend(List<String> ids) {
+    public SpendJson getSpend(String id, String username) {
         final Response<SpendJson> response;
         try {
-            response = spendApi.getSpend(ids)
-                    .execute();
+            response = spendApi.getSpend(id, username).execute();
         } catch (IOException e) {
             throw new AssertionError(e);
         }
@@ -59,10 +58,10 @@ public class SpendApiClient {
         return response.body();
     }
 
-    public List<SpendJson> getSpends() {
+    public List<SpendJson> getSpends(String username) {
         final Response<List<SpendJson>> response;
         try {
-            response = spendApi.getSpends()
+            response = spendApi.getSpends(username)
                     .execute();
         } catch (IOException e) {
             throw new AssertionError(e);
@@ -71,16 +70,15 @@ public class SpendApiClient {
         return response.body();
     }
 
-    public Void removeSpend(List<String> spendIds) {
+    public void deleteSpends(String username, List<String> spendIds) {
         final Response<Void> response;
         try {
-            response = spendApi.removeSpend(spendIds)
+            response = spendApi.deleteSpends(username, spendIds)
                     .execute();
         } catch (IOException e) {
             throw new AssertionError(e);
         }
-        assertEquals(200, response.code(), "Не удалось удалить трату");
-        return response.body();
+        assertEquals(202, response.code(), "Не удалось удалить трату");
     }
 
     public CategoryJson createCategory(CategoryJson category) {
@@ -107,10 +105,10 @@ public class SpendApiClient {
         return response.body();
     }
 
-    public List<CategoryJson> getCategories() {
+    public List<CategoryJson> getCategories(String username, boolean excludeArchived) {
         final Response<List<CategoryJson>> response;
         try {
-            response = spendApi.getCategories()
+            response = spendApi.getCategories(username, excludeArchived)
                     .execute();
         } catch (IOException e) {
             throw new AssertionError(e);

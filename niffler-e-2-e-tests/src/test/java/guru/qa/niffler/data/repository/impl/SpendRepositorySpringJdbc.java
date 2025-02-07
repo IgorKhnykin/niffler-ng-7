@@ -39,10 +39,15 @@ public class SpendRepositorySpringJdbc implements SpendRepository {
     }
 
     @Override
-    public SpendEntity update(SpendEntity spend) {
+    public SpendEntity updateSpend(SpendEntity spend) {
         spendDao.update(spend);
         categoryDao.update(spend.getCategory());
         return spend;
+    }
+
+    @Override
+    public CategoryEntity updateCategory(CategoryEntity category) {
+        return categoryDao.update(category);
     }
 
     @Override

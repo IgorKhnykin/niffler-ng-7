@@ -11,7 +11,9 @@ public interface SpendRepository {
 
     SpendEntity createSpend(SpendEntity spend);
 
-    SpendEntity update(SpendEntity spend);
+    SpendEntity updateSpend(SpendEntity spend);
+
+    CategoryEntity updateCategory(CategoryEntity category);
 
     CategoryEntity createCategory(CategoryEntity category);
 

@@ -25,12 +25,15 @@ public class MainPage {
 
   private final SelenideElement dropdownMenu = $("ul[role='menu']");
 
+  private final SelenideElement searchInput = $("input[placeholder='Search']");
+
   public EditSpendingPage editSpending(String spendingDescription) {
     tableRows.find(text(spendingDescription)).$$("td").get(5).click();
     return new EditSpendingPage();
   }
 
   public void checkThatTableContainsSpending(String spendingDescription) {
+    searchSpendInSpendsList(spendingDescription);
     tableRows.find(text(spendingDescription)).should(visible);
   }
 
@@ -56,5 +59,11 @@ public class MainPage {
     profileIcon.shouldBe(visible).click();
     dropdownMenu.$("a[href='/people/all']").click();
     return new AllPeoplePage();
+  }
+
+  public MainPage searchSpendInSpendsList(String spendName) {
+    searchInput.clear();
+    searchInput.setValue(spendName).pressEnter();
+    return this;
   }
 }

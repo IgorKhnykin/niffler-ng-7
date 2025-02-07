@@ -29,7 +29,7 @@ public class UserExtension implements BeforeEachCallback, ParameterResolver {
                         UserJson userJson = userClient.createUser(username, defaultPassword);
                         context.getStore(NAMESPACE)
                                 .put(context.getUniqueId(), userJson.addTestData(
-                                        new TestData(defaultPassword, new ArrayList<>(), new ArrayList<>())));
+                                        new TestData(defaultPassword, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>())));
                     }
         });
     }
