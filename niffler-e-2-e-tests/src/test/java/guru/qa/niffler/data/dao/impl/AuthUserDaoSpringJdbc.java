@@ -5,6 +5,7 @@ import guru.qa.niffler.data.dao.AuthUserDao;
 import guru.qa.niffler.data.entity.auth.AuthUserEntity;
 import guru.qa.niffler.data.mapper.AuthUserEntityRowMapper;
 import guru.qa.niffler.data.tpl.DataSources;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -47,13 +48,13 @@ public class AuthUserDaoSpringJdbc implements AuthUserDao {
         jdbcTemplate.update(con -> {
             PreparedStatement ps = con.prepareStatement(
                     "update \"user\" set username = ?, password = ?, enabled = ?, account_non_expired = ?, account_non_locked = ?, credentials_non_expired = ? where id = ?");
-                ps.setString(1, authUser.getUsername());
-                ps.setString(2, authUser.getPassword());
-                ps.setBoolean(3, authUser.getEnabled());
-                ps.setBoolean(4, authUser.getAccountNonExpired());
-                ps.setBoolean(5, authUser.getAccountNonLocked());
-                ps.setBoolean(6, authUser.getCredentialsNonExpired());
-                ps.setObject(7, authUser.getId());
+            ps.setString(1, authUser.getUsername());
+            ps.setString(2, authUser.getPassword());
+            ps.setBoolean(3, authUser.getEnabled());
+            ps.setBoolean(4, authUser.getAccountNonExpired());
+            ps.setBoolean(5, authUser.getAccountNonLocked());
+            ps.setBoolean(6, authUser.getCredentialsNonExpired());
+            ps.setObject(7, authUser.getId());
             return ps;
         });
         return authUser;
@@ -62,19 +63,25 @@ public class AuthUserDaoSpringJdbc implements AuthUserDao {
     @Override
     public Optional<AuthUserEntity> findUserById(UUID id) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
-        AuthUserEntity authUser = jdbcTemplate.queryForObject("SELECT * FROM \"user\" WHERE id = ?",
-                AuthUserEntityRowMapper.instance,
-                id);
-        return Optional.ofNullable(authUser);
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject("SELECT * FROM \"user\" WHERE id = ?",
+                    AuthUserEntityRowMapper.instance,
+                    id));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     @Override
     public Optional<AuthUserEntity> findUserByUsername(String username) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
-        AuthUserEntity authUser = jdbcTemplate.queryForObject("SELECT * FROM \"user\" WHERE username = ?",
-                AuthUserEntityRowMapper.instance,
-                username);
-        return Optional.ofNullable(authUser);
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject("SELECT * FROM \"user\" WHERE username = ?",
+                    AuthUserEntityRowMapper.instance,
+                    username));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     @Override

@@ -21,8 +21,8 @@ public record FriendshipJson(
                         fsEntity.getAddressee().getFullname(),
                         fsEntity.getAddressee().getCurrency(),
                         fsEntity.getAddressee().getPhoto() != null && fsEntity.getAddressee().getPhoto().length > 0 ? new String(fsEntity.getAddressee().getPhoto(), StandardCharsets.UTF_8) : null,
-                        fsEntity.getAddressee().getPhotoSmall() != null && fsEntity.getAddressee().getPhotoSmall().length > 0 ? new String(fsEntity.getAddressee().getPhotoSmall(), StandardCharsets.UTF_8) : null
-                ),
+                        fsEntity.getAddressee().getPhotoSmall() != null && fsEntity.getAddressee().getPhotoSmall().length > 0 ? new String(fsEntity.getAddressee().getPhotoSmall(), StandardCharsets.UTF_8) : null,
+                        null),
                 new UserJson(
                         fsEntity.getRequester().getId(),
                         fsEntity.getRequester().getUsername(),
@@ -31,7 +31,8 @@ public record FriendshipJson(
                         fsEntity.getRequester().getFullname(),
                         fsEntity.getRequester().getCurrency(),
                         fsEntity.getRequester().getPhoto() != null && fsEntity.getRequester().getPhoto().length > 0 ? new String(fsEntity.getRequester().getPhoto(), StandardCharsets.UTF_8) : null,
-                        fsEntity.getRequester().getPhotoSmall() != null && fsEntity.getRequester().getPhotoSmall().length > 0 ? new String(fsEntity.getRequester().getPhotoSmall(), StandardCharsets.UTF_8) : null
+                        fsEntity.getRequester().getPhotoSmall() != null && fsEntity.getRequester().getPhotoSmall().length > 0 ? new String(fsEntity.getRequester().getPhotoSmall(), StandardCharsets.UTF_8) : null,
+                        null
                 ),
                 fsEntity.getCreatedDate(),
                 fsEntity.getStatus()
