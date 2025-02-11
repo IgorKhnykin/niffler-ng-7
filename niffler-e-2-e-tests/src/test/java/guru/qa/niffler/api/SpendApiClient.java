@@ -7,11 +7,16 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@ParametersAreNonnullByDefault
 public class SpendApiClient {
 
     private static final Config CFG = Config.getInstance();
@@ -23,7 +28,7 @@ public class SpendApiClient {
 
     private final SpendApi spendApi = retrofit.create(SpendApi.class);
 
-    public SpendJson createSpend(SpendJson spend) {
+    public @Nullable SpendJson createSpend(SpendJson spend) {
         final Response<SpendJson> response;
         try {
             response = spendApi.addSpend(spend)
@@ -35,7 +40,7 @@ public class SpendApiClient {
         return response.body();
     }
 
-    public SpendJson editSpend(SpendJson spend) {
+    public @Nullable SpendJson editSpend(SpendJson spend) {
         final Response<SpendJson> response;
         try {
             response = spendApi.editSpend(spend)
@@ -43,11 +48,11 @@ public class SpendApiClient {
         } catch (IOException e) {
             throw new AssertionError(e);
         }
-        assertEquals(response.isSuccessful(), "Не удалось изменить трату");
+        assertEquals(200, response.code(), "Не удалось изменить трату");
         return response.body();
     }
 
-    public SpendJson getSpend(String id, String username) {
+    public @Nullable SpendJson getSpend(String id, String username) {
         final Response<SpendJson> response;
         try {
             response = spendApi.getSpend(id, username).execute();
@@ -58,7 +63,7 @@ public class SpendApiClient {
         return response.body();
     }
 
-    public List<SpendJson> getSpends(String username) {
+    public @Nonnull List<SpendJson> getSpends(String username) {
         final Response<List<SpendJson>> response;
         try {
             response = spendApi.getSpends(username)
@@ -67,7 +72,7 @@ public class SpendApiClient {
             throw new AssertionError(e);
         }
         assertEquals(200, response.code(), "Не удалось получить траты");
-        return response.body();
+        return response.body() == null ? Collections.emptyList() : response.body();
     }
 
     public void deleteSpends(String username, List<String> spendIds) {
@@ -81,7 +86,7 @@ public class SpendApiClient {
         assertEquals(202, response.code(), "Не удалось удалить трату");
     }
 
-    public CategoryJson createCategory(CategoryJson category) {
+    public @Nullable CategoryJson createCategory(CategoryJson category) {
         final Response<CategoryJson> response;
         try {
             response = spendApi.createCategory(category)
@@ -93,7 +98,7 @@ public class SpendApiClient {
         return response.body();
     }
 
-    public CategoryJson updateCategory(CategoryJson category) {
+    public @Nullable CategoryJson updateCategory(CategoryJson category) {
         final Response<CategoryJson> response;
         try {
             response = spendApi.updateCategory(category)
@@ -105,7 +110,7 @@ public class SpendApiClient {
         return response.body();
     }
 
-    public List<CategoryJson> getCategories(String username, boolean excludeArchived) {
+    public @Nonnull List<CategoryJson> getCategories(String username, @Nullable Boolean excludeArchived) {
         final Response<List<CategoryJson>> response;
         try {
             response = spendApi.getCategories(username, excludeArchived)
@@ -114,6 +119,6 @@ public class SpendApiClient {
             throw new AssertionError(e);
         }
         assertEquals(200, response.code(), "Не удалось получить категории");
-        return response.body();
+        return response.body() == null ? Collections.emptyList() : response.body();
     }
 }

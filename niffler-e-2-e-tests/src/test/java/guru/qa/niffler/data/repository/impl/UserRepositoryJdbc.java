@@ -6,10 +6,13 @@ import guru.qa.niffler.data.dao.impl.UserdataUserDaoJdbc;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.data.repository.UserRepository;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@ParametersAreNonnullByDefault
 public class UserRepositoryJdbc implements UserRepository {
 
     private final UserdataUserDao userdataUserDao = new UserdataUserDaoJdbc();
@@ -17,22 +20,22 @@ public class UserRepositoryJdbc implements UserRepository {
     private static final Config CFG = Config.getInstance();
 
     @Override
-    public UserEntity createUser(UserEntity user) {  //+
+    public @Nonnull UserEntity createUser(UserEntity user) {  //+
         return userdataUserDao.createUser(user);
     }
 
     @Override
-    public Optional<UserEntity> findById(UUID id) {
+    public @Nonnull Optional<UserEntity> findById(UUID id) {
         return userdataUserDao.findById(id);
     }
 
     @Override
-    public Optional<UserEntity> findByUsername(String username) {  //+
+    public @Nonnull Optional<UserEntity> findByUsername(String username) {  //+
         return userdataUserDao.findByUsername(username);
     }
 
     @Override
-    public UserEntity updateUser(UserEntity user) { //+
+    public @Nonnull UserEntity updateUser(UserEntity user) { //+
         return userdataUserDao.update(user);
     }
 
@@ -51,7 +54,6 @@ public class UserRepositoryJdbc implements UserRepository {
         UserEntity requesterEntity = userdataUserDao.findByUsername(requester.getUsername()).get();
         UserEntity addresseeEntity = userdataUserDao.findByUsername(addressee.getUsername()).get();
         userdataUserDao.sendFriendshipRequest(requesterEntity, addresseeEntity);
-
     }
 
     @Override

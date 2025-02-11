@@ -4,14 +4,13 @@ import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.service.UserClient;
 import guru.qa.niffler.service.UserDbClient;
-import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.platform.commons.support.AnnotationSupport;
 
-public class UserFriends implements BeforeEachCallback, AfterEachCallback {
+public class UserFriendsExtension implements BeforeEachCallback {
 
-    public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(UserFriends.class);
+    public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(UserFriendsExtension.class);
 
     private final UserClient userClient = new UserDbClient();
 
@@ -41,10 +40,5 @@ public class UserFriends implements BeforeEachCallback, AfterEachCallback {
 
                 }
         );
-    }
-
-    @Override
-    public void afterEach(ExtensionContext context) throws Exception {
-
     }
 }

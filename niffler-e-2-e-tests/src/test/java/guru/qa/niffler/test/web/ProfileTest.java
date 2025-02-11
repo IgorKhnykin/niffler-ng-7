@@ -3,45 +3,52 @@ package guru.qa.niffler.test.web;
 import guru.qa.niffler.jupiter.annotation.Category;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.jupiter.annotation.meta.WebTest;
-import guru.qa.niffler.model.CategoryJson;
+import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.page.LoginPage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static guru.qa.niffler.utils.RandomDataUtils.passwordMain;
-import static guru.qa.niffler.utils.RandomDataUtils.usernameMain;
 
 @WebTest
 public class ProfileTest {
 
     @Test
-    @User(username = "Igor1",
-            categories = @Category(
+    @User(categories = @Category(
                     archived = true)
     )
     @DisplayName("Проверка отображения архивной категории")
-    void archiveCategoryShouldPresentInCategoriesList(CategoryJson[] categoryJson) {
+    void archiveCategoryShouldPresentInCategoriesListTest(UserJson user) {
         LoginPage.open()
-                .inputUsernameAndPassword("Igor1", "12345")
+                .inputUsernameAndPassword(user.username(), user.testData().password())
                 .clickLoginBtn()
                 .checkMainPageEssentialInfo()
                 .openProfile()
                 .showArchivedCategories()
-                .checkCategoryIsArchived(categoryJson[0].name());
+                .checkCategoryIsArchived(user.testData().categories().get(0).name());
     }
 
     @Test
-    @User(username = usernameMain,
-            categories = @Category(
+    @User(categories = @Category(
                     archived = false)
     )
     @DisplayName("Проверка отображения не архивной категории")
-    void activeCategoryShouldPresentInCategoriesList(CategoryJson categoryJson) {
+    void activeCategoryShouldPresentInCategoriesListTest(UserJson user) {
         LoginPage.open()
-                .inputUsernameAndPassword(usernameMain, passwordMain)
+                .inputUsernameAndPassword(user.username(), user.testData().password())
                 .clickLoginBtn()
                 .checkMainPageEssentialInfo()
                 .openProfile()
-                .checkCategoryIsNotArchived(categoryJson.name());
+                .checkCategoryIsNotArchived(user.testData().categories().get(0).name());
+    }
+
+    @Test
+    @User()
+    @DisplayName("Проверка возможности редактирования профиля")
+    void editProfileTestTest(UserJson user) {
+        LoginPage.open()
+                .inputUsernameAndPassword(user.username(), user.testData().password())
+                .clickLoginBtn()
+                .checkMainPageEssentialInfo()
+                .openProfile()
+                .changeName("Новое имя");
     }
 }
