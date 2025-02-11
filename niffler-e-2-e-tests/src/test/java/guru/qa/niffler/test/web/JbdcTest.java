@@ -100,6 +100,7 @@ public class JbdcTest {
                 null,
                 CurrencyValues.EUR,
                 null,
+                null,
                 null);
 
         UserDbClient userDbClient = new UserDbClient();
@@ -114,6 +115,7 @@ public class JbdcTest {
                 null,
                 null,
                 CurrencyValues.EUR,
+                null,
                 null,
                 null);
 
@@ -130,6 +132,8 @@ public class JbdcTest {
     @Test
     void test1() {
         UserDbClient userDbClient = new UserDbClient();
-        userDbClient.findAllUsers().forEach(System.out::println);
+        userDbClient.findAllUsers().stream()
+                .filter(user -> user.username().contains("."))
+                .forEach(user -> userDbClient.deleteUser(user.username()));
     }
 }

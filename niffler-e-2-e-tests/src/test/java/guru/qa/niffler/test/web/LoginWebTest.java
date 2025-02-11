@@ -1,7 +1,11 @@
 package guru.qa.niffler.test.web;
 
+import guru.qa.niffler.jupiter.annotation.Category;
 import guru.qa.niffler.jupiter.annotation.DisableByIssue;
+import guru.qa.niffler.jupiter.annotation.Spending;
+import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.jupiter.annotation.meta.WebTest;
+import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.MainPage;
 import org.junit.jupiter.api.DisplayName;
@@ -54,11 +58,19 @@ public class LoginWebTest {
                 .checkPasswordNotEqualsError();
     }
 
+    @User(
+            categories = {
+                    @Category(categoryName = "Магазины", archived = false),
+                    @Category(categoryName = "Бары", archived = true)
+            },
+            spendings = {
+                    @Spending(category = "Обучение", description = "QA guru", amount = 80000)
+            })
     @Test
     @DisplayName("Проверка отображения основных компонентов основной страницы после успешной регистрации")
-    void mainPageShouldBeDisplayedAfterSuccessfulLogin() {
+    void mainPageShouldBeDisplayedAfterSuccessfulLogin(UserJson user) {
         LoginPage.open()
-                .inputUsernameAndPassword(usernameMain, passwordMain)
+                .inputUsernameAndPassword(user.username(), user.testData().password())
                 .clickLoginBtn();
 
         MainPage.initPage().checkMainPageEssentialInfo();

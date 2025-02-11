@@ -18,16 +18,16 @@ public class SpendingWebTest {
     @Test
     @DisplayName("Обновление описания траты")
     @User(username = usernameMain,
-            spending = @Spending(
+            spendings = @Spending(
                     category = "Обучение3",
                     description = "new description",
                     amount = 841114.0))
-    void categoryDescriptionShouldBeEditedByCategoryAction(SpendJson spend) {
+    void categoryDescriptionShouldBeEditedByCategoryAction(SpendJson[] spend) {
         final String newSpendingName = "Маши1111111а edited";
         LoginPage.open()
-                .inputUsernameAndPassword(spend.username(), passwordMain)
+                .inputUsernameAndPassword(spend[0].username(), passwordMain)
                 .clickLoginBtn()
-                .editSpending(spend.description())
+                .editSpending(spend[0].description())
                 .editSpendingDescription(newSpendingName)
                 .save();
 

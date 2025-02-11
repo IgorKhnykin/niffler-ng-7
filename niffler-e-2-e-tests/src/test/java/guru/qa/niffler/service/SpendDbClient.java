@@ -81,4 +81,16 @@ public class SpendDbClient implements SpendClient {
             return null;
         });
     }
+
+    @Override
+    public SpendJson updateSpend(SpendJson spendJson) {
+        return SpendJson.fromEntity(xaTransactionTemplate.execute(
+                () -> spendRepository.updateSpend(SpendEntity.fromJson(spendJson))));
+    }
+
+    @Override
+    public CategoryJson updateCategory(CategoryJson categoryJson) {
+        return CategoryJson.fromEntity(xaTransactionTemplate.execute(
+                () -> spendRepository.updateCategory(CategoryEntity.fromJson(categoryJson))));
+    }
 }

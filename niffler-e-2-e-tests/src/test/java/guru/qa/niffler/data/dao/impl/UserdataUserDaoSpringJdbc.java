@@ -6,6 +6,7 @@ import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.data.mapper.UserdataUserEntityRowManager;
 import guru.qa.niffler.data.tpl.DataSources;
 import guru.qa.niffler.model.FriendshipStatus;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -28,7 +29,7 @@ public class UserdataUserDaoSpringJdbc implements UserdataUserDao {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {
             PreparedStatement ps = con.prepareStatement("INSERT INTO \"user\" (username, currency, firstname, surname, photo, photo_small, full_name)" +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                            "VALUES (?, ?, ?, ?, ?, ?, ?)",
                     Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getCurrency().name());
@@ -65,19 +66,25 @@ public class UserdataUserDaoSpringJdbc implements UserdataUserDao {
     @Override
     public Optional<UserEntity> findById(UUID id) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.userdataJdbcUrl()));
-        UserEntity ue = jdbcTemplate.queryForObject("SELECT * FROM \"user\" WHERE id = ?",
-                UserdataUserEntityRowManager.instance,
-                id);
-        return Optional.ofNullable(ue);
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject("SELECT * FROM \"user\" WHERE id = ?",
+                    UserdataUserEntityRowManager.instance,
+                    id));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     @Override
     public Optional<UserEntity> findByUsername(String username) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.userdataJdbcUrl()));
-        UserEntity ue = jdbcTemplate.queryForObject("SELECT * FROM \"user\" WHERE username = ?",
-                UserdataUserEntityRowManager.instance,
-                username);
-        return Optional.ofNullable(ue);
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject("SELECT * FROM \"user\" WHERE username = ?",
+                    UserdataUserEntityRowManager.instance,
+                    username));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     @Override

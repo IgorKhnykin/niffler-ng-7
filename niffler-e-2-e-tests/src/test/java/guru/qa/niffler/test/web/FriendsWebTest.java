@@ -1,33 +1,33 @@
 package guru.qa.niffler.test.web;
 
-import guru.qa.niffler.jupiter.annotation.UserType;
+import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.jupiter.annotation.meta.WebTest;
-import guru.qa.niffler.jupiter.extension.UserQueueExtension;
+import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.page.LoginPage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static guru.qa.niffler.jupiter.annotation.UserType.Type.*;
 
 @WebTest
 public class FriendsWebTest {
 
     @Test
+    @User(withFriend = 1)
     @DisplayName("Проверка присутствия друга в таблице друзей")
-    void friendShouldBePresentInFriendsTable(@UserType(WITH_FRIEND) UserQueueExtension.StaticUser user) {
+    void friendShouldBePresentInFriendsTable(UserJson user) {
             LoginPage.open()
-                    .inputUsernameAndPassword(user.username(), user.password())
+                    .inputUsernameAndPassword(user.username(), user.testData().password())
                     .clickLoginBtn()
                     .checkMainPageEssentialInfo()
                     .openFriends()
-                    .checkFriendExist(user.friend());
+                    .checkFriendExist(user.testData().friends());
     }
 
     @Test
+    @User
     @DisplayName("Проверка пустой таблицы друзей для пустого пользователя")
-    void friendSTableShouldBeEmptyForNewUser(@UserType(EMPTY) UserQueueExtension.StaticUser user) {
+    void friendSTableShouldBeEmptyForNewUser(UserJson user) {
         LoginPage.open()
-                .inputUsernameAndPassword(user.username(), user.password())
+                .inputUsernameAndPassword(user.username(), user.testData().password())
                 .clickLoginBtn()
                 .checkMainPageEssentialInfo()
                 .openFriends()
@@ -35,24 +35,26 @@ public class FriendsWebTest {
     }
 
     @Test
+    @User(incomeRequest = 1)
     @DisplayName("Проверка присутствия входящего запроса в друзья")
-    void incomeInvitationBePresentInFriendsTable(@UserType(WITH_INCOME_REQUEST) UserQueueExtension.StaticUser user) {
+    void incomeInvitationBePresentInFriendsTable(UserJson user) {
         LoginPage.open()
-                .inputUsernameAndPassword(user.username(), user.password())
+                .inputUsernameAndPassword(user.username(), user.testData().password())
                 .clickLoginBtn()
                 .checkMainPageEssentialInfo()
                 .openFriends()
-                .checkIncomeRequestExist(user.income());
+                .checkIncomeRequestExist(user.testData().incomeRequests());
     }
 
     @Test
+    @User(outcomeRequest = 1)
     @DisplayName("Проверка присутствия исходящего запроса в друзья")
-    void outcomeInvitationBePresentInAllPeoplesTable(@UserType(WITH_OUTCOME_REQUEST) UserQueueExtension.StaticUser user) {
+    void outcomeInvitationBePresentInAllPeoplesTable(UserJson user) {
         LoginPage.open()
-                .inputUsernameAndPassword(user.username(), user.password())
+                .inputUsernameAndPassword(user.username(), user.testData().password())
                 .clickLoginBtn()
                 .checkMainPageEssentialInfo()
                 .openAllPeople()
-                .checkOutcomeInvitationInPeopleList(user.outcome());
+                .checkOutcomeInvitationInPeopleList(user.testData().outcomeRequests());
     }
 }

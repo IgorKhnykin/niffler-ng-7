@@ -20,4 +20,8 @@ public interface SpendClient {
     CategoryJson findCategoryByUsernameAndCategoryName(String username, String categoryName);
 
     void deleteCategory(CategoryJson categoryJson);
+
+    SpendJson updateSpend(SpendJson spendJson);
+
+    CategoryJson updateCategory(CategoryJson categoryJson);
 }

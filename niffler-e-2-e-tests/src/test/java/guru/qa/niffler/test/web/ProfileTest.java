@@ -15,24 +15,24 @@ import static guru.qa.niffler.utils.RandomDataUtils.usernameMain;
 public class ProfileTest {
 
     @Test
-    @User(username = usernameMain,
-            category = @Category(
+    @User(username = "Igor1",
+            categories = @Category(
                     archived = true)
     )
     @DisplayName("Проверка отображения архивной категории")
-    void archiveCategoryShouldPresentInCategoriesList(CategoryJson categoryJson) {
+    void archiveCategoryShouldPresentInCategoriesList(CategoryJson[] categoryJson) {
         LoginPage.open()
-                .inputUsernameAndPassword(usernameMain, passwordMain)
+                .inputUsernameAndPassword("Igor1", "12345")
                 .clickLoginBtn()
                 .checkMainPageEssentialInfo()
                 .openProfile()
                 .showArchivedCategories()
-                .checkCategoryIsArchived(categoryJson.name());
+                .checkCategoryIsArchived(categoryJson[0].name());
     }
 
     @Test
     @User(username = usernameMain,
-            category = @Category(
+            categories = @Category(
                     archived = false)
     )
     @DisplayName("Проверка отображения не архивной категории")
