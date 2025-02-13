@@ -6,11 +6,14 @@ import guru.qa.niffler.data.repository.AuthUserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 import java.util.UUID;
 
 import static guru.qa.niffler.data.jpa.EntityManagers.em;
 
+@ParametersAreNonnullByDefault
 public class AuthUserRepositoryHibernate implements AuthUserRepository {
 
     private static final Config CFG = Config.getInstance();
@@ -18,26 +21,26 @@ public class AuthUserRepositoryHibernate implements AuthUserRepository {
     private final EntityManager entityManager = em(CFG.authJdbcUrl());
 
     @Override
-    public AuthUserEntity create(AuthUserEntity authUser) {
+    public @Nonnull AuthUserEntity create(AuthUserEntity authUser) {
         entityManager.joinTransaction();
         entityManager.persist(authUser);
         return authUser;
     }
 
     @Override
-    public AuthUserEntity update(AuthUserEntity authUser) {
+    public @Nonnull AuthUserEntity update(AuthUserEntity authUser) {
         entityManager.joinTransaction();
         entityManager.persist(entityManager.contains(authUser) ? authUser : entityManager.merge(authUser));
         return authUser;
     }
 
     @Override
-    public Optional<AuthUserEntity> findUserById(UUID id) {
+    public @Nonnull Optional<AuthUserEntity> findUserById(UUID id) {
         return Optional.ofNullable(entityManager.find(AuthUserEntity.class, id));
     }
 
     @Override
-    public Optional<AuthUserEntity> findUserByUsername(String username) {
+    public @Nonnull Optional<AuthUserEntity> findUserByUsername(String username) {
         try {
             return Optional.of(entityManager.createQuery("select u from AuthUserEntity u where u.username =: username", AuthUserEntity.class)
                     .setParameter("username", username)

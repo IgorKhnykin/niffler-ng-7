@@ -5,36 +5,39 @@ import guru.qa.niffler.data.dao.impl.UserdataUserDaoSpringJdbc;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.data.repository.UserRepository;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@ParametersAreNonnullByDefault
 public class UserRepositorySpringJdbc implements UserRepository {
 
     private final UserdataUserDao userdataUserDao = new UserdataUserDaoSpringJdbc();
 
     @Override
-    public UserEntity createUser(UserEntity user) {
+    public @Nonnull UserEntity createUser(UserEntity user) {
         return userdataUserDao.createUser(user);
     }
 
     @Override
-    public Optional<UserEntity> findById(UUID id) {
+    public @Nonnull Optional<UserEntity> findById(UUID id) {
         return userdataUserDao.findById(id);
     }
 
     @Override
-    public Optional<UserEntity> findByUsername(String username) {
+    public @Nonnull Optional<UserEntity> findByUsername(String username) {
         return userdataUserDao.findByUsername(username);
     }
 
     @Override
-    public UserEntity updateUser(UserEntity user) {
+    public @Nonnull UserEntity updateUser(UserEntity user) {
         return userdataUserDao.update(user);
     }
 
     @Override
-    public List<UserEntity> findAll() {
+    public @Nonnull List<UserEntity> findAll() {
         return userdataUserDao.findAll();
     }
 

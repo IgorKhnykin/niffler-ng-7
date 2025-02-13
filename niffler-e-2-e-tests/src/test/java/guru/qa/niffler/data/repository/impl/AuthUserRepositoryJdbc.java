@@ -10,6 +10,8 @@ import guru.qa.niffler.data.entity.auth.AuthUserEntity;
 import guru.qa.niffler.data.extractor.AuthUserEntityExtractor;
 import guru.qa.niffler.data.repository.AuthUserRepository;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,6 +20,7 @@ import java.util.UUID;
 
 import static guru.qa.niffler.data.tpl.Connections.holder;
 
+@ParametersAreNonnullByDefault
 public class AuthUserRepositoryJdbc implements AuthUserRepository {
 
     private static final Config CFG = Config.getInstance();
@@ -27,20 +30,20 @@ public class AuthUserRepositoryJdbc implements AuthUserRepository {
     private final AuthAuthorityDao authAuthorityDao = new AuthAuthorityDaoJdbc();
 
     @Override
-    public AuthUserEntity create(AuthUserEntity authUser) {  //+
+    public @Nonnull AuthUserEntity create(AuthUserEntity authUser) {  //+
         authUserDao.create(authUser);
         authAuthorityDao.addAuthority(authUser.getAuthorities().toArray(new AuthAuthorityEntity[0]));
         return authUser;
     }
 
     @Override
-    public AuthUserEntity update(AuthUserEntity authUser) { //+
+    public @Nonnull AuthUserEntity update(AuthUserEntity authUser) { //+
         authUserDao.update(authUser);
         return authUser;
     }
 
     @Override
-    public Optional<AuthUserEntity> findUserById(UUID id) {
+    public @Nonnull Optional<AuthUserEntity> findUserById(UUID id) {
         try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
                 "select a.id as authority_id, " +
                         "authority," +
@@ -64,7 +67,7 @@ public class AuthUserRepositoryJdbc implements AuthUserRepository {
     }
 
     @Override
-    public Optional<AuthUserEntity> findUserByUsername(String username) {  //+
+    public @Nonnull Optional<AuthUserEntity> findUserByUsername(String username) {  //+
         try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
                 "select a.id as authority_id, " +
                         "authority," +

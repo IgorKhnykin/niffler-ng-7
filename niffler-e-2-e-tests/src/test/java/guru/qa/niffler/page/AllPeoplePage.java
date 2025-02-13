@@ -2,6 +2,8 @@ package guru.qa.niffler.page;
 
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
+import guru.qa.niffler.page.component.SearchField;
+import io.qameta.allure.Step;
 
 import java.util.List;
 
@@ -17,22 +19,25 @@ public class AllPeoplePage {
 
     private final SelenideElement addFriendBtn = $x(".//button[text()='Add friend']");
 
-    private final SelenideElement searchInput = $("input[placeholder='Search']");
+    private final SearchField search = new SearchField($("input[placeholder='Search']"));
 
+    @Step("Найти пользователя {username} в списке всех пользователей")
     public AllPeoplePage searchUserInAllPeopleList(String username) {
-        searchInput.clear();
-        searchInput.setValue(username).pressEnter();
+        search.searchField(username);
         return this;
     }
 
+    @Step("Проверить, что пользователь {username} присутствует в списке всех пользователей")
     public AllPeoplePage checkPeopleExist(String username) {
+        search.searchField(username);
         peopleRows.findBy(text(username)).shouldHave(text("Unfriend"));
         return this;
     }
 
+    @Step("Проверить исходящее предложение о дружбе")
     public AllPeoplePage checkOutcomeInvitationInPeopleList(List<String> outcomeInvitations) {
         outcomeInvitations.forEach(username -> {
-            searchUserInAllPeopleList(username);
+            search.searchField(username);
             peopleRows.findBy(text(username)).shouldHave(text("waiting"));
         });
         return this;

@@ -9,8 +9,11 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
-
+import java.util.Objects;
+@ParametersAreNonnullByDefault
 public class AuthApiClient{
 
     private static final Config CFG = Config.getInstance();
@@ -22,7 +25,8 @@ public class AuthApiClient{
 
     private final AuthApi authApi = retrofit.create(AuthApi.class);
 
-    public String getToken() {
+
+    public @Nonnull String getToken() {
         final Response<JsonNode> response;
         try {
             response = authApi.getToken("",
@@ -37,7 +41,7 @@ public class AuthApiClient{
         }
         Assertions.assertEquals(200, response.code());
         JsonNode jsonResponse = response.body();
-        return jsonResponse.get("access_token").asText();
+        return Objects.requireNonNull(jsonResponse.get("access_token").asText());
     }
 
     public void register(String username, String password) {

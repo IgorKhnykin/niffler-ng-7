@@ -6,17 +6,20 @@ import guru.qa.niffler.data.mapper.SpendEntityRowMapper;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+@ParametersAreNonnullByDefault
 public class SpendEntityExtractor implements ResultSetExtractor<SpendEntity> {
     public static SpendEntityExtractor instance = new SpendEntityExtractor();
 
     @Override
-    public SpendEntity extractData(ResultSet rs) throws SQLException, DataAccessException {
+    public @Nullable SpendEntity extractData(ResultSet rs) throws SQLException, DataAccessException {
         Map<UUID, SpendEntity> spendMap = new ConcurrentHashMap<>();
         UUID id = null;
         while (rs.next()) {

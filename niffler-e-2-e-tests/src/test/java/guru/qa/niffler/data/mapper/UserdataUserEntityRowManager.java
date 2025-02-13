@@ -4,10 +4,13 @@ import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.model.CurrencyValues;
 import org.springframework.jdbc.core.RowMapper;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
+@ParametersAreNonnullByDefault
 public class UserdataUserEntityRowManager implements RowMapper<UserEntity>{
 
     private UserdataUserEntityRowManager() {
@@ -16,7 +19,7 @@ public class UserdataUserEntityRowManager implements RowMapper<UserEntity>{
     public static final UserdataUserEntityRowManager instance = new UserdataUserEntityRowManager();
 
     @Override
-    public UserEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
+    public @Nonnull UserEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
 
         UserEntity user = new UserEntity();
         user.setId(rs.getObject("id", UUID.class));

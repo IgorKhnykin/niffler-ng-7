@@ -13,7 +13,7 @@ public class FriendsWebTest {
     @Test
     @User(withFriend = 1)
     @DisplayName("Проверка присутствия друга в таблице друзей")
-    void friendShouldBePresentInFriendsTable(UserJson user) {
+    void friendShouldBePresentInFriendsTableTest(UserJson user) {
             LoginPage.open()
                     .inputUsernameAndPassword(user.username(), user.testData().password())
                     .clickLoginBtn()
@@ -25,7 +25,7 @@ public class FriendsWebTest {
     @Test
     @User
     @DisplayName("Проверка пустой таблицы друзей для пустого пользователя")
-    void friendSTableShouldBeEmptyForNewUser(UserJson user) {
+    void friendSTableShouldBeEmptyForNewUserTest(UserJson user) {
         LoginPage.open()
                 .inputUsernameAndPassword(user.username(), user.testData().password())
                 .clickLoginBtn()
@@ -37,7 +37,7 @@ public class FriendsWebTest {
     @Test
     @User(incomeRequest = 1)
     @DisplayName("Проверка присутствия входящего запроса в друзья")
-    void incomeInvitationBePresentInFriendsTable(UserJson user) {
+    void incomeInvitationBePresentInFriendsTableTest(UserJson user) {
         LoginPage.open()
                 .inputUsernameAndPassword(user.username(), user.testData().password())
                 .clickLoginBtn()
@@ -49,12 +49,36 @@ public class FriendsWebTest {
     @Test
     @User(outcomeRequest = 1)
     @DisplayName("Проверка присутствия исходящего запроса в друзья")
-    void outcomeInvitationBePresentInAllPeoplesTable(UserJson user) {
+    void outcomeInvitationBePresentInAllPeoplesTableTest(UserJson user) {
         LoginPage.open()
                 .inputUsernameAndPassword(user.username(), user.testData().password())
                 .clickLoginBtn()
                 .checkMainPageEssentialInfo()
                 .openAllPeople()
                 .checkOutcomeInvitationInPeopleList(user.testData().outcomeRequests());
+    }
+
+    @Test
+    @User(incomeRequest = 1)
+    @DisplayName("Проверка возможности приема запроса в друзья")
+    void acceptIncomeRequestTableTest(UserJson user) {
+        LoginPage.open()
+                .inputUsernameAndPassword(user.username(), user.testData().password())
+                .clickLoginBtn()
+                .checkMainPageEssentialInfo()
+                .openFriends()
+                .acceptIncomeRequest(user.testData().incomeRequests().get(0));
+    }
+
+    @Test
+    @User(incomeRequest = 1)
+    @DisplayName("Проверка возможности отклонения запроса в друзья")
+    void declineIncomeRequestTableTest(UserJson user) {
+        LoginPage.open()
+                .inputUsernameAndPassword(user.username(), user.testData().password())
+                .clickLoginBtn()
+                .checkMainPageEssentialInfo()
+                .openFriends()
+                .declineIncomeRequest(user.testData().incomeRequests().get(0));
     }
 }

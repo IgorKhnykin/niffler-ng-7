@@ -13,10 +13,13 @@ import guru.qa.niffler.data.repository.SpendRepository;
 import guru.qa.niffler.data.tpl.DataSources;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@ParametersAreNonnullByDefault
 public class SpendRepositorySpringJdbc implements SpendRepository {
 
     private static final Config CFG = Config.getInstance();
@@ -26,7 +29,7 @@ public class SpendRepositorySpringJdbc implements SpendRepository {
     private final CategoryDao categoryDao = new CategoryDaoSpringJdbc();
 
     @Override
-    public SpendEntity createSpend(SpendEntity spend) {
+    public @Nonnull SpendEntity createSpend(SpendEntity spend) {
         Optional<CategoryEntity> category = categoryDao.findCategoryByUsernameAndCategoryName(spend.getUsername(), spend.getCategory().getName());
         if (category.isPresent()) {
             spend.setCategory(category.get());
@@ -39,41 +42,41 @@ public class SpendRepositorySpringJdbc implements SpendRepository {
     }
 
     @Override
-    public SpendEntity updateSpend(SpendEntity spend) {
+    public @Nonnull SpendEntity updateSpend(SpendEntity spend) {
         spendDao.update(spend);
         categoryDao.update(spend.getCategory());
         return spend;
     }
 
     @Override
-    public CategoryEntity updateCategory(CategoryEntity category) {
+    public @Nonnull CategoryEntity updateCategory(CategoryEntity category) {
         return categoryDao.update(category);
     }
 
     @Override
-    public CategoryEntity createCategory(CategoryEntity category) {
+    public @Nonnull CategoryEntity createCategory(CategoryEntity category) {
         return categoryDao.create(category);
     }
 
     @Override
-    public Optional<CategoryEntity> findCategoryById(UUID id) {
+    public @Nonnull Optional<CategoryEntity> findCategoryById(UUID id) {
         return categoryDao.findCategoryById(id);
     }
 
     @Override
-    public Optional<CategoryEntity> findCategoryByUsernameAndCategoryName(String username, String categoryName) {
+    public @Nonnull Optional<CategoryEntity> findCategoryByUsernameAndCategoryName(String username, String categoryName) {
         return categoryDao.findCategoryByUsernameAndCategoryName(username, categoryName);
     }
 
     @Override
-    public Optional<SpendEntity> findSpendById(UUID id) {
+    public @Nonnull Optional<SpendEntity> findSpendById(UUID id) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.spendJdbcUrl()));
         SpendEntity spendEntity = jdbcTemplate.query("SELECT * FROM spend s join category c on s.category_id = c.id where s.id = ?", SpendEntityExtractor.instance, id);
         return Optional.ofNullable(spendEntity);
     }
 
     @Override
-    public List<SpendEntity> findByUsernameAndSpendDescription(String username, String spendDescription) {
+    public @Nonnull List<SpendEntity> findByUsernameAndSpendDescription(String username, String spendDescription) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.spendJdbcUrl()));
         List<SpendEntity> spendEntityList = jdbcTemplate.query(
                 "SELECT * FROM spend s join category c on s.category_id = c.id where s.username = ? and s.description = ?",

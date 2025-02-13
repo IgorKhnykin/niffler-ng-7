@@ -1,11 +1,13 @@
 package guru.qa.niffler.data.tpl;
 
+import javax.annotation.Nullable;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+
 
 public class JdbcConnectionHolder implements AutoCloseable {
 
@@ -17,7 +19,7 @@ public class JdbcConnectionHolder implements AutoCloseable {
 
     private final Map<Long, Connection> threadConnections = new ConcurrentHashMap<>();
 
-    public Connection connection() {
+    public @Nullable Connection connection() {
         return threadConnections.computeIfAbsent(
                 Thread.currentThread().threadId(),
                 key -> {

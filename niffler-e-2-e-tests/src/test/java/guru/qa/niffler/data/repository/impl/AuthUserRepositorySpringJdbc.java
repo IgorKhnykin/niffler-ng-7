@@ -12,9 +12,12 @@ import guru.qa.niffler.data.repository.AuthUserRepository;
 import guru.qa.niffler.data.tpl.DataSources;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 import java.util.UUID;
 
+@ParametersAreNonnullByDefault
 public class AuthUserRepositorySpringJdbc implements AuthUserRepository {
 
     public static final Config CFG = Config.getInstance();
@@ -24,19 +27,19 @@ public class AuthUserRepositorySpringJdbc implements AuthUserRepository {
     private final AuthAuthorityDao authAuthorityDao = new AuthAuthorityDaoSpringJdbc();
 
     @Override
-    public AuthUserEntity create(AuthUserEntity authUser) {
+    public @Nonnull AuthUserEntity create(AuthUserEntity authUser) {
         authUserDao.create(authUser);
         authAuthorityDao.addAuthority(authUser.getAuthorities().toArray(new AuthAuthorityEntity[0]));
         return authUser;
     }
 
     @Override
-    public AuthUserEntity update(AuthUserEntity authUser) {
+    public @Nonnull AuthUserEntity update(AuthUserEntity authUser) {
         return authUserDao.update(authUser);
     }
 
     @Override
-    public Optional<AuthUserEntity> findUserById(UUID id) {
+    public @Nonnull Optional<AuthUserEntity> findUserById(UUID id) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
 
         AuthUserEntity authUser = jdbcTemplate.query(
@@ -55,7 +58,7 @@ public class AuthUserRepositorySpringJdbc implements AuthUserRepository {
     }
 
     @Override
-    public Optional<AuthUserEntity> findUserByUsername(String username) {
+    public @Nonnull Optional<AuthUserEntity> findUserByUsername(String username) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
 
         AuthUserEntity authUser = jdbcTemplate.query(

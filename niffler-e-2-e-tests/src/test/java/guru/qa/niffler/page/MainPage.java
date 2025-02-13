@@ -3,6 +3,10 @@ package guru.qa.niffler.page;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.SelenideElement;
+import guru.qa.niffler.page.component.Header;
+import guru.qa.niffler.page.component.SearchField;
+import guru.qa.niffler.page.component.SpendingTable;
+import io.qameta.allure.Step;
 
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
@@ -21,49 +25,57 @@ public class MainPage {
 
   private final SelenideElement spendingBlock = $("#spendings");
 
-  private final SelenideElement profileIcon = $("button[aria-label='Menu']");
-
-  private final SelenideElement dropdownMenu = $("ul[role='menu']");
-
   private final SelenideElement searchInput = $("input[placeholder='Search']");
 
-  public EditSpendingPage editSpending(String spendingDescription) {
-    tableRows.find(text(spendingDescription)).$$("td").get(5).click();
+  private final Header header = new Header();
+
+  private final SearchField search = new SearchField($("input[placeholder='Search']"));
+
+  private final SpendingTable spendingTable = new SpendingTable();
+
+  @Step("Перейти к странице редактирования траты {spendingDescription}")
+  public EditSpendingPage openEditSpendingPage(String spendingDescription) {
+    spendingTable.toEditSpendingPage(spendingDescription);
     return new EditSpendingPage();
   }
 
+  @Step("Проверка присутствия траты {spendingDescription} в списке трат")
   public void checkThatTableContainsSpending(String spendingDescription) {
-    searchSpendInSpendsList(spendingDescription);
+    search.searchField(spendingDescription);
     tableRows.find(text(spendingDescription)).should(visible);
   }
 
+  @Step("Проверка основной информации главной страницы")
   public MainPage checkMainPageEssentialInfo() {
     spendingBlock.shouldBe(visible);
     statisticsBlock.shouldBe(visible);
     return new MainPage();
   }
 
+  @Step("Перейти к странице профиля пользователя")
   public ProfilePage openProfile() {
-    profileIcon.shouldBe(visible).click();
-    dropdownMenu.$("a[href='/profile']").click();
-    return new ProfilePage();
+    return header.toProfilePage();
   }
 
+  @Step("Перейти на вкладку Друзья")
   public FriendsPage openFriends() {
-    profileIcon.shouldBe(visible).click();
-    dropdownMenu.$("a[href='/people/friends']").click();
-    return new FriendsPage();
+    return header.toFriendsPage();
   }
 
+  @Step("Перейти на вкладку все пользователи")
   public AllPeoplePage openAllPeople() {
-    profileIcon.shouldBe(visible).click();
-    dropdownMenu.$("a[href='/people/all']").click();
-    return new AllPeoplePage();
+    return header.toAllPeoplePage();
   }
 
-  public MainPage searchSpendInSpendsList(String spendName) {
-    searchInput.clear();
-    searchInput.setValue(spendName).pressEnter();
+  @Step("Перейти на вкладку создания категории")
+  public EditSpendingPage createNewSpend() {
+    header.addSpendingPage();
+
+    return new EditSpendingPage();
+  }
+
+  public MainPage searchSpendInSpendsList(String spendDescription) {
+    search.searchField(spendDescription);
     return this;
   }
 }

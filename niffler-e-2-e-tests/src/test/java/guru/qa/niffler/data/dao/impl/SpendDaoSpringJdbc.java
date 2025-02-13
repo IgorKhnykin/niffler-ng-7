@@ -10,18 +10,21 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@ParametersAreNonnullByDefault
 public class SpendDaoSpringJdbc implements SpendDao {
 
     private static final Config CFG = Config.getInstance();
 
     @Override
-    public SpendEntity create(SpendEntity spend) {
+    public @Nonnull SpendEntity create(SpendEntity spend) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.spendJdbcUrl()));
         jdbcTemplate.update(con -> {
@@ -42,7 +45,7 @@ public class SpendDaoSpringJdbc implements SpendDao {
     }
 
     @Override
-    public SpendEntity update(SpendEntity spend) {
+    public @Nonnull SpendEntity update(SpendEntity spend) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.spendJdbcUrl()));
         jdbcTemplate.update(con -> {
             PreparedStatement ps = con.prepareStatement("update spend set username = ?, spend_date = ?, currency = ?, amount = ?, description  = ?, category_id  = ? where id =?");
@@ -59,7 +62,7 @@ public class SpendDaoSpringJdbc implements SpendDao {
     }
 
     @Override
-    public Optional<SpendEntity> findSpendById(UUID id) {
+    public @Nonnull Optional<SpendEntity> findSpendById(UUID id) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.spendJdbcUrl()));
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject("SELECT * FROM spend WHERE id = ?",
@@ -71,7 +74,7 @@ public class SpendDaoSpringJdbc implements SpendDao {
     }
 
     @Override
-    public List<SpendEntity> findAllByUsername(String username) {
+    public @Nonnull List<SpendEntity> findAllByUsername(String username) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.spendJdbcUrl()));
         return jdbcTemplate.query("SELECT * FROM spend WHERE username = ?",
                 SpendEntityRowMapper.instance,
@@ -89,7 +92,7 @@ public class SpendDaoSpringJdbc implements SpendDao {
     }
 
     @Override
-    public List<SpendEntity> findAll() {
+    public @Nonnull List<SpendEntity> findAll() {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.spendJdbcUrl()));
         return jdbcTemplate.query("SELECT * FROM spend", SpendEntityRowMapper.instance);
     }

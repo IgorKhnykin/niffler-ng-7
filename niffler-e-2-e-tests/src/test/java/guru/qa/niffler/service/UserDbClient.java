@@ -12,13 +12,17 @@ import guru.qa.niffler.data.tpl.XaTransactionTemplate;
 import guru.qa.niffler.model.Authority;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.UserJson;
+import io.qameta.allure.Step;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.*;
 
 import static guru.qa.niffler.utils.RandomDataUtils.randomUsername;
 
+@ParametersAreNonnullByDefault
 public class UserDbClient implements UserClient{
 
     private static final Config CFG = Config.getInstance();
@@ -32,7 +36,8 @@ public class UserDbClient implements UserClient{
     private final UserRepository userRepository = new UserRepositorySpringJdbc();
 
     @Override
-    public UserJson createUser(String username, String password) {
+    @Step("Создать пользователя {username} через базу данных")
+    public @Nullable UserJson createUser(String username, String password) {
         return xaTransactionTemplate.execute(() -> {
 
             AuthUserEntity authUserEntity = authUserEntity(username, password);
@@ -44,6 +49,7 @@ public class UserDbClient implements UserClient{
     }
 
     @Override
+    @Step("Удалить пользователя {username} через базу данных")
     public void deleteUser(String username) {
         xaTransactionTemplate.execute(() -> {
 
@@ -61,7 +67,8 @@ public class UserDbClient implements UserClient{
     }
 
     @Override
-    public List<String> sendInvitation(UserJson targetUser, int count) {
+    @Step("Отправить приглашение о дружбе пользователю через базу данных")
+    public @Nullable List<String> sendInvitation(UserJson targetUser, int count) {
         return xaTransactionTemplate.execute(() -> {
             Optional<UserEntity> requester = userRepository.findByUsername(targetUser.username());
             List<String> outcomeRequests = new ArrayList<>();
@@ -84,7 +91,8 @@ public class UserDbClient implements UserClient{
     }
 
     @Override
-    public List<String> getInvitation(UserJson targetUser, int count) {
+    @Step("СПолучить приглашение о дружбе от пользователя через базу данных")
+    public @Nullable List<String> getInvitation(UserJson targetUser, int count) {
         return xaTransactionTemplate.execute(() -> {
             Optional<UserEntity> assignee = userRepository.findByUsername(targetUser.username());
             List<String> incomeRequests = new ArrayList<>();
@@ -107,7 +115,8 @@ public class UserDbClient implements UserClient{
     }
 
     @Override
-    public List<String> addFriend(UserJson targetUser, int count) {
+    @Step("Добавить в друзья пользователя через базу данных")
+    public @Nullable List<String> addFriend(UserJson targetUser, int count) {
         return xaTransactionTemplate.execute(() -> {
             Optional<UserEntity> requester = userRepository.findByUsername(targetUser.username());
             List<String> friends = new ArrayList<>();
@@ -130,7 +139,8 @@ public class UserDbClient implements UserClient{
     }
 
     @Override
-    public UserJson updateUser(UserJson user) {
+    @Step("Обновить пользователя через базу данных")
+    public @Nullable UserJson updateUser(UserJson user) {
         return xaTransactionTemplate.execute(() -> {
             UserEntity userEntity = UserEntity.fromJson(user);
             return UserJson.fromEntity(userRepository.updateUser(userEntity));
@@ -138,16 +148,17 @@ public class UserDbClient implements UserClient{
     }
 
     @Override
-    public AuthUserEntity updateAuthUser(String username) {
+    @Step("Обновить права пользователя {username} через базу данных")
+    public @Nullable AuthUserEntity updateAuthUser(String username) {
         return xaTransactionTemplate.execute(() -> {
             AuthUserEntity userEntity = authUserRepository.findUserByUsername(username).get();
-            AuthUserEntity userEntityUpdated = authUserRepository.update(userEntity);
-            return userEntityUpdated;
+            return authUserRepository.update(userEntity);
         });
     }
 
     @Override
-    public UserJson findById(UUID id) {
+    @Step("Найти пользователя по id {id} через базу данных")
+    public @Nullable UserJson findById(UUID id) {
         return xaTransactionTemplate.execute(() -> {
             Optional<UserEntity> userEntity = userRepository.findById(id);
             if (userEntity.isPresent()) {
@@ -160,7 +171,8 @@ public class UserDbClient implements UserClient{
     }
 
     @Override
-    public List<UserJson> findAllUsers() {
+    @Step("Найти всех пользователей через базу данных")
+    public @Nullable List<UserJson> findAllUsers() {
         return xaTransactionTemplate.execute(() -> userRepository.findAll()
                 .stream()
                 .map(UserJson::fromEntity)
