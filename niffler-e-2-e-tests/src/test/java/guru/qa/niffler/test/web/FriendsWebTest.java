@@ -67,7 +67,8 @@ public class FriendsWebTest {
                 .clickLoginBtn()
                 .checkMainPageEssentialInfo()
                 .openFriends()
-                .acceptIncomeRequest(user.testData().incomeRequests().get(0));
+                .acceptIncomeRequest(user.testData().incomeRequests().get(0))
+                .checkNotification("Invitation of %s accepted".formatted(user.testData().incomeRequests().get(0)));
     }
 
     @Test
@@ -79,6 +80,7 @@ public class FriendsWebTest {
                 .clickLoginBtn()
                 .checkMainPageEssentialInfo()
                 .openFriends()
-                .declineIncomeRequest(user.testData().incomeRequests().get(0));
+                .declineIncomeRequest(user.testData().incomeRequests().get(0))
+                .checkNotification("Invitation of %s is declined".formatted(user.testData().incomeRequests().get(0)));
     }
 }

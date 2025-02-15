@@ -9,7 +9,7 @@ import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 
-public class LoginPage {
+public class LoginPage extends BasePage<LoginPage>{
 
     public static LoginPage open() {
         return Selenide.open(Config.getInstance().frontUrl(), LoginPage.class);

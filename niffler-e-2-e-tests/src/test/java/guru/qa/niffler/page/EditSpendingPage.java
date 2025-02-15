@@ -10,7 +10,7 @@ import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$x;
 
-public class EditSpendingPage {
+public class EditSpendingPage extends BasePage<EditSpendingPage> {
 
   private final SelenideElement descriptionInput = $("#description");
 
@@ -53,7 +53,8 @@ public class EditSpendingPage {
   }
 
   @Step("Нажать кнопку 'Add'")
-  public void save() {
+  public MainPage save() {
     saveBtn.click();
+    return new MainPage();
   }
 }

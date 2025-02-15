@@ -12,7 +12,8 @@ import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$x;
 
-public class ProfilePage {
+public class ProfilePage extends BasePage<ProfilePage>{
+
     public static ProfilePage initPage() {
         return Selenide.page(ProfilePage.class);
     }

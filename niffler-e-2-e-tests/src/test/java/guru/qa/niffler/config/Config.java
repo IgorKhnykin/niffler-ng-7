@@ -17,7 +17,9 @@ public interface Config {
 
     String spendUrl();
 
-    String ghUrl();
+    default String ghUrl() {
+        return "https://api.github.com/";
+    }
 
     String authJdbcUrl();
 

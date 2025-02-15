@@ -16,6 +16,8 @@ import java.util.UUID;
 @ParametersAreNonnullByDefault
 public class UserApiClient implements UserClient {
 
+    private static final String PASSWORD = "1234";
+
     final guru.qa.niffler.api.UserApiClient userApiClient = new guru.qa.niffler.api.UserApiClient();
 
     final guru.qa.niffler.api.AuthApiClient authApiClient = new guru.qa.niffler.api.AuthApiClient();
@@ -30,6 +32,7 @@ public class UserApiClient implements UserClient {
                 null,
                 null,
                 CurrencyValues.RUB,
+                null,
                 null,
                 null,
                 null);
@@ -48,7 +51,7 @@ public class UserApiClient implements UserClient {
         if (count > 0) {
             for (int i = 0; i < count; i++) {
                 final String username = RandomDataUtils.randomUsername();
-                authApiClient.register(username, "1234");
+                authApiClient.register(username, PASSWORD);
                 userApiClient.sendInvitation(targetUser.username(), username);
                 outcomeRequests.add(username);
             }
@@ -63,7 +66,7 @@ public class UserApiClient implements UserClient {
         if (count > 0) {
             for (int i = 0; i < count; i++) {
                 final String username = RandomDataUtils.randomUsername();
-                authApiClient.register(username, "1234");
+                authApiClient.register(username, PASSWORD);
                 userApiClient.sendInvitation(username, targetUser.username());
                 incomeRequests.add(username);
             }
@@ -78,7 +81,8 @@ public class UserApiClient implements UserClient {
         if (count > 0) {
             for (int i = 0; i < count; i++) {
                 final String username = RandomDataUtils.randomUsername();
-                authApiClient.register(username, "1234");
+                authApiClient.register(username, PASSWORD);
+                userApiClient.sendInvitation(username, targetUser.username());
                 userApiClient.acceptInvitation(targetUser.username(), username);
                 friends.add(username);
             }

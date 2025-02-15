@@ -5,9 +5,8 @@ import guru.qa.niffler.page.*;
 
 import static com.codeborne.selenide.Selenide.$;
 
-public class Header {
+public class Header extends BaseComponent<Header> {
 
-    private final SelenideElement self = $("#root header");
     private final SelenideElement accountMenuBtn = self.$("button[aria-label='Menu']");
     private final SelenideElement toMainMenuBtn = self.$("a[href='/main']");
     private final SelenideElement addNewSpendBtn = self.$("a[href='/spending']");
@@ -15,6 +14,10 @@ public class Header {
     private final SelenideElement openFriendsPageBtn = $("a[href='/people/friends']");
     private final SelenideElement openAllPeoplePageBtn = $("a[href='/people/all']");
     private final SelenideElement signOutBtn = $("ul[role='menu'] li:last-child");
+
+    public Header() {
+        super($("#root header"));
+    }
 
     public FriendsPage toFriendsPage() {
         accountMenuBtn.click();

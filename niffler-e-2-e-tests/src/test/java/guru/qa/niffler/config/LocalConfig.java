@@ -35,11 +35,6 @@ enum LocalConfig implements Config {
   }
 
   @Override
-  public String ghUrl() {
-    return "https://api.github.com/";
-  }
-
-  @Override
   public String authJdbcUrl() {
     return "jdbc:postgresql://127.0.0.1:5432/niffler-auth";
   }

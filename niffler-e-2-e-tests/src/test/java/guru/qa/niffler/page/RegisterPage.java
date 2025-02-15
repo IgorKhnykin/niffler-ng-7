@@ -8,7 +8,7 @@ import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 
-public class RegisterPage {
+public class RegisterPage extends BasePage<RegisterPage> {
 
     public static RegisterPage initPage() {
         return Selenide.page(RegisterPage.class);

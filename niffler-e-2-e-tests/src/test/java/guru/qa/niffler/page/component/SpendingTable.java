@@ -8,22 +8,19 @@ import org.junit.jupiter.api.Assertions;
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.$x;
 
 
-public class SpendingTable {
-
-    private final SelenideElement self = $("div[id='spendings']");
+public class SpendingTable extends BaseComponent<SpendingTable> {
 
     private final ElementsCollection spendingTableRows = self.$$("tr");
 
     private final SelenideElement deleteBtn = self.$("button[id='delete']");
 
-    private final SelenideElement acceptDeleteBtn = self.$("(.//button[text()='Delete'])[2]");
-
     private final SearchField search = new SearchField($("input[placeholder='Search']"));
 
-    public SpendingTable selectPeriod() {
-        return this;
+    public SpendingTable() {
+        super($("div[id='spendings']"));
     }
 
     public EditSpendingPage toEditSpendingPage(String description) {
@@ -34,7 +31,6 @@ public class SpendingTable {
     public SpendingTable deleteSpending(String description) {
         findSpendByDescription(description).$("input[type='checkbox']").click();
         deleteBtn.click();
-        acceptDeleteBtn.click();
         return this;
     }
 

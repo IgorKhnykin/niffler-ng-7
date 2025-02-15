@@ -1,9 +1,9 @@
 package guru.qa.niffler.data.repository.impl;
 
 import guru.qa.niffler.config.Config;
+import guru.qa.niffler.data.entity.userdata.FriendshipStatus;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.data.repository.UserRepository;
-import guru.qa.niffler.model.FriendshipStatus;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 
