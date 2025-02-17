@@ -73,9 +73,4 @@ public class MainPage {
 
     return new EditSpendingPage();
   }
-
-  public MainPage searchSpendInSpendsList(String spendDescription) {
-    search.searchField(spendDescription);
-    return this;
-  }
 }

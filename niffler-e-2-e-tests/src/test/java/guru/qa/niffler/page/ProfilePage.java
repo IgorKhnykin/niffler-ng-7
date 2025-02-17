@@ -62,7 +62,7 @@ public class ProfilePage {
 
     @Step("Изменить фото профиля")
     public ProfilePage changeProfilePicture(String filename) {
-        uploadFileBtn.uploadFile(new File("niffler-e-2-e-tests/src/test/resources/%s".formatted(filename)));
+        uploadFileBtn.uploadFromClasspath("niffler-e-2-e-tests/src/test/resources/%s".formatted(filename));
         saveChangesBtn.click();
         alert.shouldHave(text("Profile successfully updated"));
         return this;

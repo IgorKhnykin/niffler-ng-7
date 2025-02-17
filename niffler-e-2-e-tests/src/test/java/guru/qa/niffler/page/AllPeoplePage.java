@@ -29,7 +29,7 @@ public class AllPeoplePage {
 
     @Step("Проверить, что пользователь {username} присутствует в списке всех пользователей")
     public AllPeoplePage checkPeopleExist(String username) {
-        search.searchField(username);
+        searchUserInAllPeopleList(username);
         peopleRows.findBy(text(username)).shouldHave(text("Unfriend"));
         return this;
     }
@@ -37,7 +37,7 @@ public class AllPeoplePage {
     @Step("Проверить исходящее предложение о дружбе")
     public AllPeoplePage checkOutcomeInvitationInPeopleList(List<String> outcomeInvitations) {
         outcomeInvitations.forEach(username -> {
-            search.searchField(username);
+            searchUserInAllPeopleList(username);
             peopleRows.findBy(text(username)).shouldHave(text("waiting"));
         });
         return this;
