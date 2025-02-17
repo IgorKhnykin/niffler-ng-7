@@ -7,9 +7,14 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
+@ParametersAreNonnullByDefault
 public class UserApiClient {
 
     private static final Config CFG = Config.getInstance();
@@ -21,7 +26,7 @@ public class UserApiClient {
 
     private final UserApi userApi = retrofit.create(UserApi.class);
 
-    public UserJson getCurrentUser(String username) {
+    public @Nullable UserJson getCurrentUser(String username) {
         Response<UserJson> response;
         try {
             response = userApi.getCurrentUser(username).execute();
@@ -32,7 +37,7 @@ public class UserApiClient {
         return response.body();
     }
 
-    public List<UserJson> getAllUsers(String username) {
+    public @Nonnull List<UserJson> getAllUsers(String username) {
         Response<List<UserJson>> response;
         try {
             response = userApi.getAllUsers(username).execute();
@@ -40,10 +45,10 @@ public class UserApiClient {
             throw new AssertionError(e);
         }
         Assertions.assertEquals(200, response.code(), "Не удалось получить всех пользователей");
-        return response.body();
+        return response.body() == null ? Collections.emptyList() : response.body();
     }
 
-    public UserJson updateUser(UserJson user) {
+    public @Nullable UserJson updateUser(UserJson user) {
         Response<UserJson> response;
         try {
             response = userApi.updateUser(user).execute();
@@ -54,7 +59,7 @@ public class UserApiClient {
         return response.body();
     }
 
-    public UserJson sendInvitation(String username, String targetUser) {
+    public @Nullable UserJson sendInvitation(String username, String targetUser) {
         Response<UserJson> response;
         try {
             response = userApi.sendInvitation(username, targetUser).execute();
@@ -65,7 +70,7 @@ public class UserApiClient {
         return response.body();
     }
 
-    public UserJson acceptInvitation(String username, String targetUser) {
+    public @Nullable UserJson acceptInvitation(String username, String targetUser) {
         Response<UserJson> response;
         try {
             response = userApi.acceptInvitation(username, targetUser).execute();
@@ -76,7 +81,7 @@ public class UserApiClient {
         return response.body();
     }
 
-    public UserJson declineInvitation(String username, String targetUser) {
+    public @Nullable UserJson declineInvitation(String username, String targetUser) {
         Response<UserJson> response;
         try {
             response = userApi.declineInvitation(username, targetUser).execute();
@@ -87,7 +92,7 @@ public class UserApiClient {
         return response.body();
     }
 
-    public List<UserJson> getAllFriends(String username) {
+    public @Nonnull List<UserJson> getAllFriends(String username) {
         Response<List<UserJson>> response;
         try {
             response = userApi.getAllFriends(username).execute();
@@ -95,7 +100,7 @@ public class UserApiClient {
             throw new AssertionError(e);
         }
         Assertions.assertEquals(200, response.code(), "Не удалось получить всех пользователей");
-        return response.body();
+        return response.body() == null ? Collections.emptyList() : response.body();
     }
 
     public void removeFriend(String username, String targetUser) {

@@ -7,12 +7,15 @@ import guru.qa.niffler.model.FriendshipStatus;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static guru.qa.niffler.data.jpa.EntityManagers.em;
 
+@ParametersAreNonnullByDefault
 public class UserRepositoryHibernate implements UserRepository {
 
     private static final Config CFG = Config.getInstance();
@@ -20,19 +23,19 @@ public class UserRepositoryHibernate implements UserRepository {
     EntityManager entityManager = em(CFG.userdataJdbcUrl());
 
     @Override
-    public UserEntity createUser(UserEntity user) {
+    public @Nonnull UserEntity createUser(UserEntity user) {
         entityManager.joinTransaction();
         entityManager.persist(user);
         return user;
     }
 
     @Override
-    public Optional<UserEntity> findById(UUID id) {
+    public @Nonnull Optional<UserEntity> findById(UUID id) {
         return Optional.ofNullable(entityManager.find(UserEntity.class, id));
     }
 
     @Override
-    public Optional<UserEntity> findByUsername(String username) {
+    public @Nonnull Optional<UserEntity> findByUsername(String username) {
         try {
             return Optional.of(entityManager.createQuery("select u from UserEntity u where u.username =: username", UserEntity.class)
                     .setParameter("username", username)
@@ -43,14 +46,14 @@ public class UserRepositoryHibernate implements UserRepository {
     }
 
     @Override
-    public UserEntity updateUser(UserEntity user) {
+    public @Nonnull UserEntity updateUser(UserEntity user) {
         entityManager.joinTransaction();
         entityManager.persist(entityManager.contains(user) ? user : entityManager.merge(user));
         return user;
     }
 
     @Override
-    public List<UserEntity> findAll() {
+    public @Nonnull List<UserEntity> findAll() {
         return entityManager.createQuery("select u from UserEntity u", UserEntity.class).getResultList();
     }
 

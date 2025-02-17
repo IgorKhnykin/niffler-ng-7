@@ -1,10 +1,13 @@
 package guru.qa.niffler.data.tpl;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
+@ParametersAreNonnullByDefault
 public class JdbcTransactionTemplate {
 
     private final JdbcConnectionHolder holder;
@@ -20,7 +23,7 @@ public class JdbcTransactionTemplate {
         return this;
     }
 
-    public <T> T execute(Supplier<T> function, int transactionLevel) {
+    public @Nullable <T> T execute(Supplier<T> function, int transactionLevel) {
         Connection connection = null;
         try {
             connection = holder.connection();
@@ -47,7 +50,7 @@ public class JdbcTransactionTemplate {
         }
     }
 
-    public <T> T execute(Supplier<T> function) {
+    public @Nullable <T> T execute(Supplier<T> function) {
         return execute(function, Connection.TRANSACTION_READ_COMMITTED);
     }
 }

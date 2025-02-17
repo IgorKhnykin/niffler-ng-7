@@ -9,10 +9,14 @@ import guru.qa.niffler.data.tpl.JdbcTransactionTemplate;
 import guru.qa.niffler.data.tpl.XaTransactionTemplate;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.SpendJson;
+import io.qameta.allure.Step;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 
+@ParametersAreNonnullByDefault
 public class SpendDbClient implements SpendClient {
 
     private final JdbcTransactionTemplate jdbcTxTemplate = new JdbcTransactionTemplate(CFG.spendJdbcUrl());
@@ -24,7 +28,8 @@ public class SpendDbClient implements SpendClient {
     private static final Config CFG = Config.getInstance();
 
     @Override
-    public SpendJson createSpend(SpendJson spendJson) {
+    @Step("Создание траты через базу данных")
+    public @Nullable SpendJson createSpend(SpendJson spendJson) {
         return xaTransactionTemplate.execute(() -> {
             SpendEntity spendEntity = SpendEntity.fromJson(spendJson);
             return SpendJson.fromEntity(spendRepository.createSpend(spendEntity));
@@ -32,7 +37,8 @@ public class SpendDbClient implements SpendClient {
     }
 
     @Override
-    public SpendJson findSpend(SpendJson spendJson) {
+    @Step("Найти трату через базу данных")
+    public @Nullable SpendJson findSpend(SpendJson spendJson) {
         return xaTransactionTemplate.execute(() -> {
             SpendEntity spendEntity = SpendEntity.fromJson(spendJson);
             Optional<SpendEntity> spendFromDb = (spendRepository.findSpendById(spendEntity.getId()));
@@ -41,7 +47,8 @@ public class SpendDbClient implements SpendClient {
     }
 
     @Override
-    public List<SpendJson> findSpendByUsernameAndDescription(String username, String description) {
+    @Step("Найти трату по имени пользователя {username} и описанию {description} через базу данных")
+    public @Nullable List<SpendJson> findSpendByUsernameAndDescription(String username, String description) {
         return xaTransactionTemplate.execute(() -> {
             List<SpendEntity> spendFromDb = (spendRepository.findByUsernameAndSpendDescription(username, description));
             return spendFromDb.stream().map(SpendJson::fromEntity).toList();
@@ -49,6 +56,7 @@ public class SpendDbClient implements SpendClient {
     }
 
     @Override
+    @Step("Удалить трату через базу данных")
     public void deleteSpend(SpendJson spendJson) {
         xaTransactionTemplate.execute(() -> {
             SpendEntity spendEntity = SpendEntity.fromJson(spendJson);
@@ -58,7 +66,8 @@ public class SpendDbClient implements SpendClient {
     }
 
     @Override
-    public CategoryJson createCategory(CategoryJson categoryJson) {
+    @Step("Создать категорию через базу данных")
+    public @Nullable CategoryJson createCategory(CategoryJson categoryJson) {
         return xaTransactionTemplate.execute(() -> {
             CategoryEntity categoryEntity = CategoryEntity.fromJson(categoryJson);
             return CategoryJson.fromEntity(spendRepository.createCategory(categoryEntity));
@@ -66,7 +75,8 @@ public class SpendDbClient implements SpendClient {
     }
 
     @Override
-    public CategoryJson findCategoryByUsernameAndCategoryName(String username, String categoryName) {
+    @Step("Найти категорию по имени пользователя {username} и имени категории {categoryName} через базу данных")
+    public @Nullable CategoryJson findCategoryByUsernameAndCategoryName(String username, String categoryName) {
         return xaTransactionTemplate.execute(() -> {
             Optional<CategoryEntity> categoryFromDb = spendRepository.findCategoryByUsernameAndCategoryName(username, categoryName);
             return categoryFromDb.map(CategoryJson::fromEntity).orElse(null);
@@ -74,6 +84,7 @@ public class SpendDbClient implements SpendClient {
     }
 
     @Override
+    @Step("Удалить категорию через базу данных")
     public void deleteCategory(CategoryJson categoryJson) {
         xaTransactionTemplate.execute(() -> {
             CategoryEntity categoryEntity = CategoryEntity.fromJson(categoryJson);
@@ -83,14 +94,16 @@ public class SpendDbClient implements SpendClient {
     }
 
     @Override
-    public SpendJson updateSpend(SpendJson spendJson) {
-        return SpendJson.fromEntity(xaTransactionTemplate.execute(
-                () -> spendRepository.updateSpend(SpendEntity.fromJson(spendJson))));
+    @Step("Обновить данные траты через базу данных")
+    public @Nullable SpendJson updateSpend(SpendJson spendJson) {
+        return xaTransactionTemplate.execute(
+                () -> SpendJson.fromEntity(spendRepository.updateSpend(SpendEntity.fromJson(spendJson))));
     }
 
     @Override
-    public CategoryJson updateCategory(CategoryJson categoryJson) {
-        return CategoryJson.fromEntity(xaTransactionTemplate.execute(
-                () -> spendRepository.updateCategory(CategoryEntity.fromJson(categoryJson))));
+    @Step("Обновить данные категории через базу данных")
+    public @Nullable CategoryJson updateCategory(CategoryJson categoryJson) {
+        return xaTransactionTemplate.execute(
+                () -> CategoryJson.fromEntity(spendRepository.updateCategory(CategoryEntity.fromJson(categoryJson))));
     }
 }

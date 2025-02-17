@@ -10,18 +10,21 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@ParametersAreNonnullByDefault
 public class CategoryDaoSpringJdbc implements CategoryDao {
 
     private static final Config CFG = Config.getInstance();
 
     @Override
-    public CategoryEntity create(CategoryEntity category) {
+    public @Nonnull CategoryEntity create(CategoryEntity category) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.spendJdbcUrl()));
         jdbcTemplate.update(con -> {
@@ -38,7 +41,7 @@ public class CategoryDaoSpringJdbc implements CategoryDao {
     }
 
     @Override
-    public CategoryEntity update(CategoryEntity category) {
+    public @Nonnull CategoryEntity update(CategoryEntity category) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.spendJdbcUrl()));
         jdbcTemplate.update(con -> {
             PreparedStatement ps = con.prepareStatement("update category set name = ?, username = ?, archived = ? where id = ?",
@@ -53,7 +56,7 @@ public class CategoryDaoSpringJdbc implements CategoryDao {
     }
 
     @Override
-    public Optional<CategoryEntity> findCategoryById(UUID id) {
+    public @Nonnull Optional<CategoryEntity> findCategoryById(UUID id) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.spendJdbcUrl()));
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject("SELECT * FROM category WHERE id = ?",
@@ -65,7 +68,7 @@ public class CategoryDaoSpringJdbc implements CategoryDao {
     }
 
     @Override
-    public Optional<CategoryEntity> findCategoryByUsernameAndCategoryName(String username, String categoryName) {
+    public @Nonnull Optional<CategoryEntity> findCategoryByUsernameAndCategoryName(String username, String categoryName) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.spendJdbcUrl()));
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject("SELECT * FROM category WHERE username = ? and name = ?",
@@ -95,9 +98,8 @@ public class CategoryDaoSpringJdbc implements CategoryDao {
     }
 
     @Override
-    public List<CategoryEntity> findAll() {
+    public @Nonnull List<CategoryEntity> findAll() {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.spendJdbcUrl()));
         return jdbcTemplate.query("SELECT * FROM category", CategoryEntityRowMapper.instance);
     }
-
 }
