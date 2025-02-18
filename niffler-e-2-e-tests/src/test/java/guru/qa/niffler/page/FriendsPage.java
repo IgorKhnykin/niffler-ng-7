@@ -28,7 +28,7 @@ public class FriendsPage extends BasePage<FriendsPage> {
 
     private final SearchField search = new SearchField($("input[placeholder='Search']"));
 
-    private final SelenideElement acceptDeclineBtn = $x(".//div[@role='dialog']//button[text()='Decline']");
+    private final SelenideElement confirmDeclineFriendshipBtn = $x(".//div[@role='dialog']//button[text()='Decline']");
 
     @Step("Проверка присутствия друга в таблице друзей")
     public FriendsPage checkFriendExist(List<String> friendsName) {
@@ -66,7 +66,7 @@ public class FriendsPage extends BasePage<FriendsPage> {
     public FriendsPage declineIncomeRequest(String requesterName) {
         search.searchField(requesterName);
         friendsRows.findBy(text(requesterName)).$x(".//button[text()='Decline']").click();
-        acceptDeclineBtn.click();
+        confirmDeclineFriendshipBtn.click();
         return this;
     }
 }
