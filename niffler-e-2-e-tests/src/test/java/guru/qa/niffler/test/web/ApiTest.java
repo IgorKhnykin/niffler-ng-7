@@ -18,7 +18,8 @@ public class ApiTest {
     @Test
     void test1() {
         UserClient userApiClient = new UserApiClient();
-        UserJson userJson = userApiClient.createUser("api user", "1234");
+        UserJson userJson = userApiClient.createUser("api userTest7", "1234");
+        userApiClient.addFriend(userJson, 1);
         System.out.println(userJson);
     }
 

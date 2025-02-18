@@ -1,16 +1,16 @@
 package guru.qa.niffler.page.component;
 
-import com.codeborne.selenide.SelenideElement;
-
 import java.util.Date;
 
 import static com.codeborne.selenide.Selenide.$;
 
-public class Calendar {
+public class Calendar extends BaseComponent<Calendar>{
 
     java.util.Calendar calendar = java.util.Calendar.getInstance();
 
-    private final SelenideElement self = $(".MuiDateCalendar-root");
+    public Calendar() {
+        super($(".MuiDateCalendar-root"));
+    }
 
     public Calendar selectDateInCalendar(Date date) {
         calendar.setTime(date);

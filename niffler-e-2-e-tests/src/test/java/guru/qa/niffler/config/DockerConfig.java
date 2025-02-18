@@ -29,11 +29,6 @@ public enum DockerConfig implements Config{
     }
 
     @Override
-    public String ghUrl() {
-        return "";
-    }
-
-    @Override
     public String authJdbcUrl() {
         return "";
     }

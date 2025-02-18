@@ -12,7 +12,7 @@ import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$x;
 
-public class FriendsPage {
+public class FriendsPage extends BasePage<FriendsPage> {
 
     private final SelenideElement friendsTable = $("table[aria-labelledby='tableTitle']");
 
@@ -27,6 +27,8 @@ public class FriendsPage {
     private final ElementsCollection requestsRows = requestsTable.$$("tr");
 
     private final SearchField search = new SearchField($("input[placeholder='Search']"));
+
+    private final SelenideElement confirmDeclineFriendshipBtn = $x(".//div[@role='dialog']//button[text()='Decline']");
 
     @Step("Проверка присутствия друга в таблице друзей")
     public FriendsPage checkFriendExist(List<String> friendsName) {
@@ -64,6 +66,7 @@ public class FriendsPage {
     public FriendsPage declineIncomeRequest(String requesterName) {
         search.searchField(requesterName);
         friendsRows.findBy(text(requesterName)).$x(".//button[text()='Decline']").click();
+        confirmDeclineFriendshipBtn.click();
         return this;
     }
 }

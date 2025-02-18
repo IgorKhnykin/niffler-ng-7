@@ -26,6 +26,8 @@ public record UserJson(
         String photo,
         @JsonProperty("photoSmall")
         String photoSmall,
+        @JsonProperty("friendshipStatus")
+        FriendshipStatus friendshipStatus,
         @JsonIgnore
         TestData testData) {
 
@@ -39,12 +41,13 @@ public record UserJson(
                 entity.getCurrency(),
                 entity.getPhoto() != null && entity.getPhoto().length > 0 ? new String(entity.getPhoto(), StandardCharsets.UTF_8) : null,
                 entity.getPhotoSmall() != null && entity.getPhotoSmall().length > 0 ? new String(entity.getPhotoSmall(), StandardCharsets.UTF_8) : null,
+                null,
                 null
         );
     }
 
     public UserJson addTestData(TestData testData) {
-        return new UserJson(id, username, firstname, surname, fullname, currency, photo, photoSmall, testData);
+        return new UserJson(id, username, firstname, surname, fullname, currency, photo, photoSmall, friendshipStatus, testData);
     }
 }
 

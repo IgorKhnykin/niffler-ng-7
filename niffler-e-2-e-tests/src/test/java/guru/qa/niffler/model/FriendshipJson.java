@@ -1,6 +1,7 @@
 package guru.qa.niffler.model;
 
 import guru.qa.niffler.data.entity.userdata.FriendshipEntity;
+import guru.qa.niffler.data.entity.userdata.FriendshipStatus;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -22,6 +23,7 @@ public record FriendshipJson(
                         fsEntity.getAddressee().getCurrency(),
                         fsEntity.getAddressee().getPhoto() != null && fsEntity.getAddressee().getPhoto().length > 0 ? new String(fsEntity.getAddressee().getPhoto(), StandardCharsets.UTF_8) : null,
                         fsEntity.getAddressee().getPhotoSmall() != null && fsEntity.getAddressee().getPhotoSmall().length > 0 ? new String(fsEntity.getAddressee().getPhotoSmall(), StandardCharsets.UTF_8) : null,
+                        null,
                         null),
                 new UserJson(
                         fsEntity.getRequester().getId(),
@@ -32,6 +34,7 @@ public record FriendshipJson(
                         fsEntity.getRequester().getCurrency(),
                         fsEntity.getRequester().getPhoto() != null && fsEntity.getRequester().getPhoto().length > 0 ? new String(fsEntity.getRequester().getPhoto(), StandardCharsets.UTF_8) : null,
                         fsEntity.getRequester().getPhotoSmall() != null && fsEntity.getRequester().getPhotoSmall().length > 0 ? new String(fsEntity.getRequester().getPhotoSmall(), StandardCharsets.UTF_8) : null,
+                        null,
                         null
                 ),
                 fsEntity.getCreatedDate(),

@@ -101,6 +101,7 @@ public class JbdcTest {
                 CurrencyValues.EUR,
                 null,
                 null,
+                null,
                 null);
 
         UserDbClient userDbClient = new UserDbClient();
@@ -115,6 +116,7 @@ public class JbdcTest {
                 null,
                 null,
                 CurrencyValues.EUR,
+                null,
                 null,
                 null,
                 null);

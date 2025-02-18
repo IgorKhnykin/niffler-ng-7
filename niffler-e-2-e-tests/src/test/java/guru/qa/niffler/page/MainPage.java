@@ -10,10 +10,9 @@ import io.qameta.allure.Step;
 
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.$$;
+import static com.codeborne.selenide.Selenide.*;
 
-public class MainPage {
+public class MainPage extends BasePage<MainPage> {
 
   public static MainPage initPage() {
     return Selenide.page(MainPage.class);
@@ -26,6 +25,8 @@ public class MainPage {
   private final SelenideElement spendingBlock = $("#spendings");
 
   private final SelenideElement searchInput = $("input[placeholder='Search']");
+
+  private final SelenideElement acceptDeleteBtn = $x(".//div[@role='dialog']//button[text()='Delete']");
 
   private final Header header = new Header();
 
@@ -41,7 +42,7 @@ public class MainPage {
 
   @Step("Проверка присутствия траты {spendingDescription} в списке трат")
   public void checkThatTableContainsSpending(String spendingDescription) {
-    search.searchField(spendingDescription);
+    spendingTable.searchSpendingByDescription(spendingDescription);
     tableRows.find(text(spendingDescription)).should(visible);
   }
 
@@ -70,7 +71,13 @@ public class MainPage {
   @Step("Перейти на вкладку создания категории")
   public EditSpendingPage createNewSpend() {
     header.addSpendingPage();
-
     return new EditSpendingPage();
+  }
+
+  @Step("Удалить трату")
+  public MainPage deleteSpend(String description) {
+    spendingTable.deleteSpending(description);
+    acceptDeleteBtn.click();
+    return  new MainPage();
   }
 }

@@ -1,30 +1,26 @@
 package guru.qa.niffler.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import guru.qa.niffler.api.core.ThreadSafeCookieStore;
 import guru.qa.niffler.config.Config;
 import org.junit.jupiter.api.Assertions;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.util.Objects;
 @ParametersAreNonnullByDefault
-public class AuthApiClient{
+public class AuthApiClient extends RestClient{
 
     private static final Config CFG = Config.getInstance();
 
-    private final Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl(CFG.authUrl())
-            .addConverterFactory(JacksonConverterFactory.create())
-            .build();
+    private final AuthApi authApi;
 
-    private final AuthApi authApi = retrofit.create(AuthApi.class);
-
+    public AuthApiClient() {
+        super(CFG.authUrl());
+        this.authApi = retrofit.create(AuthApi.class);
+    }
 
     public @Nonnull String getToken() {
         final Response<JsonNode> response;
@@ -47,15 +43,16 @@ public class AuthApiClient{
     public void register(String username, String password) {
         final Response<Void> response;
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            ObjectNode jsonObject = objectMapper.createObjectNode();
-            jsonObject.put("username", username);
-            jsonObject.put("password", password);
+            authApi.requestRegisterForm().execute();
 
-            response = authApi.register(jsonObject).execute();
+            response = authApi.register(ThreadSafeCookieStore.INSTANCE.xsrfCookieValue(), username, password, password)
+                    .execute();
+
         } catch (IOException e) {
             throw new AssertionError(e);
         }
-        Assertions.assertEquals(200, response.code(), "Не удалось зарегистрироваться");
+        Assertions.assertEquals(201, response.code(), "Не удалось зарегистрироваться");
     }
+
+
 }
