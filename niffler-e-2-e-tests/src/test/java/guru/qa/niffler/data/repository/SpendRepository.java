@@ -2,12 +2,24 @@ package guru.qa.niffler.data.repository;
 
 import guru.qa.niffler.data.entity.spend.CategoryEntity;
 import guru.qa.niffler.data.entity.spend.SpendEntity;
+import guru.qa.niffler.data.repository.impl.SpendRepositoryHibernate;
+import guru.qa.niffler.data.repository.impl.SpendRepositoryJdbc;
+import guru.qa.niffler.data.repository.impl.SpendRepositorySpringJdbc;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface SpendRepository {
+
+    static SpendRepository getInstance() {
+        return switch (System.getProperty("repository.impl", "sjdbc")) {
+            case "jpa" -> new SpendRepositoryHibernate();
+            case "sjdbc" -> new SpendRepositorySpringJdbc();
+            case "jdbc" -> new SpendRepositoryJdbc();
+            default -> throw new IllegalStateException("Unexpected value: " + System.getProperty("repository.impl"));
+        };
+    }
 
     SpendEntity createSpend(SpendEntity spend);
 

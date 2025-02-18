@@ -1,14 +1,10 @@
 package guru.qa.niffler.jupiter.extension;
 
 import guru.qa.niffler.jupiter.annotation.User;
-import guru.qa.niffler.model.TestData;
 import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.service.UserClient;
-import guru.qa.niffler.service.UserDbClient;
 import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
-
-import java.util.ArrayList;
 
 import static guru.qa.niffler.utils.RandomDataUtils.randomUsername;
 
@@ -16,7 +12,7 @@ public class UserExtension implements BeforeEachCallback, ParameterResolver {
 
     public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(UserExtension.class);
 
-    private final UserClient userClient = new UserDbClient();
+    private final UserClient userClient = UserClient.getInstance();
 
     private static final String defaultPassword = "1234";
 
@@ -28,8 +24,7 @@ public class UserExtension implements BeforeEachCallback, ParameterResolver {
                     if ("".equals(user.username())) {
                         UserJson userJson = userClient.createUser(username, defaultPassword);
                         context.getStore(NAMESPACE)
-                                .put(context.getUniqueId(), userJson.addTestData(
-                                        new TestData(defaultPassword, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>())));
+                                .put(context.getUniqueId(), userJson);
                     }
         });
     }

@@ -5,7 +5,6 @@ import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.service.SpendClient;
-import guru.qa.niffler.service.SpendDbClient;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
@@ -17,7 +16,7 @@ import static guru.qa.niffler.utils.RandomDataUtils.randomCategoryName;
 
 public class CategoryExtension implements BeforeEachCallback, ParameterResolver {
 
-    private final SpendClient dbClient = new SpendDbClient();
+    private final SpendClient client = SpendClient.getInstance();
 
     public final static ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(CategoryExtension.class);
 
@@ -40,7 +39,7 @@ public class CategoryExtension implements BeforeEachCallback, ParameterResolver 
                                             username,
                                             category.archived()
                                     );
-                                    CategoryJson createdCategory = dbClient.createCategory(categoryJson);
+                                    CategoryJson createdCategory = client.createCategory(categoryJson);
                                     categories.add(createdCategory);
                                 }
                                 if (user != null) {

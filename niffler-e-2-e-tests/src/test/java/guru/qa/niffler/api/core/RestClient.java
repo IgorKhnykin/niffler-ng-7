@@ -1,6 +1,5 @@
-package guru.qa.niffler.api;
+package guru.qa.niffler.api.core;
 
-import guru.qa.niffler.api.core.ThreadSafeCookieStore;
 import okhttp3.Interceptor;
 import okhttp3.JavaNetCookieJar;
 import okhttp3.OkHttpClient;
@@ -48,5 +47,24 @@ public class RestClient {
                 .client(okHttpClient)
                 .addConverterFactory(converterFactory)
                 .build();
+    }
+
+    public <T> T create(Class<T> clazz) {
+        return this.retrofit.create(clazz);
+    }
+
+    public static final class EmptyRestClient extends RestClient{
+
+        public EmptyRestClient(String baseUrl) {
+            super(baseUrl);
+        }
+
+        public EmptyRestClient(String baseUrl, boolean followRedirects) {
+            super(baseUrl, followRedirects);
+        }
+
+        public EmptyRestClient(String baseUrl, boolean followRedirects, Converter.Factory converterFactory, HttpLoggingInterceptor.Level level, Interceptor... interceptors) {
+            super(baseUrl, followRedirects, converterFactory, level, interceptors);
+        }
     }
 }

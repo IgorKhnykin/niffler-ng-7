@@ -1,4 +1,4 @@
-package guru.qa.niffler.service;
+package guru.qa.niffler.service.impl;
 
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.entity.auth.AuthAuthorityEntity;
@@ -6,12 +6,12 @@ import guru.qa.niffler.data.entity.auth.AuthUserEntity;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.data.repository.AuthUserRepository;
 import guru.qa.niffler.data.repository.UserRepository;
-import guru.qa.niffler.data.repository.impl.AuthUserRepositorySpringJdbc;
-import guru.qa.niffler.data.repository.impl.UserRepositorySpringJdbc;
 import guru.qa.niffler.data.tpl.XaTransactionTemplate;
 import guru.qa.niffler.model.Authority;
 import guru.qa.niffler.model.CurrencyValues;
+import guru.qa.niffler.model.TestData;
 import guru.qa.niffler.model.UserJson;
+import guru.qa.niffler.service.UserClient;
 import io.qameta.allure.Step;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,7 +23,7 @@ import java.util.*;
 import static guru.qa.niffler.utils.RandomDataUtils.randomUsername;
 
 @ParametersAreNonnullByDefault
-public class UserDbClient implements UserClient{
+public class UserDbClient implements UserClient {
 
     private static final Config CFG = Config.getInstance();
 
@@ -31,9 +31,9 @@ public class UserDbClient implements UserClient{
 
     private final XaTransactionTemplate xaTransactionTemplate = new XaTransactionTemplate(CFG.authJdbcUrl(), CFG.userdataJdbcUrl());
 
-    private final AuthUserRepository authUserRepository = new AuthUserRepositorySpringJdbc();
+    private final AuthUserRepository authUserRepository = AuthUserRepository.getInstance();
 
-    private final UserRepository userRepository = new UserRepositorySpringJdbc();
+    private final UserRepository userRepository = UserRepository.getInstance();
 
     @Override
     @Step("Создать пользователя {username} через базу данных")
@@ -44,7 +44,7 @@ public class UserDbClient implements UserClient{
 
             authUserRepository.create(authUserEntity);
 
-            return UserJson.fromEntity(userRepository.createUser(userEntity(username)));
+            return UserJson.fromEntity(userRepository.createUser(userEntity(username))).addTestData(new TestData(password));
         });
     }
 
@@ -86,6 +86,7 @@ public class UserDbClient implements UserClient{
                     outcomeRequests.add(assignee.getUsername());
                 }
             }
+            targetUser.testData().outcomeRequests().addAll(outcomeRequests);
             return outcomeRequests;
         });
     }
@@ -109,6 +110,7 @@ public class UserDbClient implements UserClient{
                     incomeRequests.add(requester.getUsername());
                 }
             }
+            targetUser.testData().incomeRequests().addAll(incomeRequests);
             return incomeRequests;
         });
 
@@ -134,6 +136,7 @@ public class UserDbClient implements UserClient{
                     friends.add(assignee.getUsername());
                 }
             }
+            targetUser.testData().friends().addAll(friends);
             return friends;
         });
     }
@@ -163,8 +166,7 @@ public class UserDbClient implements UserClient{
             Optional<UserEntity> userEntity = userRepository.findById(id);
             if (userEntity.isPresent()) {
                 return UserJson.fromEntity(userEntity.get());
-            }
-            else {
+            } else {
                 return null;
             }
         });
@@ -173,10 +175,16 @@ public class UserDbClient implements UserClient{
     @Override
     @Step("Найти всех пользователей через базу данных")
     public @Nullable List<UserJson> findAllUsers() {
-        return xaTransactionTemplate.execute(() -> userRepository.findAll()
-                .stream()
-                .map(UserJson::fromEntity)
-                .toList());
+        return xaTransactionTemplate.execute(() -> {
+            List<UserEntity> userlist = userRepository.findAll();
+            if (!userlist.isEmpty()) {
+                return userlist.stream()
+                        .map(UserJson::fromEntity)
+                        .toList();
+            } else {
+                return Collections.emptyList();
+            }
+        });
     }
 
     private UserEntity userEntity(String username) {
