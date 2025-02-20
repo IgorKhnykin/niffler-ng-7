@@ -2,7 +2,7 @@ package guru.qa.niffler.data.mapper;
 
 import guru.qa.niffler.data.entity.auth.AuthAuthorityEntity;
 import guru.qa.niffler.data.entity.auth.AuthUserEntity;
-import guru.qa.niffler.model.Authority;
+import guru.qa.niffler.model.rest.Authority;
 import org.springframework.jdbc.core.RowMapper;
 
 import javax.annotation.Nonnull;

@@ -1,6 +1,6 @@
 package guru.qa.niffler.api;
 
-import guru.qa.niffler.model.UserJson;
+import guru.qa.niffler.model.rest.UserJson;
 import retrofit2.Call;
 import retrofit2.http.*;
 
@@ -12,7 +12,7 @@ public interface UserApi {
     Call<UserJson> getCurrentUser(@Query("username") String username);
 
     @GET("/internal/users/all")
-    Call<List<UserJson>> getAllUsers(@Query("sort") String username);
+    Call<List<UserJson>> getAllUsers(@Query("username") String username);
 
     @POST("/internal/users/update")
     Call<UserJson> updateUser(@Body UserJson user);
