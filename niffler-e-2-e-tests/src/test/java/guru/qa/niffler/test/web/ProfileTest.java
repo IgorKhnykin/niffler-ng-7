@@ -5,15 +5,15 @@ import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.jupiter.annotation.meta.WebTest;
 import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.page.LoginPage;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 @WebTest
 public class ProfileTest {
 
     @Test
     @User(categories = @Category(
-                    archived = true)
+            archived = true)
     )
     @DisplayName("Проверка отображения архивной категории")
     void archiveCategoryShouldPresentInCategoriesListTest(UserJson user) {
@@ -28,7 +28,7 @@ public class ProfileTest {
 
     @Test
     @User(categories = @Category(
-                    archived = false)
+            archived = false)
     )
     @DisplayName("Проверка отображения не архивной категории")
     void activeCategoryShouldPresentInCategoriesListTest(UserJson user) {
