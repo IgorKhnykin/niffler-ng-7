@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 public class FriendsWebTest {
 
     @Test
-    @User(withFriend = 1)
+    @User(withFriend = 2)
     @DisplayName("Проверка присутствия друга в таблице друзей")
     void friendShouldBePresentInFriendsTableTest(UserJson user) {
             LoginPage.open()

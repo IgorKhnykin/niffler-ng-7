@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
+@Deprecated
 public class UserQueueExtension implements
         BeforeEachCallback,
         AfterEachCallback,

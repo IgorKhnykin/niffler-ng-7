@@ -1,7 +1,10 @@
-package guru.qa.niffler.api;
+package guru.qa.niffler.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import guru.qa.niffler.api.GhAPI;
+import guru.qa.niffler.api.core.RestClient;
 import guru.qa.niffler.config.Config;
+import guru.qa.niffler.service.GhClient;
 import retrofit2.Response;
 
 import javax.annotation.Nonnull;
@@ -12,23 +15,19 @@ import java.util.Objects;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ParametersAreNonnullByDefault
-public class GhApiClient extends RestClient{
+public class GhApiClient implements GhClient {
 
     private static final String GH_TOKEN = "GH_TOKEN";
 
     private static final Config CFG = Config.getInstance();
 
-    private final GhAPI ghAPI;
+    private final GhAPI client = new RestClient.EmptyRestClient(CFG.ghUrl()).create(GhAPI.class) ;
 
-    public GhApiClient() {
-        super(CFG.ghUrl());
-        this.ghAPI = retrofit.create(GhAPI.class);
-    }
 
     public @Nonnull String getIssueState(String issueNumber) {
         final Response<JsonNode> response;
         try {
-            response = ghAPI.getIssueStatus("Bearer " + System.getenv(GH_TOKEN), issueNumber)
+            response = client.getIssueStatus("Bearer " + System.getenv(GH_TOKEN), issueNumber)
                     .execute();
         }
         catch (IOException e) {

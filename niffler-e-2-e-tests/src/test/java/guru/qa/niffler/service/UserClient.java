@@ -2,11 +2,17 @@ package guru.qa.niffler.service;
 
 import guru.qa.niffler.data.entity.auth.AuthUserEntity;
 import guru.qa.niffler.model.UserJson;
+import guru.qa.niffler.service.impl.UserApiClient;
+import guru.qa.niffler.service.impl.UserDbClient;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface UserClient {
+
+    static UserClient getInstance() {
+        return "api".equals(System.getProperty("client.impl", "api")) ? new UserApiClient() : new UserDbClient();
+    }
 
     UserJson createUser(String username, String password);
 

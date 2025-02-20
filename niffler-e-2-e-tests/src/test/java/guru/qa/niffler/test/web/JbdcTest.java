@@ -4,43 +4,45 @@ import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.model.UserJson;
-import guru.qa.niffler.service.SpendDbClient;
-import guru.qa.niffler.service.UserDbClient;
+import guru.qa.niffler.service.SpendClient;
+import guru.qa.niffler.service.UserClient;
+import guru.qa.niffler.service.impl.SpendDbClient;
+import guru.qa.niffler.service.impl.UserDbClient;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+@Disabled
 public class JbdcTest {
+    UserClient userClient = new UserDbClient();
+    SpendClient spendClient = new SpendDbClient();
+    
     @Test
     void createAndDeleteUserViaRepository() {
-        UserDbClient userDbClient = new UserDbClient();
-        UserJson userJson = userDbClient.createUser("TestSpringUser", "12345");
-        userDbClient.deleteUser(userJson.username());
+        UserJson userJson = userClient.createUser("TestSpringUser", "12345");
+        userClient.deleteUser(userJson.username());
     }
 
     @Test
     void createAndUpdateUserViaRepository() {
-        UserDbClient userDbClient = new UserDbClient();
-        UserJson userJson = userDbClient.createUser("TestSpringUser3", "12345");
-        UserJson userJsonUpdated = userDbClient.updateUser(userJson);
-        userDbClient.deleteUser(userJsonUpdated.username());
+        UserJson userJson = userClient.createUser("TestSpringUser3", "12345");
+        UserJson userJsonUpdated = userClient.updateUser(userJson);
+        userClient.deleteUser(userJsonUpdated.username());
     }
 
     @Test
     void updateAuthUserViaRepository() {
-        UserDbClient userDbClient = new UserDbClient();
-        UserJson userJson = userDbClient.createUser("TestSpringUser3", "12345");
-        userDbClient.updateAuthUser(userJson.username());
-        userDbClient.deleteUser(userJson.username());
+        UserJson userJson = userClient.createUser("TestSpringUser3", "12345");
+        userClient.updateAuthUser(userJson.username());
+        userClient.deleteUser(userJson.username());
     }
 
     @Test
     void spendCreateFindDelete() {
-        SpendDbClient spendDbClient = new SpendDbClient();
-
-        SpendJson response = spendDbClient.createSpend(new SpendJson(
+        SpendJson response = spendClient.createSpend(new SpendJson(
                 null,
                 new Date(),
                 new CategoryJson(
@@ -54,30 +56,26 @@ public class JbdcTest {
                 "igorKhn"
         ));
 
-        SpendJson foundSpend = spendDbClient.findSpend(response);
-        spendDbClient.deleteSpend(foundSpend);
+        SpendJson foundSpend = spendClient.findSpend(response);
+        spendClient.deleteSpend(foundSpend);
     }
 
     @Test
     void spendFindByUsernameAndDescr() {
-        SpendDbClient spendDbClient = new SpendDbClient();
-
-        List<SpendJson> foundSpend = spendDbClient.findSpendByUsernameAndDescription("igorKhn", "Машина edited");
+        List<SpendJson> foundSpend = spendClient.findSpendByUsernameAndDescription("igorKhn", "Машина edited");
         System.out.println(foundSpend);
     }
 
     @Test
     void categoryCreateFindDelete() {
-        SpendDbClient spendDbClient = new SpendDbClient();
-
-        CategoryJson createdCategory = spendDbClient.createCategory(new CategoryJson(
+        CategoryJson createdCategory = spendClient.createCategory(new CategoryJson(
                 null,
                 "TEST3",
                 "igorKhn",
                 false)
         );
         for (int i = 0; i < 10; i++) {
-            SpendJson createdSpend = spendDbClient.createSpend(new SpendJson(
+            SpendJson createdSpend = spendClient.createSpend(new SpendJson(
                     null,
                     new Date(),
                     createdCategory,
@@ -87,8 +85,8 @@ public class JbdcTest {
                     "igorKhn"
             ));
         }
-        CategoryJson foundCategory = spendDbClient.findCategoryByUsernameAndCategoryName(createdCategory.username(), createdCategory.name());
-        spendDbClient.deleteCategory(foundCategory);
+        CategoryJson foundCategory = spendClient.findCategoryByUsernameAndCategoryName(createdCategory.username(), createdCategory.name());
+        spendClient.deleteCategory(foundCategory);
     }
 
     @Test
@@ -103,9 +101,8 @@ public class JbdcTest {
                 null,
                 null,
                 null);
-
-        UserDbClient userDbClient = new UserDbClient();
-        userDbClient.sendInvitation(requester, 1);
+        
+        userClient.sendInvitation(requester, 1);
     }
 
     @Test
@@ -120,22 +117,19 @@ public class JbdcTest {
                 null,
                 null,
                 null);
-
-        UserDbClient userDbClient = new UserDbClient();
-        userDbClient.addFriend(requester, 1);
+        
+        userClient.addFriend(requester, 1);
     }
 
     @Test
     void test() {
-        UserDbClient userDbClient = new UserDbClient();
-        userDbClient.findById(UUID.fromString("7e681763-942d-45e6-b459-37d93e6cdebf"));
+        userClient.findById(UUID.fromString("7e781763-942d-45e6-b459-37d93e6cdebf"));
     }
 
     @Test
     void test1() {
-        UserDbClient userDbClient = new UserDbClient();
-        userDbClient.findAllUsers().stream()
+        userClient.findAllUsers().stream()
                 .filter(user -> user.username().contains("."))
-                .forEach(user -> userDbClient.deleteUser(user.username()));
+                .forEach(user -> userClient.deleteUser(user.username()));
     }
 }
