@@ -1,12 +1,26 @@
 package guru.qa.niffler.page;
 
+import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.SelenideElement;
+import guru.qa.niffler.model.rest.CategoryJson;
+import guru.qa.niffler.model.rest.SpendJson;
 import guru.qa.niffler.page.component.Header;
 import guru.qa.niffler.page.component.SearchField;
 import guru.qa.niffler.page.component.SpendingTable;
+import guru.qa.niffler.utils.ScreenResult;
 import io.qameta.allure.Step;
+import org.junit.jupiter.api.Assertions;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
@@ -27,6 +41,10 @@ public class MainPage extends BasePage<MainPage> {
   private final SelenideElement searchInput = $("input[placeholder='Search']");
 
   private final SelenideElement acceptDeleteBtn = $x(".//div[@role='dialog']//button[text()='Delete']");
+
+  private final SelenideElement statistic = $("canvas[role='img']");
+
+  private final ElementsCollection statisticBubbles = $$("#legend-container li");
 
   private final Header header = new Header();
 
@@ -79,5 +97,38 @@ public class MainPage extends BasePage<MainPage> {
     spendingTable.deleteSpending(description);
     acceptDeleteBtn.click();
     return  new MainPage();
+  }
+
+  @Step("Сделать скриншот статистики")
+  public MainPage makeStatisticScreenshot(BufferedImage expected) throws IOException {
+    Selenide.sleep(2000);
+    BufferedImage actual = ImageIO.read(Objects.requireNonNull(statistic.screenshot()));
+    Assertions.assertFalse(new ScreenResult(expected, actual));
+    return this;
+  }
+
+  @Step("Проверка присутствия bubbles под статистикой")
+  public MainPage checkStatisticBubbles(List<SpendJson> spends) {
+    List<CategoryJson> categoryList = spends.stream().map(SpendJson::category).distinct().toList();
+    for (int i = 0; i < categoryList.size(); i++) {
+      switch (i) {
+        case 0 -> statisticBubbles.get(0).shouldHave(Condition.cssValue("background-color", "rgba(255, 183, 3, 1)"));
+        case 1 -> statisticBubbles.get(1).shouldHave(Condition.cssValue("background-color", "rgba(53, 173, 123, 1)"));
+        case 2 -> statisticBubbles.get(2).shouldHave(Condition.cssValue("background-color", "rgba(251, 133, 0, 1)"));
+        case 3 -> statisticBubbles.get(3).shouldHave(Condition.cssValue("background-color", "rgba(41, 65, 204, 1)"));
+        case 4 -> statisticBubbles.get(4).shouldHave(Condition.cssValue("background-color", "rgba(33, 158, 188, 1)"));
+        case 5 -> statisticBubbles.get(5).shouldHave(Condition.cssValue("background-color", "rgba(22, 41, 149, 1)"));
+        case 6 -> statisticBubbles.get(6).shouldHave(Condition.cssValue("background-color", "rgba(247, 89, 67, 1)"));
+        case 7 -> statisticBubbles.get(7).shouldHave(Condition.cssValue("background-color", "rgba(99, 181, 226, 1)"));
+      }
+    }
+
+    spends.stream()
+            .collect(Collectors.groupingBy(SpendJson::category, Collectors.summingDouble(SpendJson::amount)))
+            .forEach((category, sum) -> {
+              String bubbleExpectedText = category.name() + " " + sum.longValue() + " ₽";
+              statisticBubbles.get(categoryList.indexOf(category)).shouldHave(Condition.text(bubbleExpectedText));
+            });
+    return new MainPage();
   }
 }
