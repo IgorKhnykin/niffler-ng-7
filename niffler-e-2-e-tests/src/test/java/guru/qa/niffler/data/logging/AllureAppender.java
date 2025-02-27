@@ -10,6 +10,7 @@ import io.qameta.allure.attachment.DefaultAttachmentProcessor;
 import io.qameta.allure.attachment.FreemarkerAttachmentRenderer;
 
 import static org.apache.commons.lang3.StringUtils.isNoneEmpty;
+import static org.apache.commons.lang3.StringUtils.substringBefore;
 
 public class AllureAppender extends StdoutLogger {
 
@@ -21,7 +22,7 @@ public class AllureAppender extends StdoutLogger {
     public void logSQL(int connectionId, String now, long elapsed, Category category, String prepared, String sql, String url) {
         if (isNoneEmpty(sql)) {
             final SqlAttachmentData sqlAttachmentData = new SqlAttachmentData(
-                    sql.toUpperCase() + " query to: " + url,
+                    sql.split("\\s+")[0].toUpperCase() + " query to: " + substringBefore(url, "?"),
                     SqlFormatter.of(Dialect.PostgreSql).format(sql));
 
             attachmentProcessor.addAttachment(sqlAttachmentData, new FreemarkerAttachmentRenderer(templateName));
