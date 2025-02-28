@@ -7,6 +7,7 @@ import io.qameta.allure.model.TestResult;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.UUID;
 
 public class AllureBackendLogsExtension implements SuiteExtension{
@@ -22,11 +23,13 @@ public class AllureBackendLogsExtension implements SuiteExtension{
         lifecycle.scheduleTestCase(new TestResult().setUuid(caseId).setTestCaseName(caseName));
         lifecycle.startTestCase(caseId);
 
-        addAttachToAllure("auth");
-        addAttachToAllure("currency");
-        addAttachToAllure("gateway");
-        addAttachToAllure("spend");
-        addAttachToAllure("userdata");
+        Arrays.stream(serviceName).forEach(name -> {
+            try {
+                addAttachToAllure(name);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         lifecycle.stopTestCase(caseId);
         lifecycle.writeTestCase(caseId);
@@ -39,4 +42,6 @@ public class AllureBackendLogsExtension implements SuiteExtension{
                 Files.newInputStream(Path.of("./logs/niffler-%s/app.log".formatted(serviceName)))
         );
     }
+
+    private final String[] serviceName = {"auth", "currency", "gateway", "spend", "userdata"};
 }

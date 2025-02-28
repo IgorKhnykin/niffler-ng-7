@@ -36,8 +36,8 @@ public class ScreenResult implements BooleanSupplier {
         if (anno.rewriteExpected()) {
             ImageIO.write(expected, "png", new File("niffler-e-2-e-tests/src/test/resources/" + anno.value()).getAbsoluteFile());
         }
-        if (hasDiff) { //У этого кода есть недостаток, если тест падает не на сравнении картинок, то печаль, в NAMESPACE ничего не попадает
-            ScreenshotTestExtension.setExpected(expected); //и в handleTestExecutionException image==null
+        if (hasDiff) {
+            ScreenshotTestExtension.setExpected(expected);
             setActual(actual);
             ScreenshotTestExtension.setDiff(diff.getMarkedImage());
         }
