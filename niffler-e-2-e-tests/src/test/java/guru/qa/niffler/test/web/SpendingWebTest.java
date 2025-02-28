@@ -3,7 +3,7 @@ package guru.qa.niffler.test.web;
 import guru.qa.niffler.jupiter.annotation.Spending;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.jupiter.annotation.meta.WebTest;
-import guru.qa.niffler.model.UserJson;
+import guru.qa.niffler.model.rest.UserJson;
 import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.MainPage;
 import org.junit.jupiter.api.DisplayName;
@@ -65,5 +65,5 @@ public class SpendingWebTest {
                 .deleteSpend(user.testData().spends().get(0).description())
                 .checkNotification("Spendings succesfully deleted");
     }
-}
+ }
 

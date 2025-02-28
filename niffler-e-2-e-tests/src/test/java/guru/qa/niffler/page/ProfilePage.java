@@ -1,9 +1,16 @@
 package guru.qa.niffler.page;
 
 import com.codeborne.selenide.ElementsCollection;
-import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.SelenideElement;
+import guru.qa.niffler.page.component.Header;
+import guru.qa.niffler.utils.ScreenResult;
 import io.qameta.allure.Step;
+import org.junit.jupiter.api.Assertions;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.Objects;
 
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
@@ -11,10 +18,6 @@ import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$x;
 
 public class ProfilePage extends BasePage<ProfilePage>{
-
-    public static ProfilePage initPage() {
-        return Selenide.page(ProfilePage.class);
-    }
 
     private final SelenideElement switcher = $("input[type='checkbox']");
 
@@ -26,9 +29,13 @@ public class ProfilePage extends BasePage<ProfilePage>{
 
     private final SelenideElement alert = $(".MuiAlert-message");
 
+    private final SelenideElement profileAvatar = $("form .MuiAvatar-img");
+
     private final ElementsCollection archiveCategories = $$x(".//span[@aria-label='Unarchive category']/..");
 
     private final ElementsCollection notArchiveCategories = $$x(".//button[@aria-label='Archive category']/../..");
+
+    private final Header header = new Header();
 
     @Step("Отобразить архивные категории")
     public ProfilePage showArchivedCategories() {
@@ -61,9 +68,23 @@ public class ProfilePage extends BasePage<ProfilePage>{
 
     @Step("Изменить фото профиля")
     public ProfilePage changeProfilePicture(String filename) {
-        uploadFileBtn.uploadFromClasspath("niffler-e-2-e-tests/src/test/resources/%s".formatted(filename));
+        uploadFileBtn.uploadFromClasspath("img/%s".formatted(filename));
         saveChangesBtn.click();
         alert.shouldHave(text("Profile successfully updated"));
+        return this;
+    }
+
+    @Step("Сделать скриншот аватарки пользователя")
+    public ProfilePage makeAvatarScreenshot(BufferedImage expected) throws IOException {
+        BufferedImage actual = ImageIO.read(Objects.requireNonNull(profileAvatar.screenshot()));
+        Assertions.assertFalse(new ScreenResult(expected, actual));
+        return this;
+    }
+
+    @Step("Сделать скриншот аватарки пользователя в header-е")
+    public ProfilePage makeAvatarScreenshotInHeader(BufferedImage expected) throws IOException {
+        BufferedImage actual = header.getUserAvatarFromHeader();
+        Assertions.assertFalse(new ScreenResult(expected, actual));
         return this;
     }
 }

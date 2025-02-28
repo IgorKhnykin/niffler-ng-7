@@ -3,6 +3,11 @@ package guru.qa.niffler.page.component;
 import com.codeborne.selenide.SelenideElement;
 import guru.qa.niffler.page.*;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.Objects;
+
 import static com.codeborne.selenide.Selenide.$;
 
 public class Header extends BaseComponent<Header> {
@@ -14,6 +19,7 @@ public class Header extends BaseComponent<Header> {
     private final SelenideElement openFriendsPageBtn = $("a[href='/people/friends']");
     private final SelenideElement openAllPeoplePageBtn = $("a[href='/people/all']");
     private final SelenideElement signOutBtn = $("ul[role='menu'] li:last-child");
+    private final SelenideElement headerAvatar = self.$(".MuiAvatar-img");
 
     public Header() {
         super($("#root header"));
@@ -48,8 +54,7 @@ public class Header extends BaseComponent<Header> {
         return new EditSpendingPage();
     }
 
-    public MainPage toMainPage() {
-        toMainMenuBtn.click();
-        return new MainPage();
+    public BufferedImage getUserAvatarFromHeader() throws IOException {
+        return ImageIO.read(Objects.requireNonNull(headerAvatar.screenshot()));
     }
 }
