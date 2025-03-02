@@ -1,12 +1,16 @@
 package guru.qa.niffler.test.web;
 
+import guru.qa.niffler.condition.Color;
 import guru.qa.niffler.jupiter.annotation.ScreenshotTest;
 import guru.qa.niffler.jupiter.annotation.Spending;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.rest.SpendJson;
 import guru.qa.niffler.model.rest.UserJson;
 import guru.qa.niffler.page.LoginPage;
+import guru.qa.niffler.page.MainPage;
 import guru.qa.niffler.service.impl.SpendApiClient;
+import guru.qa.niffler.utils.ScreenResult;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 
 import java.awt.image.BufferedImage;
@@ -20,13 +24,16 @@ public class ScreenshotWebTest {
     @User(spendings = @Spending(
             category = "Обучение",
             description = "new description",
-            amount = 79990.0))
+            amount = 7999011.0))
     void checkStatAfterAddingSpendingTest(UserJson user, BufferedImage expected) throws IOException {
-        LoginPage.open()
+        BufferedImage actual = LoginPage.open()
                 .inputUsernameAndPassword(user.username(), user.testData().password())
                 .clickLoginBtn()
-                .makeStatisticScreenshot(expected)
-                .checkStatisticBubbles(user.testData().spends());
+                .makeStatisticScreenshot();
+
+        Assertions.assertFalse(new ScreenResult(expected, actual));
+
+        new MainPage().checkStatisticBubbles(user.testData().spends(), Color.green);
     }
 
     @DisplayName("Проверка изменения статистики после изменения траты")
@@ -46,11 +53,13 @@ public class ScreenshotWebTest {
                 spend.description(),
                 spend.username()));
 
-        LoginPage.open()
+        BufferedImage actual = LoginPage.open()
                 .inputUsernameAndPassword(user.username(), user.testData().password())
                 .clickLoginBtn()
-                .makeStatisticScreenshot(expected)
-                .checkStatisticBubbles(user.testData().spends());
+                .makeStatisticScreenshot();
+
+        Assertions.assertFalse(new ScreenResult(expected, actual));
+        new MainPage().checkStatisticBubbles(user.testData().spends());
     }
 
     @DisplayName("Проверка изменения статистики при добавлении нескольких трат")
@@ -63,11 +72,14 @@ public class ScreenshotWebTest {
                     description = "new description",
                     amount = 54300.0)})
     void checkStatAfterAddingSeveralSpendingsTest(UserJson user, BufferedImage expected) throws IOException {
-        LoginPage.open()
+        BufferedImage actual = LoginPage.open()
                 .inputUsernameAndPassword(user.username(), user.testData().password())
                 .clickLoginBtn()
-                .makeStatisticScreenshot(expected)
-                .checkStatisticBubbles(user.testData().spends());
+                .makeStatisticScreenshot();
+
+        Assertions.assertFalse(new ScreenResult(expected, actual));
+
+        new MainPage().checkStatisticBubbles(user.testData().spends());
     }
 
     @DisplayName("Проверка изменения статистики после удаления траты")
@@ -84,34 +96,40 @@ public class ScreenshotWebTest {
         new SpendApiClient().deleteSpend(createdSpends.get(0));
         createdSpends.remove(createdSpends.get(0));
 
-        LoginPage.open()
+        BufferedImage actual = LoginPage.open()
                 .inputUsernameAndPassword(user.username(), user.testData().password())
                 .clickLoginBtn()
-                .makeStatisticScreenshot(expected)
-                .checkStatisticBubbles(createdSpends);
+                .makeStatisticScreenshot();
+
+        Assertions.assertFalse(new ScreenResult(expected, actual));
+        new MainPage().checkStatisticBubbles(createdSpends);
     }
 
     @DisplayName("Проверка добавления аватарки")
     @ScreenshotTest(value = "img/expected-new-avatar.png")
     @User()
     void checkAddingNewAvatarTest(UserJson user, BufferedImage expected) throws IOException {
-        LoginPage.open()
+        BufferedImage actual = LoginPage.open()
                 .inputUsernameAndPassword(user.username(), user.testData().password())
                 .clickLoginBtn()
                 .openProfile()
                 .changeProfilePicture("expected-new-avatar.png")
-                .makeAvatarScreenshot(expected);
+                .makeAvatarScreenshot();
+
+        Assertions.assertFalse(new ScreenResult(expected, actual));
     }
 
     @DisplayName("Проверка добавления аватарки в header")
     @ScreenshotTest(value = "img/expected-new-avatar-in-header.png")
     @User()
     void checkAddingNewAvatarInHeaderTest(UserJson user, BufferedImage expected) throws IOException {
-        LoginPage.open()
+        BufferedImage actual = LoginPage.open()
                 .inputUsernameAndPassword(user.username(), user.testData().password())
                 .clickLoginBtn()
                 .openProfile()
                 .changeProfilePicture("expected-new-avatar.png")
-                .makeAvatarScreenshotInHeader(expected);
+                .makeAvatarScreenshotInHeader();
+
+        Assertions.assertFalse(new ScreenResult(expected, actual));
     }
 }

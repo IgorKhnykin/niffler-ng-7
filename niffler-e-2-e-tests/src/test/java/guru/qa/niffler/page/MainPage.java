@@ -1,6 +1,8 @@
 package guru.qa.niffler.page;
 
 import com.codeborne.selenide.*;
+import guru.qa.niffler.condition.Color;
+import guru.qa.niffler.condition.StatConditions;
 import guru.qa.niffler.model.rest.CategoryJson;
 import guru.qa.niffler.model.rest.SpendJson;
 import guru.qa.niffler.page.component.Header;
@@ -97,19 +99,15 @@ public class MainPage extends BasePage<MainPage> {
     }
 
     @Step("Сделать скриншот статистики")
-    public MainPage makeStatisticScreenshot(BufferedImage expected) throws IOException {
+    public BufferedImage makeStatisticScreenshot() throws IOException {
         Selenide.sleep(2000);
-        BufferedImage actual = ImageIO.read(Objects.requireNonNull(statistic.screenshot()));
-        Assertions.assertFalse(new ScreenResult(expected, actual));
-        return this;
+        return ImageIO.read(Objects.requireNonNull(statistic.screenshot()));
     }
 
     @Step("Проверка присутствия bubbles под статистикой")
-    public MainPage checkStatisticBubbles(List<SpendJson> spends) {
+    public MainPage checkStatisticBubbles(List<SpendJson> spends, Color... colors) {
         List<CategoryJson> categoryList = spends.stream().map(SpendJson::category).distinct().toList();
-        for (int i = 0; i < categoryList.size(); i++) {
-            statisticBubbles.get(i).shouldHave(Condition.cssValue("background-color", colors[i]));
-        }
+            statisticBubbles.shouldHave(StatConditions.color(colors));
 
         spends.stream()
                 .collect(Collectors.groupingBy(SpendJson::category, Collectors.summingDouble(SpendJson::amount)))
@@ -119,15 +117,4 @@ public class MainPage extends BasePage<MainPage> {
                 });
         return new MainPage();
     }
-
-    private final String[] colors = {
-            "rgba(255, 183, 3, 1)",
-            "rgba(53, 173, 123, 1)",
-            "rgba(251, 133, 0, 1)",
-            "rgba(41, 65, 204, 1)",
-            "rgba(33, 158, 188, 1)",
-            "rgba(22, 41, 149, 1)",
-            "rgba(247, 89, 67, 1)",
-            "rgba(99, 181, 226, 1)"
-    };
 }
