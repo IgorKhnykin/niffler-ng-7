@@ -1,6 +1,5 @@
 package guru.qa.niffler.test.web;
 
-import guru.qa.niffler.condition.Color;
 import guru.qa.niffler.jupiter.annotation.ScreenshotTest;
 import guru.qa.niffler.jupiter.annotation.Spending;
 import guru.qa.niffler.jupiter.annotation.User;
@@ -24,7 +23,7 @@ public class ScreenshotWebTest {
     @User(spendings = @Spending(
             category = "Обучение",
             description = "new description",
-            amount = 7999011.0))
+            amount = 79990.0))
     void checkStatAfterAddingSpendingTest(UserJson user, BufferedImage expected) throws IOException {
         BufferedImage actual = LoginPage.open()
                 .inputUsernameAndPassword(user.username(), user.testData().password())
@@ -33,7 +32,7 @@ public class ScreenshotWebTest {
 
         Assertions.assertFalse(new ScreenResult(expected, actual));
 
-        new MainPage().checkStatisticBubbles(user.testData().spends(), Color.green);
+        new MainPage().checkStatisticBubbles(user.testData().spends());
     }
 
     @DisplayName("Проверка изменения статистики после изменения траты")
@@ -102,7 +101,7 @@ public class ScreenshotWebTest {
                 .makeStatisticScreenshot();
 
         Assertions.assertFalse(new ScreenResult(expected, actual));
-        new MainPage().checkStatisticBubbles(createdSpends);
+        new MainPage().checkStatisticBubbles(user.testData().spends());
     }
 
     @DisplayName("Проверка добавления аватарки")

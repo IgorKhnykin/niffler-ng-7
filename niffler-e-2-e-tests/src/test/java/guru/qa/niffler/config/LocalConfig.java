@@ -6,7 +6,7 @@ enum LocalConfig implements Config {
   INSTANCE;
 
   static {
-    Configuration.timeout = 8000;
+    Configuration.timeout = 4000;
   }
 
   @Override
