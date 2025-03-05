@@ -75,12 +75,16 @@ public class ProfilePage extends BasePage<ProfilePage>{
     }
 
     @Step("Сделать скриншот аватарки пользователя")
-    public BufferedImage makeAvatarScreenshot() throws IOException {
-        return ImageIO.read(Objects.requireNonNull(profileAvatar.screenshot()));
+    public ProfilePage makeAvatarScreenshot(BufferedImage expected) throws IOException {
+        BufferedImage actual = ImageIO.read(Objects.requireNonNull(profileAvatar.screenshot()));
+        Assertions.assertFalse(new ScreenResult(expected, actual));
+        return this;
     }
 
     @Step("Сделать скриншот аватарки пользователя в header-е")
-    public BufferedImage makeAvatarScreenshotInHeader() throws IOException {
-        return header.getUserAvatarFromHeader();
+    public ProfilePage makeAvatarScreenshotInHeader(BufferedImage expected) throws IOException {
+        BufferedImage actual = header.getUserAvatarFromHeader();
+        Assertions.assertFalse(new ScreenResult(expected, actual));
+        return this;
     }
 }

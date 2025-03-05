@@ -11,7 +11,6 @@ import org.openqa.selenium.WebElement;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 

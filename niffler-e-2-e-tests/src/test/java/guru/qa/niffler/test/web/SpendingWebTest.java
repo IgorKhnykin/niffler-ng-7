@@ -9,7 +9,6 @@ import guru.qa.niffler.model.rest.SpendJson;
 import guru.qa.niffler.model.rest.UserJson;
 import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.MainPage;
-import org.apache.commons.lang3.ArrayUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
