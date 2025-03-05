@@ -1,6 +1,6 @@
 package guru.qa.niffler.data.logging;
 
-import io.qameta.allure.attachment.*;
+import io.qameta.allure.attachment.AttachmentData;
 import lombok.Getter;
 
 @Getter

@@ -1,7 +1,12 @@
 package guru.qa.niffler.page;
 
-import com.codeborne.selenide.*;
-import guru.qa.niffler.model.rest.CategoryJson;
+import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.Selenide;
+import com.codeborne.selenide.SelenideElement;
+import guru.qa.niffler.condition.Bubble;
+import guru.qa.niffler.condition.Color;
+import guru.qa.niffler.condition.SpendsCondition;
+import guru.qa.niffler.condition.StatConditions;
 import guru.qa.niffler.model.rest.SpendJson;
 import guru.qa.niffler.page.component.Header;
 import guru.qa.niffler.page.component.SearchField;
@@ -13,13 +18,10 @@ import org.junit.jupiter.api.Assertions;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.*;
 
@@ -56,9 +58,8 @@ public class MainPage extends BasePage<MainPage> {
     }
 
     @Step("Проверка присутствия траты {spendingDescription} в списке трат")
-    public void checkThatTableContainsSpending(String spendingDescription) {
-        spendingTable.searchSpendingByDescription(spendingDescription);
-        tableRows.find(text(spendingDescription)).should(visible);
+    public void checkThatTableContainsSpending(SpendJson... spends) {
+            tableRows.shouldHave(SpendsCondition.spendingsRows(spends));
     }
 
     @Step("Проверка основной информации главной страницы")
@@ -96,9 +97,7 @@ public class MainPage extends BasePage<MainPage> {
         return new MainPage();
     }
 
-    @Step("Сделать скриншот статистики")
     public MainPage makeStatisticScreenshot(BufferedImage expected) throws IOException {
-        Selenide.sleep(2000);
         BufferedImage actual = ImageIO.read(Objects.requireNonNull(statistic.screenshot()));
         Assertions.assertFalse(new ScreenResult(expected, actual));
         return this;
@@ -106,28 +105,16 @@ public class MainPage extends BasePage<MainPage> {
 
     @Step("Проверка присутствия bubbles под статистикой")
     public MainPage checkStatisticBubbles(List<SpendJson> spends) {
-        List<CategoryJson> categoryList = spends.stream().map(SpendJson::category).distinct().toList();
-        for (int i = 0; i < categoryList.size(); i++) {
-            statisticBubbles.get(i).shouldHave(Condition.cssValue("background-color", colors[i]));
+        List<Bubble> bubbles = new ArrayList<>();
+        for (int i = 0; i < spends.size(); i++) {
+            SpendJson spend = spends.get(i);
+            Color actualColor = Color.values()[i];
+            String text = spend.category().name() + " " + spend.amount().longValue() + " ₽";
+            bubbles.add(new Bubble(actualColor, text));
         }
-
-        spends.stream()
-                .collect(Collectors.groupingBy(SpendJson::category, Collectors.summingDouble(SpendJson::amount)))
-                .forEach((category, sum) -> {
-                    String bubbleExpectedText = category.name() + " " + sum.longValue() + " ₽";
-                    statisticBubbles.get(categoryList.indexOf(category)).shouldHave(Condition.text(bubbleExpectedText));
-                });
+        Bubble[] bubblesArray = new Bubble[bubbles.size()];
+        bubbles.toArray(bubblesArray);
+        statisticBubbles.shouldHave(StatConditions.statBubblesAnyOrder(bubblesArray));
         return new MainPage();
     }
-
-    private final String[] colors = {
-            "rgba(255, 183, 3, 1)",
-            "rgba(53, 173, 123, 1)",
-            "rgba(251, 133, 0, 1)",
-            "rgba(41, 65, 204, 1)",
-            "rgba(33, 158, 188, 1)",
-            "rgba(22, 41, 149, 1)",
-            "rgba(247, 89, 67, 1)",
-            "rgba(99, 181, 226, 1)"
-    };
 }

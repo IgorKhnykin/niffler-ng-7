@@ -39,12 +39,12 @@ public class ScreenshotWebTest {
         SpendJson spend = user.testData().spends().get(0);
         new SpendApiClient().updateSpend(
                 new SpendJson(spend.id(),
-                spend.spendDate(),
-                spend.category(),
-                spend.currency(),
-                228.0,
-                spend.description(),
-                spend.username()));
+                        spend.spendDate(),
+                        spend.category(),
+                        spend.currency(),
+                        228.0,
+                        spend.description(),
+                        spend.username()));
 
         LoginPage.open()
                 .inputUsernameAndPassword(user.username(), user.testData().password())
@@ -59,9 +59,9 @@ public class ScreenshotWebTest {
             {@Spending(category = "Обучение",
                     description = "new description",
                     amount = 79990.0),
-            @Spending(category = "Обучение-new",
-                    description = "new description",
-                    amount = 54300.0)})
+                    @Spending(category = "Обучение-new",
+                            description = "new description",
+                            amount = 54300.0)})
     void checkStatAfterAddingSeveralSpendingsTest(UserJson user, BufferedImage expected) throws IOException {
         LoginPage.open()
                 .inputUsernameAndPassword(user.username(), user.testData().password())
@@ -76,9 +76,9 @@ public class ScreenshotWebTest {
             {@Spending(category = "Обучение",
                     description = "new description",
                     amount = 79990.0),
-            @Spending(category = "Обучение-new",
-                    description = "new description",
-                    amount = 54300.0)})
+                    @Spending(category = "Обучение-new",
+                            description = "new description",
+                            amount = 54300.0)})
     void checkStatAfterDeletingTest(UserJson user, BufferedImage expected) throws IOException {
         List<SpendJson> createdSpends = user.testData().spends();
         new SpendApiClient().deleteSpend(createdSpends.get(0));
@@ -88,7 +88,7 @@ public class ScreenshotWebTest {
                 .inputUsernameAndPassword(user.username(), user.testData().password())
                 .clickLoginBtn()
                 .makeStatisticScreenshot(expected)
-                .checkStatisticBubbles(createdSpends);
+                .checkStatisticBubbles(user.testData().spends());
     }
 
     @DisplayName("Проверка добавления аватарки")
