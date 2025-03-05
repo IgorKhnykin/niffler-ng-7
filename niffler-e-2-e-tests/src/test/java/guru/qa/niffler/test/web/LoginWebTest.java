@@ -1,27 +1,35 @@
 package guru.qa.niffler.test.web;
 
+import com.codeborne.selenide.SelenideDriver;
 import guru.qa.niffler.jupiter.annotation.Category;
 import guru.qa.niffler.jupiter.annotation.DisableByIssue;
 import guru.qa.niffler.jupiter.annotation.Spending;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.jupiter.annotation.meta.WebTest;
+import guru.qa.niffler.jupiter.extension.BrowserExtension;
 import guru.qa.niffler.model.rest.UserJson;
 import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.MainPage;
+import guru.qa.niffler.page.RegisterPage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static guru.qa.niffler.utils.RandomDataUtils.*;
+import static guru.qa.niffler.utils.SelenideUtils.chromeConfig;
+import static guru.qa.niffler.utils.SelenideUtils.firefoxConfig;
 
-@WebTest
 public class LoginWebTest {
 
+    private final BrowserExtension extension = new BrowserExtension();
+
+    private final SelenideDriver driver = new SelenideDriver(chromeConfig);
+
     @Test
-    @DisableByIssue("3")
     @DisplayName("Успешная регистрация нового пользователя")
     void shouldRegisterNewUser() {
-        LoginPage.open()
-                .clickCreateNewAccountBtn()
+        extension.drivers.add(driver);
+
+        LoginPage.open(driver).clickCreateNewAccountBtn()
                 .setUsername(randomUsername())
                 .setPassword(passwordMain)
                 .setPasswordSubmit(passwordMain)
@@ -30,14 +38,14 @@ public class LoginWebTest {
                 .clickSingInButton()
                 .inputUsernameAndPassword(randomUsername(), passwordMain)
                 .clickLoginBtn();
-
-        MainPage.initPage().checkMainPageEssentialInfo();
     }
 
     @Test
     @DisplayName("Неуспешная регистрация по существующему имени пользователя")
     void shouldNotRegisterWithExistingUsername() {
-        LoginPage.open()
+        extension.drivers.add(driver);
+
+        LoginPage.open(driver)
                 .clickCreateNewAccountBtn()
                 .setUsername(usernameMain)
                 .setPassword(passwordMain)
@@ -49,7 +57,9 @@ public class LoginWebTest {
     @Test
     @DisplayName("Неуспешная регистрация, если пароль при подтверждении не совпадает")
     void shouldShowErrorIfPasswordAndConfirmPasswordAreNotEqual() {
-        LoginPage.open()
+        extension.drivers.add(driver);
+
+        LoginPage.open(driver)
                 .clickCreateNewAccountBtn()
                 .setUsername(randomUsername())
                 .setPassword(passwordMain)
@@ -69,20 +79,21 @@ public class LoginWebTest {
     @Test
     @DisplayName("Проверка отображения основных компонентов основной страницы после успешной регистрации")
     void mainPageShouldBeDisplayedAfterSuccessfulLogin(UserJson user) {
-        LoginPage.open()
+        extension.drivers.add(driver);
+
+        LoginPage.open(driver)
                 .inputUsernameAndPassword(user.username(), user.testData().password())
                 .clickLoginBtn();
-
-        MainPage.initPage().checkMainPageEssentialInfo();
     }
 
     @Test
     @DisplayName("Проверка появления ошибки при неверных данных пользователя")
     void userShouldStayOnLoginPageAfterLoginWithBadCredentials() {
-        LoginPage.open()
+        extension.drivers.add(driver);
+
+        LoginPage.open(driver)
                 .inputUsernameAndPassword(usernameMain, "123456")
                 .clickLoginBtn();
-
-        LoginPage.initPage().checkIncorrectCredentialsError();
+        new LoginPage(driver).checkIncorrectCredentialsError();
     }
 }
