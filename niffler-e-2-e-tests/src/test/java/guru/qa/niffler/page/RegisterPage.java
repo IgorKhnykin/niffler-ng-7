@@ -1,6 +1,7 @@
 package guru.qa.niffler.page;
 
-import com.codeborne.selenide.*;
+import com.codeborne.selenide.SelenideDriver;
+import com.codeborne.selenide.SelenideElement;
 import io.qameta.allure.Step;
 
 import static com.codeborne.selenide.Condition.text;
