@@ -9,7 +9,7 @@ public class RandomDataUtils {
 
     private static final Faker faker = new Faker();
 
-    public static final String usernameMain = "igorKhn";
+    public static final String usernameMain = "IgorKhn";
     public static final String passwordMain = "1234";
 
     public static String randomUsername() {
