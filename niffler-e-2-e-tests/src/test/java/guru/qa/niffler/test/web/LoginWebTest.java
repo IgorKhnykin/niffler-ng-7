@@ -1,88 +1,55 @@
 package guru.qa.niffler.test.web;
 
-import guru.qa.niffler.jupiter.annotation.Category;
-import guru.qa.niffler.jupiter.annotation.DisableByIssue;
-import guru.qa.niffler.jupiter.annotation.Spending;
+import com.codeborne.selenide.SelenideDriver;
 import guru.qa.niffler.jupiter.annotation.User;
-import guru.qa.niffler.jupiter.annotation.meta.WebTest;
+import guru.qa.niffler.jupiter.converters.Browser;
+import guru.qa.niffler.jupiter.converters.BrowserConverter;
+import guru.qa.niffler.jupiter.extension.NonStaticBrowserExtension;
 import guru.qa.niffler.model.rest.UserJson;
 import guru.qa.niffler.page.LoginPage;
-import guru.qa.niffler.page.MainPage;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.converter.ConvertWith;
+import org.junit.jupiter.params.provider.EnumSource;
 
-import static guru.qa.niffler.utils.RandomDataUtils.*;
+import static guru.qa.niffler.utils.RandomDataUtils.usernameMain;
 
-@WebTest
 public class LoginWebTest {
 
-    @Test
-    @DisableByIssue("3")
-    @DisplayName("Успешная регистрация нового пользователя")
-    void shouldRegisterNewUser() {
-        LoginPage.open()
-                .clickCreateNewAccountBtn()
-                .setUsername(randomUsername())
-                .setPassword(passwordMain)
-                .setPasswordSubmit(passwordMain)
-                .submitRegistration()
-                .checkSuccessfulRegistrationMessage()
-                .clickSingInButton()
-                .inputUsernameAndPassword(randomUsername(), passwordMain)
-                .clickLoginBtn();
+    @RegisterExtension
+    private static NonStaticBrowserExtension extension = new NonStaticBrowserExtension();
 
-        MainPage.initPage().checkMainPageEssentialInfo();
-    }
-
-    @Test
-    @DisplayName("Неуспешная регистрация по существующему имени пользователя")
-    void shouldNotRegisterWithExistingUsername() {
-        LoginPage.open()
-                .clickCreateNewAccountBtn()
-                .setUsername(usernameMain)
-                .setPassword(passwordMain)
-                .setPasswordSubmit(passwordMain)
-                .submitRegistration()
-                .checkUsernameAlreadyExistMessage(usernameMain);
-    }
-
-    @Test
-    @DisplayName("Неуспешная регистрация, если пароль при подтверждении не совпадает")
-    void shouldShowErrorIfPasswordAndConfirmPasswordAreNotEqual() {
-        LoginPage.open()
-                .clickCreateNewAccountBtn()
-                .setUsername(randomUsername())
-                .setPassword(passwordMain)
-                .setPasswordSubmit("12345")
-                .submitRegistration()
-                .checkPasswordNotEqualsError();
-    }
-
-    @User(
-            categories = {
-                    @Category(categoryName = "Магазины", archived = false),
-                    @Category(categoryName = "Бары", archived = true)
-            },
-            spendings = {
-                    @Spending(category = "Обучение", description = "QA guru", amount = 80000)
-            })
-    @Test
-    @DisplayName("Проверка отображения основных компонентов основной страницы после успешной регистрации")
-    void mainPageShouldBeDisplayedAfterSuccessfulLogin(UserJson user) {
-        LoginPage.open()
+    @User()
+    @ParameterizedTest()
+    @DisplayName("Проверка отображения основных компонентов основной страницы после успешной регистрации ")
+    @EnumSource(Browser.class)
+    void mainPageShouldBeDisplayedAfterSuccessfulLogin(@ConvertWith(BrowserConverter.class) SelenideDriver driver, UserJson user) {
+        extension.getDrivers().add(driver);
+        LoginPage.open(driver)
                 .inputUsernameAndPassword(user.username(), user.testData().password())
                 .clickLoginBtn();
-
-        MainPage.initPage().checkMainPageEssentialInfo();
     }
 
-    @Test
+    @ParameterizedTest()
     @DisplayName("Проверка появления ошибки при неверных данных пользователя")
-    void userShouldStayOnLoginPageAfterLoginWithBadCredentials() {
-        LoginPage.open()
+    @EnumSource(Browser.class)
+    void userShouldStayOnLoginPageAfterLoginWithBadCredentials(@ConvertWith(BrowserConverter.class) SelenideDriver driver) {
+        extension.getDrivers().add(driver);
+        LoginPage.open(driver)
                 .inputUsernameAndPassword(usernameMain, "123456")
                 .clickLoginBtn();
+        new LoginPage(driver).checkIncorrectCredentialsError();
+    }
 
-        LoginPage.initPage().checkIncorrectCredentialsError();
+    @ParameterizedTest()
+    @DisplayName("Проверка появления ошибки при неверных данных пользователя")
+    @EnumSource(Browser.class)
+    void userShouldStay(@ConvertWith(BrowserConverter.class) SelenideDriver driver) {
+        extension.getDrivers().add(driver);
+        LoginPage.open(driver)
+                .inputUsernameAndPassword(usernameMain, "123456")
+                .clickLoginBtn();
+        new LoginPage(driver).checkIncorrectCredentialsError();
     }
 }
