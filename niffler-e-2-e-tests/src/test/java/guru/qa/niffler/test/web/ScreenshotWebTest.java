@@ -30,7 +30,7 @@ public class ScreenshotWebTest {
     }
 
     @DisplayName("Проверка изменения статистики после изменения траты")
-    @ScreenshotTest(value = "img/expected-stat-after-editing-spend.png")
+    @ScreenshotTest("img/expected-stat-after-editing-spend.png")
     @User(spendings = @Spending(
             category = "Обучение",
             description = "new description",
@@ -54,7 +54,7 @@ public class ScreenshotWebTest {
     }
 
     @DisplayName("Проверка изменения статистики при добавлении нескольких трат")
-    @ScreenshotTest(value = "img/expected-stat-after-adding-several-spends.png")
+    @ScreenshotTest("img/expected-stat-after-adding-several-spends.png")
     @User(spendings =
             {@Spending(category = "Обучение",
                     description = "new description",
@@ -71,7 +71,7 @@ public class ScreenshotWebTest {
     }
 
     @DisplayName("Проверка изменения статистики после удаления траты")
-    @ScreenshotTest(value = "img/expected-stat-after-deleting-spend.png", rewriteExpected = true)
+    @ScreenshotTest("img/expected-stat-after-deleting-spend.png")
     @User(spendings =
             {@Spending(category = "Обучение",
                     description = "new description",
@@ -92,7 +92,7 @@ public class ScreenshotWebTest {
     }
 
     @DisplayName("Проверка добавления аватарки")
-    @ScreenshotTest(value = "img/expected-new-avatar.png")
+    @ScreenshotTest("img/expected-new-avatar.png")
     @User()
     void checkAddingNewAvatarTest(UserJson user, BufferedImage expected) throws IOException {
         LoginPage.open()
@@ -104,7 +104,7 @@ public class ScreenshotWebTest {
     }
 
     @DisplayName("Проверка добавления аватарки в header")
-    @ScreenshotTest(value = "img/expected-new-avatar-in-header.png")
+    @ScreenshotTest("img/expected-new-avatar-in-header.png")
     @User()
     void checkAddingNewAvatarInHeaderTest(UserJson user, BufferedImage expected) throws IOException {
         LoginPage.open()

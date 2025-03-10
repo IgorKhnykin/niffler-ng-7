@@ -98,6 +98,7 @@ public class MainPage extends BasePage<MainPage> {
     }
 
     public MainPage makeStatisticScreenshot(BufferedImage expected) throws IOException {
+        Selenide.sleep(2000);
         BufferedImage actual = ImageIO.read(Objects.requireNonNull(statistic.screenshot()));
         Assertions.assertFalse(new ScreenResult(expected, actual));
         return this;

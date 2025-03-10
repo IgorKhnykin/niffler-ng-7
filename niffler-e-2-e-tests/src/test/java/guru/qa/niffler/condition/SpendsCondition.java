@@ -10,7 +10,6 @@ import org.openqa.selenium.WebElement;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -22,6 +21,7 @@ public class SpendsCondition {
 
     public static WebElementsCondition spendingsRows(SpendJson... expectedSpends) {
         return new WebElementsCondition() {
+
             String expectedTextForPrint;
 
             @NotNull
@@ -30,7 +30,6 @@ public class SpendsCondition {
                 if (ArrayUtils.isEmpty(expectedSpends)) {
                     throw new IllegalArgumentException("No expected expected Spends given");
                 }
-                final List<String> expectedText = new ArrayList<>();
                 boolean isPresent = true;
 
                 List<String> actualText = elements.stream()
@@ -39,22 +38,27 @@ public class SpendsCondition {
 
                 for (SpendJson expectedSpend : expectedSpends) {
                     String expected = getExpectedText(expectedSpend);
-                    expectedText.add(expected);
 
                     if (isPresent) {
                         isPresent = actualText.contains(expected);
                     }
                 }
-                expectedTextForPrint = expectedText.toString();
                 if (!isPresent) {
-                    return rejected("Rows mismatched", actualText);
+                    return rejected(errorMessage(), actualText);
                 }
                 return accepted();
             }
 
+            @NotNull
             @Override
             public String toString() {
                 return expectedTextForPrint;
+            }
+
+            @NotNull
+            @Override
+            public String errorMessage() {
+                return "Rows mismatched";
             }
         };
     }
