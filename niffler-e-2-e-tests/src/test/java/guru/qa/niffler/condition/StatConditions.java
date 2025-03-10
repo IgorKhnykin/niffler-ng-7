@@ -45,7 +45,7 @@ public class StatConditions {
                 }
                 if (expectedBubbles.length != elements.size()) {
                     final String message = "List size mismatched (expected %s, actual %s)".formatted(expectedBubbles.length, elements.size());
-                    return rejected(message, elements);
+                    throw new IllegalArgumentException(message);
                 }
 
                 for (int i = 0; i < elements.size(); i++) {
@@ -68,15 +68,16 @@ public class StatConditions {
                 }
                 if (!isRgbaEquals) {
                     String actualRgba = actualRgbaList.toString();
-                    return rejected("List expected Colors mismatched", actualRgba);
+                    return rejected(errorMessage(), actualRgba);
                 }
                 if (!isTextEquals) {
                     String actualText = actualTextList.toString();
-                    return rejected("List expected Texts mismatched", actualText);
+                    return rejected(errorMessage(), actualText);
                 }
                 return accepted();
             }
 
+            @NotNull
             @Override
             public String toString() {
                 if (!isRgbaEquals) {
@@ -85,6 +86,12 @@ public class StatConditions {
                     return expectedText;
                 }
                 return "";
+            }
+
+            @NotNull
+            @Override
+            public String errorMessage() {
+                return "Lists mismatched";
             }
         };
     }
@@ -121,7 +128,7 @@ public class StatConditions {
                 }
                 if (expectedBubbles.length != elements.size()) {
                     final String message = "List size mismatched (expected %s, actual %s)".formatted(expectedBubbles.length, elements.size());
-                    return rejected(message, elements);
+                    throw new IllegalArgumentException(message);
                 }
                 for (int i = 0; i < elements.size(); i++) {
                     if (containsRgba) {
@@ -133,15 +140,16 @@ public class StatConditions {
                 }
                 if (!containsRgba) {
                     String actualRgba = rgbaActualValues.toString();
-                    return rejected("List expected Colors mismatched", actualRgba);
+                    return rejected(errorMessage(), actualRgba);
                 }
                 if (!containsText) {
                     String actualText = rgbaActualText.toString();
-                    return rejected("List expected Texts mismatched", actualText);
+                    return rejected(errorMessage(), actualText);
                 }
                 return accepted();
             }
 
+            @NotNull
             @Override
             public String toString() {
                 if (!containsRgba) {
@@ -150,6 +158,12 @@ public class StatConditions {
                     return expectedText;
                 }
                 return "";
+            }
+
+            @NotNull
+            @Override
+            public String errorMessage() {
+                return "Lists mismatched";
             }
         };
     }
@@ -194,15 +208,16 @@ public class StatConditions {
                 }
                 if (!containsRgba) {
                     String actualRgba = rgbaActualValues.toString();
-                    return rejected("List expected Colors mismatched", actualRgba);
+                    return rejected(errorMessage(), actualRgba);
                 }
                 if (!containsText) {
                     String actualText = rgbaActualText.toString();
-                    return rejected("List expected Texts mismatched", actualText);
+                    return rejected(errorMessage(), actualText);
                 }
                 return accepted();
             }
 
+            @NotNull
             @Override
             public String toString() {
                 if (!containsRgba) {
@@ -211,6 +226,12 @@ public class StatConditions {
                     return expectedText;
                 }
                 return "";
+            }
+
+            @NotNull
+            @Override
+            public String errorMessage() {
+                return "Lists mismatched";
             }
         };
     }

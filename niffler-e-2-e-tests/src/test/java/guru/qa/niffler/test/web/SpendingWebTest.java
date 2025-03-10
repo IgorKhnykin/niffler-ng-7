@@ -33,7 +33,6 @@ public class SpendingWebTest {
         final SpendJson spend2 = user.testData().spends().get(1);
         final SpendJson spendWithNewDesc = initNewSpend(user, spend1.category().name(), "new Spending Description", spend1.amount());
 
-
         LoginPage.open()
                 .inputUsernameAndPassword(user.username(), user.testData().password())
                 .clickLoginBtn()
@@ -65,7 +64,7 @@ public class SpendingWebTest {
     }
 
     @Test
-    @DisplayName("Проверка удаления траты траты")
+    @DisplayName("Проверка удаления траты")
     @User(spendings = @Spending(
             category = "Обучение4",
             description = "new description",
