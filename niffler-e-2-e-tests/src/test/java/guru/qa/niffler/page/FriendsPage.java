@@ -1,7 +1,9 @@
 package guru.qa.niffler.page;
 
 import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.SelenideElement;
+import guru.qa.niffler.config.Config;
 import guru.qa.niffler.page.component.SearchField;
 import io.qameta.allure.Step;
 
@@ -13,6 +15,10 @@ import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$x;
 
 public class FriendsPage extends BasePage<FriendsPage> {
+
+    public static FriendsPage open() {
+        return Selenide.open(Config.getInstance().frontUrl() + "people/friends", FriendsPage.class);
+    }
 
     private final SelenideElement friendsTable = $("table[aria-labelledby='tableTitle']");
 

@@ -65,6 +65,6 @@ public class ApiTest {
 
     @Test
     void getUsers() {
-        userApiClient.findAllUsers();
+        userApiClient.findAllUsers("Igor");
     }
 }

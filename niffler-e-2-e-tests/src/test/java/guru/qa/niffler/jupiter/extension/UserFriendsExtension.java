@@ -22,7 +22,7 @@ public class UserFriendsExtension implements BeforeEachCallback {
                     UserJson userJson = context.getStore(UserExtension.NAMESPACE).get(context.getUniqueId(), UserJson.class);
 
                     if (userJson == null) {
-                        userJson = userClient.findAllUsers()
+                        userJson = userClient.findAllUsers(userAnno.username())
                                 .stream()
                                 .filter(user -> user.username().equals(userAnno.username()))
                                 .findFirst()

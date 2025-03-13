@@ -1,7 +1,9 @@
 package guru.qa.niffler.page;
 
 import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.SelenideElement;
+import guru.qa.niffler.config.Config;
 import guru.qa.niffler.page.component.Header;
 import guru.qa.niffler.utils.ScreenResult;
 import io.qameta.allure.Step;
@@ -18,6 +20,10 @@ import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$x;
 
 public class ProfilePage extends BasePage<ProfilePage>{
+
+    public static ProfilePage open() {
+        return Selenide.open(Config.getInstance().frontUrl() + "profile", ProfilePage.class);
+    }
 
     private final SelenideElement switcher = $("input[type='checkbox']");
 

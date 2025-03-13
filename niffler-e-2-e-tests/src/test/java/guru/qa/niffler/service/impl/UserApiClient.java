@@ -164,10 +164,23 @@ public class UserApiClient implements UserClient {
 
     @Override
     @Step("Найти всех пользователей через API")
-    public @Nonnull List<UserJson> findAllUsers() {
+    public @Nonnull List<UserJson> findAllUsers(String username) {
         Response<List<UserJson>> response;
         try {
-            response = userApi.getAllUsers("username,ASC").execute();
+            response = userApi.getAllUsers(username).execute();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+        Assertions.assertEquals(200, response.code(), "Не удалось получить всех пользователей");
+        return response.body() == null ? Collections.emptyList() : response.body();
+    }
+
+    @Override
+    @Step("Найти всех друзей через API")
+    public @Nonnull List<UserJson> findAllFriends(String username) {
+        Response<List<UserJson>> response;
+        try {
+            response = userApi.getAllFriends(username).execute();
         } catch (IOException e) {
             throw new AssertionError(e);
         }

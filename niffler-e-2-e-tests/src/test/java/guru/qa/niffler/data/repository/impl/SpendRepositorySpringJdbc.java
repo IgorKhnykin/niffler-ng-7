@@ -99,4 +99,18 @@ public class SpendRepositorySpringJdbc implements SpendRepository {
         spendEntityList.forEach(spendDao::deleteSpend);
         categoryDao.deleteCategory(category);
     }
+
+    @Override
+    public @Nonnull List<SpendEntity> findAllSpendsByUsername(String username) {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.spendJdbcUrl()));
+        List<SpendEntity> spendEntityList = jdbcTemplate.query(
+                "SELECT * FROM spend s join category c on s.category_id = c.id where s.username = ?",
+                SpendEntityListExtractor.instance, username);
+        return spendEntityList;
+    }
+
+    @Override
+    public @Nonnull List<CategoryEntity> findAllCategoriesByUsername(String username) {
+        return categoryDao.findAllByUsername(username);
+    }
 }

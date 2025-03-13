@@ -7,6 +7,7 @@ import guru.qa.niffler.condition.Bubble;
 import guru.qa.niffler.condition.Color;
 import guru.qa.niffler.condition.SpendsCondition;
 import guru.qa.niffler.condition.StatConditions;
+import guru.qa.niffler.config.Config;
 import guru.qa.niffler.model.rest.SpendJson;
 import guru.qa.niffler.page.component.Header;
 import guru.qa.niffler.page.component.SearchField;
@@ -26,6 +27,10 @@ import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.*;
 
 public class MainPage extends BasePage<MainPage> {
+
+    public static MainPage open() {
+        return Selenide.open(Config.getInstance().frontUrl() + "main", MainPage.class);
+    }
 
     public static MainPage initPage() {
         return Selenide.page(MainPage.class);

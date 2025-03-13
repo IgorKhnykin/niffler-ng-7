@@ -7,18 +7,25 @@ import guru.qa.niffler.config.Config;
 import guru.qa.niffler.jupiter.annotation.ApiLogin;
 import guru.qa.niffler.jupiter.annotation.Token;
 import guru.qa.niffler.jupiter.annotation.User;
-import guru.qa.niffler.model.rest.TestData;
-import guru.qa.niffler.model.rest.UserJson;
+import guru.qa.niffler.model.rest.*;
 import guru.qa.niffler.page.MainPage;
+import guru.qa.niffler.service.SpendClient;
+import guru.qa.niffler.service.UserClient;
 import guru.qa.niffler.service.impl.AuthApiClient;
 import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
 import org.openqa.selenium.Cookie;
 
+import java.util.List;
+import java.util.Objects;
+
 import static guru.qa.niffler.jupiter.extension.UserExtension.getUserFromContext;
 import static guru.qa.niffler.jupiter.extension.UserExtension.setUserToContext;
 
 public class ApiLoginExtension implements BeforeEachCallback, ParameterResolver {
+
+    private final SpendClient spendClient = SpendClient.getInstance();
+    private final UserClient userClient = UserClient.getInstance();
 
     public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(ApiLoginExtension.class);
 
@@ -57,7 +64,7 @@ public class ApiLoginExtension implements BeforeEachCallback, ParameterResolver 
                         if (userFromExtension != null) {
                             throw new IllegalStateException("ApiLogin with login and password should be without @User annotation");
                         }
-                        userToLogin = new UserJson(anno.username(), new TestData(anno.password()));
+                        userToLogin = collectTestDataModel(anno.username(), anno.password());
                         setUserToContext(userToLogin);
                     }
 
@@ -108,5 +115,29 @@ public class ApiLoginExtension implements BeforeEachCallback, ParameterResolver 
 
     public static Cookie getJsessionIdCookie() {
         return new Cookie("JSESSIONID", ThreadSafeCookieStore.INSTANCE.cookieValue("JSESSIONID"));
+    }
+
+    private UserJson collectTestDataModel(String username, String password) {
+        List<SpendJson> spends = spendClient.getAllSpendsByUsername(username);
+        List<CategoryJson> categories = spendClient.getAllActiveCategoriesByUsername(username);
+        List<UserJson> allFriends = userClient.findAllFriends(username);
+
+        List<String> incomeRequests = allFriends.stream()
+                .filter(user -> user.friendshipStatus().equals(FriendshipStatus.INVITE_RECEIVED))
+                .map(UserJson::username)
+                .toList();
+
+        List<String> friends = allFriends.stream()
+                .filter(user -> user.friendshipStatus().equals(FriendshipStatus.FRIEND))
+                .map(UserJson::username)
+                .toList();
+
+        List<String> outcomeRequests = userClient.findAllUsers(username).stream()
+                .filter(user -> Objects.nonNull(user.friendshipStatus()))
+                .filter(user -> user.friendshipStatus().equals(FriendshipStatus.INVITE_SENT))
+                .map(UserJson::username)
+                .toList();
+
+        return new UserJson(username, new TestData(password, categories, spends, incomeRequests, outcomeRequests, friends));
     }
 }
