@@ -20,7 +20,7 @@ import java.util.UUID;
 @ParametersAreNonnullByDefault
 public class AuthUserRepositorySpringJdbc implements AuthUserRepository {
 
-    public static final Config CFG = Config.getInstance();
+    private static final Config CFG = Config.getInstance();
 
     private final AuthUserDao authUserDao = new AuthUserDaoSpringJdbc();
 
