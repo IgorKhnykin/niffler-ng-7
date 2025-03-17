@@ -10,6 +10,7 @@ import retrofit2.Converter;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
+import javax.annotation.Nonnull;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 
@@ -27,7 +28,11 @@ public class RestClient {
         this(baseUrl, followRedirects, JacksonConverterFactory.create(), HttpLoggingInterceptor.Level.BODY);
     }
 
-    public RestClient(String baseUrl, boolean followRedirects, Converter.Factory converterFactory, HttpLoggingInterceptor.Level level, Interceptor... interceptors) {
+    public RestClient(String baseUrl, boolean followRedirects, @Nonnull Interceptor... interceptors) {
+        this(baseUrl, followRedirects, JacksonConverterFactory.create(), HttpLoggingInterceptor.Level.BODY, interceptors);
+    }
+
+    public RestClient(String baseUrl, boolean followRedirects, Converter.Factory converterFactory, HttpLoggingInterceptor.Level level, @Nonnull Interceptor... interceptors) {
         OkHttpClient.Builder okBuilder = new OkHttpClient.Builder()
                 .followRedirects(followRedirects);
 
@@ -65,6 +70,10 @@ public class RestClient {
 
         public EmptyRestClient(String baseUrl, boolean followRedirects) {
             super(baseUrl, followRedirects);
+        }
+
+        public EmptyRestClient(String baseUrl, boolean followRedirects, @Nonnull Interceptor... interceptors) {
+            super(baseUrl, followRedirects, interceptors);
         }
 
         public EmptyRestClient(String baseUrl, boolean followRedirects, Converter.Factory converterFactory, HttpLoggingInterceptor.Level level, Interceptor... interceptors) {

@@ -92,7 +92,7 @@ public class UserDbClient implements UserClient {
     }
 
     @Override
-    @Step("СПолучить приглашение о дружбе от пользователя через базу данных")
+    @Step("Получить приглашение о дружбе от пользователя через базу данных")
     public @Nullable List<String> getInvitation(UserJson targetUser, int count) {
         return xaTransactionTemplate.execute(() -> {
             Optional<UserEntity> assignee = userRepository.findByUsername(targetUser.username());
@@ -174,7 +174,7 @@ public class UserDbClient implements UserClient {
 
     @Override
     @Step("Найти всех пользователей через базу данных")
-    public @Nullable List<UserJson> findAllUsers() {
+    public @Nullable List<UserJson> findAllUsers(String username) {
         return xaTransactionTemplate.execute(() -> {
             List<UserEntity> userlist = userRepository.findAll();
             if (!userlist.isEmpty()) {
@@ -185,6 +185,11 @@ public class UserDbClient implements UserClient {
                 return Collections.emptyList();
             }
         });
+    }
+
+    @Override
+    public List<UserJson> findAllFriends(String username) {
+        return List.of();
     }
 
     private UserEntity userEntity(String username) {

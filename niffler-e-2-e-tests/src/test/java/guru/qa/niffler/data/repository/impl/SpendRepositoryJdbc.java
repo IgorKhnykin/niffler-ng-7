@@ -125,4 +125,24 @@ public class SpendRepositoryJdbc implements SpendRepository {
         spendEntityList.forEach(spendDao::deleteSpend);
         categoryDao.deleteCategory(category);
     }
+
+    @Override
+    public @Nonnull List<SpendEntity> findAllSpendsByUsername(String username) {
+        try (PreparedStatement ps = holder(CFG.spendJdbcUrl()).connection().prepareStatement(
+                "SELECT * FROM spend s join category c on s.category_id = c.id where s.username = ?")) {
+            ps.setString(1, username);
+            ps.execute();
+
+            try (ResultSet rs = ps.getResultSet()) {
+                return SpendEntityListExtractor.instance.extractData(rs);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public @Nonnull List<CategoryEntity> findAllCategoriesByUsername(String username) {
+        return categoryDao.findAllByUsername(username);
+    }
 }

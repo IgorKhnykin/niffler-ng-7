@@ -27,7 +27,7 @@ public interface UserApi {
     Call<UserJson> declineInvitation(@Query("username") String username, @Query("targetUsername") String targetUsername);
 
     @GET("/internal/friends/all")
-    Call<List<UserJson>> getAllFriends(@Query("sort") String username);
+    Call<List<UserJson>> getAllFriends(@Query("username") String username);
 
     @DELETE("/internal/friends/remove")
     Call<Void> removeFriend(@Query("username") String username, @Query("targetUsername") String targetUsername);

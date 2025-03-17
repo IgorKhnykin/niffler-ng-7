@@ -30,5 +30,7 @@ public interface UserClient {
 
     UserJson findById(UUID id);
 
-    List<UserJson> findAllUsers();
+    List<UserJson> findAllUsers(String username);
+
+    List<UserJson> findAllFriends(String username);
 }

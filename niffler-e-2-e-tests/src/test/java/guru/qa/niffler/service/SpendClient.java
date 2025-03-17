@@ -30,4 +30,9 @@ public interface SpendClient {
     SpendJson updateSpend(SpendJson spendJson);
 
     CategoryJson updateCategory(CategoryJson categoryJson);
+
+    List<SpendJson> getAllSpendsByUsername(String username);
+
+    List<CategoryJson> getAllActiveCategoriesByUsername(String username);
 }
+

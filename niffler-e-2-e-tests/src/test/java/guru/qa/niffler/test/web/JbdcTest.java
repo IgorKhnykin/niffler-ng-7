@@ -128,7 +128,7 @@ public class JbdcTest {
 
     @Test
     void test1() {
-        userClient.findAllUsers().stream()
+        userClient.findAllUsers("Igor").stream()
                 .filter(user -> user.username().contains("."))
                 .forEach(user -> userClient.deleteUser(user.username()));
     }

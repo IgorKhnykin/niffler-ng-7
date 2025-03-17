@@ -21,7 +21,7 @@ public interface AuthApi {
             @Query(value = "response_type") String responseType,
             @Query(value = "client_id") String clientId,
             @Query(value = "scope") String scope,
-            @Query(value = "redirect_uri") String redirectUri,
+            @Query(value = "redirect_uri", encoded = true) String redirectUri,
             @Query(value = "code_challenge") String codeChallenge,
             @Query(value = "code_challenge_method") String codeChallengeMethod);
 

@@ -1,5 +1,6 @@
 package guru.qa.niffler.test.web;
 
+import guru.qa.niffler.jupiter.annotation.ApiLogin;
 import guru.qa.niffler.jupiter.annotation.Spending;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.jupiter.annotation.meta.WebTest;
@@ -7,7 +8,6 @@ import guru.qa.niffler.model.rest.CategoryJson;
 import guru.qa.niffler.model.rest.CurrencyValues;
 import guru.qa.niffler.model.rest.SpendJson;
 import guru.qa.niffler.model.rest.UserJson;
-import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.MainPage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +19,7 @@ public class SpendingWebTest {
 
     @Test
     @DisplayName("Обновление описания траты")
+    @ApiLogin
     @User(spendings = {
             @Spending(
                     category = "Обучение4",
@@ -33,9 +34,7 @@ public class SpendingWebTest {
         final SpendJson spend2 = user.testData().spends().get(1);
         final SpendJson spendWithNewDesc = initNewSpend(user, spend1.category().name(), "new Spending Description", spend1.amount());
 
-        LoginPage.open()
-                .inputUsernameAndPassword(user.username(), user.testData().password())
-                .clickLoginBtn()
+        MainPage.open()
                 .openEditSpendingPage(spend1.description())
                 .editSpendingDescription(spendWithNewDesc.description())
                 .save()
@@ -46,12 +45,11 @@ public class SpendingWebTest {
 
     @Test
     @DisplayName("Проверка добавления нового спендинга через UI")
+    @ApiLogin
     @User()
     void addNewSpendingThroughUITest(UserJson user) {
         SpendJson spend = initNewSpend(user, "new Category", "new description", 2000.0);
-        LoginPage.open()
-                .inputUsernameAndPassword(user.username(), user.testData().password())
-                .clickLoginBtn()
+        MainPage.open()
                 .createNewSpend()
                 .editSpendingAmount(spend.amount().toString())
                 .editSpendingCategory(spend.category().name())
@@ -65,14 +63,13 @@ public class SpendingWebTest {
 
     @Test
     @DisplayName("Проверка удаления траты")
+    @ApiLogin
     @User(spendings = @Spending(
             category = "Обучение4",
             description = "new description",
             amount = 841114.0))
     void deleteSpendingTestTest(UserJson user) {
-        LoginPage.open()
-                .inputUsernameAndPassword(user.username(), user.testData().password())
-                .clickLoginBtn()
+        MainPage.open()
                 .deleteSpend(user.testData().spends().get(0).description())
                 .checkNotification("Spendings succesfully deleted");
     }
