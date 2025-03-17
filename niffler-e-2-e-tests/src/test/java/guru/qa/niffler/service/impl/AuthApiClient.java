@@ -43,9 +43,9 @@ public class AuthApiClient extends RestClient{
         ).execute();
 
         authApi.login(
-                ThreadSafeCookieStore.INSTANCE.xsrfCookieValue(),
                 username,
-                password
+                password,
+                ThreadSafeCookieStore.INSTANCE.xsrfCookieValue()
         ).execute();
 
         Response<JsonNode> tokenResponse = authApi.getToken(

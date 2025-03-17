@@ -38,7 +38,7 @@ public class UserApiClient implements UserClient {
         try {
             authApi.requestRegisterForm().execute();
 
-            response = authApi.register(ThreadSafeCookieStore.INSTANCE.xsrfCookieValue(), username, password, password)
+            response = authApi.register(username, password, password, ThreadSafeCookieStore.INSTANCE.xsrfCookieValue())
                     .execute();
 
             createdUser = Objects.requireNonNull(userApi.getCurrentUser(username).execute().body())
@@ -149,7 +149,7 @@ public class UserApiClient implements UserClient {
     public @Nullable UserJson findById(UUID id) {
         Response<List<UserJson>> response;
         try {
-            response = userApi.getAllUsers("username,ASC").execute();
+            response = userApi.getAllUsers("Igor").execute();
         } catch (IOException e) {
             throw new AssertionError(e);
         }

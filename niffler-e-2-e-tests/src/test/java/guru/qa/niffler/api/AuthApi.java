@@ -8,14 +8,14 @@ public interface AuthApi {
 
     @FormUrlEncoded
     @POST("/register")
-    Call<Void> register(@Field("_csrf") String _csrf,
-                        @Field("username") String username,
+    Call<Void> register(@Field("username") String username,
                         @Field("password") String password,
-                        @Field("passwordSubmit") String passwordSubmit);
+                        @Field("passwordSubmit") String passwordSubmit,
+                        @Field("_csrf") String _csrf);
 
     @GET("/register")
     Call<Void> requestRegisterForm();
-    
+
     @GET("/oauth2/authorize")
     Call<Void> authorize(
             @Query(value = "response_type") String responseType,
@@ -27,9 +27,9 @@ public interface AuthApi {
 
     @FormUrlEncoded
     @POST("/login")
-    Call<Void> login(@Field("_csrf") String _csrf,
-                     @Field("username") String username,
-                     @Field("password") String password);
+    Call<Void> login(@Field("username") String username,
+                     @Field("password") String password,
+                     @Field("_csrf") String _csrf);
 
     @FormUrlEncoded
     @POST("oauth2/token")
