@@ -1,15 +1,13 @@
 package guru.qa.niffler.service.impl;
 
-import guru.qa.niffler.api.AuthApi;
 import guru.qa.niffler.api.GatewayApi;
 import guru.qa.niffler.api.core.RestClient;
-import guru.qa.niffler.api.core.ThreadSafeCookieStore;
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.entity.auth.AuthUserEntity;
 import guru.qa.niffler.model.rest.CategoryJson;
 import guru.qa.niffler.model.rest.SpendJson;
 import guru.qa.niffler.model.rest.UserJson;
-import guru.qa.niffler.utils.RandomDataUtils;
+import guru.qa.niffler.service.UserClient;
 import io.qameta.allure.Step;
 import org.junit.jupiter.api.Assertions;
 import retrofit2.Response;
@@ -19,6 +17,8 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.*;
 
+import static guru.qa.niffler.utils.RandomDataUtils.passwordMain;
+import static guru.qa.niffler.utils.RandomDataUtils.randomUsername;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class GatewayApiClient {
@@ -26,6 +26,8 @@ public class GatewayApiClient {
     private static final Config CFG = Config.getInstance();
 
     private final GatewayApi gatewayApi = new RestClient.EmptyRestClient(CFG.gatewayUrl()).create(GatewayApi.class);
+
+    private final UserClient userClient = new UserApiClient();
 
     private final AuthApiClient authApiClient = new AuthApiClient();
 
@@ -78,7 +80,7 @@ public class GatewayApiClient {
         } catch (IOException e) {
             throw new AssertionError(e);
         }
-        assertEquals(202, response.code(), "Не удалось удалить трату");
+        assertEquals(200, response.code(), "Не удалось удалить трату");
     }
     
     @Step("Создание категории через API")
@@ -103,7 +105,7 @@ public class GatewayApiClient {
     }
     
     @Step("Поиск категории по имени пользователя {username} и названию {categoryName} категории через API")
-    public @Nullable CategoryJson findCategoryByUsernameAndCategoryName(String categoryName, String token) {
+    public @Nullable CategoryJson findCategoryByCategoryName(String categoryName, String token) {
         final Response<List<CategoryJson>> response;
         try {
             response = gatewayApi.getCategories("Bearer "+ token, true)
@@ -114,7 +116,7 @@ public class GatewayApiClient {
         assertEquals(200, response.code(), "Не удалось получить категории");
         return response.body() == null ? null : response.body().stream()
                 .filter(category -> category.name().contains(categoryName))
-                .findFirst().orElseGet(null);
+                .findFirst().orElseGet(() -> new CategoryJson(null, null, null, false));
     }
     
     @Step("Удаление категории через API")
@@ -149,7 +151,7 @@ public class GatewayApiClient {
     }
     
     @Step("Получить все траты по имени пользователя")
-    public @Nullable List<SpendJson> getAllSpendsByUsername(String username, String token) {
+    public @Nullable List<SpendJson> getAllSpends(String token) {
         final Response<List<SpendJson>> response;
         try {
             response = gatewayApi.getSpends("Bearer "+ token, null, null)
@@ -162,7 +164,7 @@ public class GatewayApiClient {
     }
     
     @Step("Получить все траты по имени пользователя")
-    public @Nullable List<CategoryJson> getAllActiveCategoriesByUsername(String token) {
+    public @Nullable List<CategoryJson> getAllActiveCategories(String token) {
         final Response<List<CategoryJson>> response;
         try {
             response = gatewayApi.getCategories("Bearer "+ token, true)
@@ -185,10 +187,11 @@ public class GatewayApiClient {
         List<String> outcomeRequests = new ArrayList<>();
         if (count > 0) {
             for (int i = 0; i < count; i++) {
-                final String username = RandomDataUtils.randomUsername();
+                final String username = randomUsername();
                 final Response<UserJson> response;
                 try {
-                    response = gatewayApi.sendInvitation("Bearer " + token, targetUser.username()).execute();
+                    UserJson createdUser = userClient.createUser(username, passwordMain);
+                    response = gatewayApi.sendInvitation("Bearer " + token, createdUser).execute();
                     outcomeRequests.add(username);
                 } catch (IOException e) {
                     throw new AssertionError(e);
@@ -207,10 +210,11 @@ public class GatewayApiClient {
             for (int i = 0; i < count; i++) {
                 final Response<UserJson> response;
                 try {
-                    String username = sendInvitation(targetUser, 1, "Bearer " + token).get(0);
-                    targetUser.testData().outcomeRequests().clear();
-                    String createdUserToken = authApiClient.login(targetUser.username(), targetUser.testData().password());
-                    response = gatewayApi.acceptInvitation(createdUserToken, username).execute();
+                    String username = sendInvitation(targetUser, 1, token).get(0);
+                    targetUser.testData().outcomeRequests().remove(username); //todo протестить
+                    String createdUserToken = authApiClient.login(username, passwordMain);
+                    UserJson createdUser = Objects.requireNonNull(gatewayApi.getCurrentUser(createdUserToken).execute().body());
+                    response = gatewayApi.acceptInvitation(createdUserToken, createdUser).execute();
                     friends.add(username);
                 } catch (IOException e) {
                     throw new AssertionError(e);

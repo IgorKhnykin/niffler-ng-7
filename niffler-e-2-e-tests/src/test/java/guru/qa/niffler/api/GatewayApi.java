@@ -58,15 +58,15 @@ public interface GatewayApi {
 
     @POST("/api/invitations/send")
     Call<UserJson> sendInvitation(@Header("Authorization") String token,
-                                  @Query("targetUsername") String targetUsername);
+                                  @Body UserJson username);
 
     @POST("/api/invitations/accept")
     Call<UserJson> acceptInvitation(@Header("Authorization") String token,
-                                    @Query("targetUsername") String targetUsername);
+                                    @Body UserJson username);
 
     @POST("/api/invitations/decline")
     Call<UserJson> declineInvitation(@Header("Authorization") String token,
-                                     @Query("targetUsername") String targetUsername);
+                                     @Body UserJson username);
 
     @GET("/api/friends/all")
     Call<List<UserJson>> getAllFriends(@Header("Authorization") String token,
@@ -74,5 +74,5 @@ public interface GatewayApi {
 
     @DELETE("/api/friends/remove")
     Call<Void> removeFriend(@Header("Authorization") String token,
-                            @Query("targetUsername") String targetUsername);
+                            @Query("username") String targetUsername);
 }

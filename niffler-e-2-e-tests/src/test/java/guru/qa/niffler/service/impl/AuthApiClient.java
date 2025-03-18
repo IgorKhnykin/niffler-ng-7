@@ -10,6 +10,8 @@ import guru.qa.niffler.jupiter.extension.ApiLoginExtension;
 import guru.qa.niffler.utils.OauthUtils;
 import lombok.SneakyThrows;
 import retrofit2.Response;
+
+
 public class AuthApiClient extends RestClient{
 
     private static final Config CFG = Config.getInstance();
@@ -32,7 +34,7 @@ public class AuthApiClient extends RestClient{
         final String codeVerifier = OauthUtils.generateCodeVerifier();
         final String codeChallenge = OauthUtils.generateCodeChallenge(codeVerifier);
 
-        authApi.authorize(
+        Response<Void> execute1 = authApi.authorize(
                 RESPONSE_TYPE,
                 CLIENT_ID,
                 SCOPE,
@@ -42,7 +44,7 @@ public class AuthApiClient extends RestClient{
 
         ).execute();
 
-        authApi.login(
+        Response<Void> execute = authApi.login(
                 username,
                 password,
                 ThreadSafeCookieStore.INSTANCE.xsrfCookieValue()
