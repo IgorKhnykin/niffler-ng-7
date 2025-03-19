@@ -35,7 +35,7 @@ public class GatewayApiClient {
     public @Nullable SpendJson createSpend(SpendJson spendJson, String token) {
         final Response<SpendJson> response;
         try {
-            response = gatewayApi.addSpend("Bearer "+ token, spendJson)
+            response = gatewayApi.addSpend(token, spendJson)
                     .execute();
         } catch (IOException e) {
             throw new AssertionError(e);
@@ -48,7 +48,7 @@ public class GatewayApiClient {
     public @Nullable SpendJson findSpend(SpendJson spendJson, String token) {
         final Response<SpendJson> response;
         try {
-            response = gatewayApi.getSpend("Bearer "+ token, String.valueOf(spendJson.id())).execute();
+            response = gatewayApi.getSpend(token, String.valueOf(spendJson.id())).execute();
         } catch (IOException e) {
             throw new AssertionError(e);
         }
@@ -56,11 +56,11 @@ public class GatewayApiClient {
         return response.body();
     }
     
-    @Step("Найти траты по имени {username} и описанию {description} через API")
+    @Step("Найти траты по описанию {description} через API")
     public @Nonnull List<SpendJson> findSpendByUsernameAndDescription(String description, String token) {
         final Response<List<SpendJson>> response;
         try {
-            response = gatewayApi.getSpends("Bearer "+ token, null, null)
+            response = gatewayApi.getSpends(token, null, null)
                     .execute();
         } catch (IOException e) {
             throw new AssertionError(e);
@@ -75,7 +75,7 @@ public class GatewayApiClient {
     public void deleteSpend(SpendJson spendJson, String token) {
         final Response<Void> response;
         try {
-            response = gatewayApi.deleteSpends("Bearer "+ token, List.of(String.valueOf(spendJson.id())))
+            response = gatewayApi.deleteSpends(token, List.of(String.valueOf(spendJson.id())))
                     .execute();
         } catch (IOException e) {
             throw new AssertionError(e);
@@ -87,7 +87,7 @@ public class GatewayApiClient {
     public @Nullable CategoryJson createCategory(CategoryJson categoryJson, String token) {
         final Response<CategoryJson> response;
         try {
-            response = gatewayApi.createCategory("Bearer "+ token, categoryJson)
+            response = gatewayApi.createCategory(token, categoryJson)
                     .execute();
         } catch (IOException e) {
             throw new AssertionError(e);
@@ -101,19 +101,19 @@ public class GatewayApiClient {
                 result.username(),
                 true);
 
-        return categoryJson.archived() ? updateCategory(createdCategory, "Bearer "+ token) : response.body();
+        return categoryJson.archived() ? updateCategory(createdCategory, token) : response.body();
     }
     
-    @Step("Поиск категории по имени пользователя {username} и названию {categoryName} категории через API")
+    @Step("Поиск категории по названию {categoryName} категории через API")
     public @Nullable CategoryJson findCategoryByCategoryName(String categoryName, String token) {
         final Response<List<CategoryJson>> response;
         try {
-            response = gatewayApi.getCategories("Bearer "+ token, true)
+            response = gatewayApi.getCategories(token, true)
                     .execute();
         } catch (IOException e) {
             throw new AssertionError(e);
         }
-        assertEquals(200, response.code(), "Не удалось получить категории");
+        assertEquals(200, response.code(), "Не удалось найти категорию по названию");
         return response.body() == null ? null : response.body().stream()
                 .filter(category -> category.name().contains(categoryName))
                 .findFirst().orElseGet(() -> new CategoryJson(null, null, null, false));
@@ -128,7 +128,7 @@ public class GatewayApiClient {
     public @Nullable SpendJson updateSpend(SpendJson spendJson, String token) {
         final Response<SpendJson> response;
         try {
-            response = gatewayApi.editSpend("Bearer "+ token, spendJson)
+            response = gatewayApi.editSpend(token, spendJson)
                     .execute();
         } catch (IOException e) {
             throw new AssertionError(e);
@@ -141,7 +141,7 @@ public class GatewayApiClient {
     public @Nullable CategoryJson updateCategory(CategoryJson categoryJson, String token) {
         final Response<CategoryJson> response;
         try {
-            response = gatewayApi.updateCategory("Bearer "+ token, categoryJson)
+            response = gatewayApi.updateCategory(token, categoryJson)
                     .execute();
         } catch (IOException e) {
             throw new AssertionError(e);
@@ -150,33 +150,33 @@ public class GatewayApiClient {
         return response.body();
     }
     
-    @Step("Получить все траты по имени пользователя")
+    @Step("Получить все траты пользователя")
     public @Nullable List<SpendJson> getAllSpends(String token) {
         final Response<List<SpendJson>> response;
         try {
-            response = gatewayApi.getSpends("Bearer "+ token, null, null)
+            response = gatewayApi.getSpends(token, null, null)
                     .execute();
         } catch (IOException e) {
             throw new AssertionError(e);
         }
-        assertEquals(200, response.code(), "Не удалось обновить категорию");
+        assertEquals(200, response.code(), "Не удалось получить все категории");
         return response.body();
     }
     
-    @Step("Получить все траты по имени пользователя")
+    @Step("Получить все категории пользователя")
     public @Nullable List<CategoryJson> getAllActiveCategories(String token) {
         final Response<List<CategoryJson>> response;
         try {
-            response = gatewayApi.getCategories("Bearer "+ token, true)
+            response = gatewayApi.getCategories(token, true)
                     .execute();
         } catch (IOException e) {
             throw new AssertionError(e);
         }
-        assertEquals(200, response.code(), "Не удалось обновить категорию");
+        assertEquals(200, response.code(), "Не удалось получить все активные категории");
         return response.body();
     }
 
-    @Step("Удалить пользователя {username} через API")
+    @Step("Удалить пользователя через API")
     public void deleteUser() {
         throw new UnsupportedOperationException();
     }
@@ -191,7 +191,7 @@ public class GatewayApiClient {
                 final Response<UserJson> response;
                 try {
                     UserJson createdUser = userClient.createUser(username, passwordMain);
-                    response = gatewayApi.sendInvitation("Bearer " + token, createdUser).execute();
+                    response = gatewayApi.sendInvitation(token, createdUser).execute();
                     outcomeRequests.add(username);
                 } catch (IOException e) {
                     throw new AssertionError(e);
@@ -201,6 +201,28 @@ public class GatewayApiClient {
         }
         targetUser.testData().outcomeRequests().addAll(outcomeRequests);
         return outcomeRequests;
+    }
+
+    @Step("Получить приглашение о дружбе через API")
+    public @Nonnull List<String> getInvitation(UserJson targetUser, int count) {
+        List<String> incomeRequest = new ArrayList<>();
+        if (count > 0) {
+            for (int i = 0; i < count; i++) {
+                final String username = randomUsername();
+                final Response<UserJson> response;
+                try {
+                    userClient.createUser(username, passwordMain);
+                    String createdUserToken = authApiClient.login(username, passwordMain);
+                    response = gatewayApi.sendInvitation(createdUserToken, targetUser).execute();
+                    incomeRequest.add(username);
+                } catch (IOException e) {
+                    throw new AssertionError(e);
+                }
+                Assertions.assertEquals(200, response.code(), "Не удалось получить приглашение о дружбе");
+            }
+        }
+        targetUser.testData().incomeRequests().addAll(incomeRequest);
+        return incomeRequest;
     }
 
     @Step("Добавить в друзья пользователя через API")
@@ -227,11 +249,31 @@ public class GatewayApiClient {
         return friends;
     }
 
+//    @Step("Отклонить запрос о дружбе")
+//    public @Nonnull List<String> declineFriendshipInvitation(UserJson targetUser, int count, String token) {
+//        List<String> friends = new ArrayList<>();
+//        if (count > 0) {
+//            for (int i = 0; i < count; i++) {
+//                final Response<UserJson> response;
+//                try {
+//                    getInvitation(targetUser, 1);
+//                    String createdUserToken = authApiClient.login(username, passwordMain);
+//                } catch (IOException e) {
+//                    throw new AssertionError(e);
+//                }
+//                Assertions.assertEquals(200, response.code(), "Не удалось добавить пользователя в друзья");
+//            }
+//        }
+//
+//        targetUser.testData().friends().addAll(friends);
+//        return friends;
+//    }
+
     @Step("Обновить пользователя через API")
     public @Nullable UserJson updateUser(UserJson user, String token) {
         Response<UserJson> response;
         try {
-            response = gatewayApi.updateUser("Bearer " + token, user).execute();
+            response = gatewayApi.updateUser(token, user).execute();
         } catch (IOException e) {
             throw new AssertionError(e);
         }
@@ -239,7 +281,7 @@ public class GatewayApiClient {
         return response.body();
     }
 
-    @Step("Обновить права пользователя {username} через API")
+    @Step("Обновить права пользователя через API")
     public @Nullable AuthUserEntity updateAuthUser() {
         throw new UnsupportedOperationException();
     }
@@ -248,11 +290,11 @@ public class GatewayApiClient {
     public @Nullable UserJson findById(UUID id, String token) {
         Response<List<UserJson>> response;
         try {
-            response = gatewayApi.getAllUsers("Bearer " + token, null).execute();
+            response = gatewayApi.getAllUsers(token, null).execute();
         } catch (IOException e) {
             throw new AssertionError(e);
         }
-        Assertions.assertEquals(200, response.code(), "Не удалось получить всех пользователей");
+        Assertions.assertEquals(200, response.code(), "Не удалось получить пользователя по id");
         return response.body() == null ?
                 null :
                 response.body().stream()
@@ -265,7 +307,7 @@ public class GatewayApiClient {
     public @Nonnull List<UserJson> findAllUsers(String token) {
         Response<List<UserJson>> response;
         try {
-            response = gatewayApi.getAllUsers("Bearer " + token, null).execute();
+            response = gatewayApi.getAllUsers(token, null).execute();
         } catch (IOException e) {
             throw new AssertionError(e);
         }
@@ -278,11 +320,11 @@ public class GatewayApiClient {
     public @Nonnull List<UserJson> findAllFriends(String token) {
         Response<List<UserJson>> response;
         try {
-            response = gatewayApi.getAllFriends("Bearer " + token, null).execute();
+            response = gatewayApi.getAllFriends(token, null).execute();
         } catch (IOException e) {
             throw new AssertionError(e);
         }
-        Assertions.assertEquals(200, response.code(), "Не удалось получить всех пользователей");
+        Assertions.assertEquals(200, response.code(), "Не удалось получить всех друзей");
         return response.body() == null ? Collections.emptyList() : response.body();
     }
 }

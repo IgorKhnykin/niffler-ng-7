@@ -164,7 +164,7 @@ public class SpendApiClient implements SpendClient {
         } catch (IOException e) {
             throw new AssertionError(e);
         }
-        assertEquals(200, response.code(), "Не удалось обновить категорию");
+        assertEquals(200, response.code(), "Не удалось получить все траты по имени пользователя");
         return response.body();
     }
 
@@ -178,7 +178,7 @@ public class SpendApiClient implements SpendClient {
         } catch (IOException e) {
             throw new AssertionError(e);
         }
-        assertEquals(200, response.code(), "Не удалось обновить категорию");
+        assertEquals(200, response.code(), "Не удалось получить все активные категории");
         return response.body();
     }
 }

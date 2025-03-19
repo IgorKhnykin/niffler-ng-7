@@ -10,6 +10,9 @@ import guru.qa.niffler.model.rest.CurrencyValues;
 import guru.qa.niffler.model.rest.SpendJson;
 import guru.qa.niffler.model.rest.UserJson;
 import guru.qa.niffler.service.impl.GatewayApiClient;
+import guru.qa.niffler.service.impl.GatewayApiClientV2;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
@@ -22,6 +25,7 @@ public class ApiTests {
     private static final ApiLoginExtension apiLoginExt = ApiLoginExtension.restApiLoginExtension();
 
     private final GatewayApiClient gatewayApiClient = new GatewayApiClient();
+    private final GatewayApiClientV2 gatewayApiClientV2 = new GatewayApiClientV2();
 
     @Test
     @ApiLogin
@@ -52,6 +56,7 @@ public class ApiTests {
     @Test
     @ApiLogin
     @User
+    @DisplayName("Запрос на дружбу должен отправляться")
     void addFriend(@Token String token, UserJson user) {
         gatewayApiClient.addFriend(user,1,  token);
     }
@@ -60,8 +65,32 @@ public class ApiTests {
     @ApiLogin
     @User
     void getUsers(@Token String token) {
-        gatewayApiClient.findAllUsers(token);
+        gatewayApiClientV2.findAllUsers(token, 0, null, null);
     }
 
+    @Test
+    @ApiLogin
+    @User
+    void getSpends(@Token String token) {
+        gatewayApiClientV2.getAllSpends(token,0, null);
+    }
 
+    @Test
+    @ApiLogin
+    @User(withFriend = 2, incomeRequest = 2)
+    void getAllFriends(@Token String token) {
+        gatewayApiClientV2.findAllFriends(token, 0, null, null);
+    }
+
+    @Test
+    @ApiLogin
+    @User(withFriend = 1, incomeRequest = 1)
+    void findFriends(UserJson user, @Token String token) {
+        final String expectedFriend = user.testData().friends().getFirst();
+        final String expectedIncomeRequest = user.testData().incomeRequests().getFirst();
+        final String actualFriend = gatewayApiClient.findAllFriends(token).getLast().username();
+        final String actualIncomeRequest = gatewayApiClient.findAllFriends(token).getFirst().username();
+        Assertions.assertEquals(expectedFriend, actualFriend);
+        Assertions.assertEquals(expectedIncomeRequest, actualIncomeRequest);
+    }
 }

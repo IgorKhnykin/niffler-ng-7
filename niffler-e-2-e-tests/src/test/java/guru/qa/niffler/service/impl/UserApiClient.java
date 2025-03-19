@@ -153,7 +153,7 @@ public class UserApiClient implements UserClient {
         } catch (IOException e) {
             throw new AssertionError(e);
         }
-        Assertions.assertEquals(200, response.code(), "Не удалось получить всех пользователей");
+        Assertions.assertEquals(200, response.code(), "Не удалось получить пользователя по id");
         return response.body() == null ?
                 null :
                 response.body().stream()
@@ -184,7 +184,7 @@ public class UserApiClient implements UserClient {
         } catch (IOException e) {
             throw new AssertionError(e);
         }
-        Assertions.assertEquals(200, response.code(), "Не удалось получить всех пользователей");
+        Assertions.assertEquals(200, response.code(), "Не удалось получить всех друзей");
         return response.body() == null ? Collections.emptyList() : response.body();
     }
 }

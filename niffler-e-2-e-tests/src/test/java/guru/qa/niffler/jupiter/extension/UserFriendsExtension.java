@@ -30,9 +30,9 @@ public class UserFriendsExtension implements BeforeEachCallback {
                     }
                     if (userAnno.withFriend() > 0) {
                         userClient.addFriend(userJson, userAnno.withFriend());
-                    } else if (userAnno.incomeRequest() > 0) {
+                    } if (userAnno.incomeRequest() > 0) {
                         userClient.getInvitation(userJson, userAnno.incomeRequest());
-                    } else if (userAnno.outcomeRequest() > 0) {
+                    } if (userAnno.outcomeRequest() > 0) {
                         userClient.sendInvitation(userJson, userAnno.outcomeRequest());
                     }
                 }
