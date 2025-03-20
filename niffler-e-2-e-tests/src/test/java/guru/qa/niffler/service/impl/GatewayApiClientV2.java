@@ -1,15 +1,13 @@
 package guru.qa.niffler.service.impl;
 
-import guru.qa.niffler.api.GatewayApi;
 import guru.qa.niffler.api.GatewayApiV2;
 import guru.qa.niffler.api.core.RestClient;
-import guru.qa.niffler.api.core.RestResponsePage;
 import guru.qa.niffler.config.Config;
+import guru.qa.niffler.model.pageable.RestResponsePage;
 import guru.qa.niffler.model.rest.SpendJson;
 import guru.qa.niffler.model.rest.UserJson;
 import io.qameta.allure.Step;
 import org.junit.jupiter.api.Assertions;
-import org.springframework.data.domain.PageImpl;
 import retrofit2.Response;
 
 import javax.annotation.Nonnull;

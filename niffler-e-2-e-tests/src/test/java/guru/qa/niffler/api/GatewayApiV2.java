@@ -1,16 +1,18 @@
 package guru.qa.niffler.api;
 
 
-import guru.qa.niffler.api.core.RestResponsePage;
-import guru.qa.niffler.model.rest.*;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import guru.qa.niffler.model.pageable.RestResponsePage;
+import guru.qa.niffler.model.rest.CurrencyValues;
+import guru.qa.niffler.model.rest.DataFilterValues;
+import guru.qa.niffler.model.rest.SpendJson;
+import guru.qa.niffler.model.rest.UserJson;
 import retrofit2.Call;
-import retrofit2.http.*;
+import retrofit2.http.GET;
+import retrofit2.http.Header;
+import retrofit2.http.Query;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.List;
 
 @ParametersAreNonnullByDefault
 public interface GatewayApiV2 {

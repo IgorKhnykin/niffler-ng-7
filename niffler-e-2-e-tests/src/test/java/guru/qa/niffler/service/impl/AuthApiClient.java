@@ -8,6 +8,7 @@ import guru.qa.niffler.api.core.ThreadSafeCookieStore;
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.jupiter.extension.ApiLoginExtension;
 import guru.qa.niffler.utils.OauthUtils;
+import io.qameta.allure.Step;
 import lombok.SneakyThrows;
 import retrofit2.Response;
 
@@ -30,21 +31,22 @@ public class AuthApiClient extends RestClient{
     }
 
     @SneakyThrows
+    @Step("Авторизовать пользователя {username}")
     public String login(String username, String password) {
         final String codeVerifier = OauthUtils.generateCodeVerifier();
         final String codeChallenge = OauthUtils.generateCodeChallenge(codeVerifier);
+        ThreadSafeCookieStore.INSTANCE.removeAll();
 
-        Response<Void> execute1 = authApi.authorize(
+        authApi.authorize(
                 RESPONSE_TYPE,
                 CLIENT_ID,
                 SCOPE,
                 REDIRECT_URI,
                 codeChallenge,
                 CODE_CHALLENGE_METHOD
-
         ).execute();
 
-        Response<Void> execute = authApi.login(
+        authApi.login(
                 username,
                 password,
                 ThreadSafeCookieStore.INSTANCE.xsrfCookieValue()
@@ -58,6 +60,6 @@ public class AuthApiClient extends RestClient{
                 CLIENT_ID
         ).execute();
 
-        return tokenResponse.body().get("id_token").asText();
+        return "Bearer " + tokenResponse.body().get("id_token").asText();
     }
 }

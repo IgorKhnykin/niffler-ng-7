@@ -7,7 +7,6 @@ import guru.qa.niffler.data.entity.auth.AuthUserEntity;
 import guru.qa.niffler.model.rest.CategoryJson;
 import guru.qa.niffler.model.rest.SpendJson;
 import guru.qa.niffler.model.rest.UserJson;
-import guru.qa.niffler.service.UserClient;
 import io.qameta.allure.Step;
 import org.junit.jupiter.api.Assertions;
 import retrofit2.Response;
@@ -15,10 +14,11 @@ import retrofit2.Response;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
-import static guru.qa.niffler.utils.RandomDataUtils.passwordMain;
-import static guru.qa.niffler.utils.RandomDataUtils.randomUsername;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class GatewayApiClient {
@@ -26,10 +26,6 @@ public class GatewayApiClient {
     private static final Config CFG = Config.getInstance();
 
     private final GatewayApi gatewayApi = new RestClient.EmptyRestClient(CFG.gatewayUrl()).create(GatewayApi.class);
-
-    private final UserClient userClient = new UserApiClient();
-
-    private final AuthApiClient authApiClient = new AuthApiClient();
 
     @Step("Создание траты через API")
     public @Nullable SpendJson createSpend(SpendJson spendJson, String token) {
@@ -43,7 +39,7 @@ public class GatewayApiClient {
         assertEquals(201, response.code(), "Не удалось создать трату");
         return response.body();
     }
-    
+
     @Step("Найти трату через API")
     public @Nullable SpendJson findSpend(SpendJson spendJson, String token) {
         final Response<SpendJson> response;
@@ -55,7 +51,7 @@ public class GatewayApiClient {
         assertEquals(200, response.code(), "Не удалось найти трату");
         return response.body();
     }
-    
+
     @Step("Найти траты по описанию {description} через API")
     public @Nonnull List<SpendJson> findSpendByUsernameAndDescription(String description, String token) {
         final Response<List<SpendJson>> response;
@@ -70,7 +66,7 @@ public class GatewayApiClient {
                 .filter(spend -> spend.description().contains(description))
                 .toList();
     }
-    
+
     @Step("Удалить трату через API")
     public void deleteSpend(SpendJson spendJson, String token) {
         final Response<Void> response;
@@ -82,7 +78,7 @@ public class GatewayApiClient {
         }
         assertEquals(200, response.code(), "Не удалось удалить трату");
     }
-    
+
     @Step("Создание категории через API")
     public @Nullable CategoryJson createCategory(CategoryJson categoryJson, String token) {
         final Response<CategoryJson> response;
@@ -103,7 +99,7 @@ public class GatewayApiClient {
 
         return categoryJson.archived() ? updateCategory(createdCategory, token) : response.body();
     }
-    
+
     @Step("Поиск категории по названию {categoryName} категории через API")
     public @Nullable CategoryJson findCategoryByCategoryName(String categoryName, String token) {
         final Response<List<CategoryJson>> response;
@@ -118,12 +114,12 @@ public class GatewayApiClient {
                 .filter(category -> category.name().contains(categoryName))
                 .findFirst().orElseGet(() -> new CategoryJson(null, null, null, false));
     }
-    
+
     @Step("Удаление категории через API")
     public void deleteCategory(CategoryJson categoryJson, String token) {
         throw new UnsupportedOperationException();
     }
-    
+
     @Step("Обновить данные траты через API")
     public @Nullable SpendJson updateSpend(SpendJson spendJson, String token) {
         final Response<SpendJson> response;
@@ -136,7 +132,7 @@ public class GatewayApiClient {
         assertEquals(200, response.code(), "Не удалось изменить трату");
         return response.body();
     }
-    
+
     @Step("Обновить данные категории через API")
     public @Nullable CategoryJson updateCategory(CategoryJson categoryJson, String token) {
         final Response<CategoryJson> response;
@@ -149,7 +145,7 @@ public class GatewayApiClient {
         assertEquals(200, response.code(), "Не удалось обновить категорию");
         return response.body();
     }
-    
+
     @Step("Получить все траты пользователя")
     public @Nullable List<SpendJson> getAllSpends(String token) {
         final Response<List<SpendJson>> response;
@@ -162,7 +158,7 @@ public class GatewayApiClient {
         assertEquals(200, response.code(), "Не удалось получить все категории");
         return response.body();
     }
-    
+
     @Step("Получить все категории пользователя")
     public @Nullable List<CategoryJson> getAllActiveCategories(String token) {
         final Response<List<CategoryJson>> response;
@@ -181,93 +177,42 @@ public class GatewayApiClient {
         throw new UnsupportedOperationException();
     }
 
-    
-    @Step("Отправить приглашение о дружбе пользователю через API")
-    public @Nonnull List<String> sendInvitation(UserJson targetUser, int count, String token) {
-        List<String> outcomeRequests = new ArrayList<>();
-        if (count > 0) {
-            for (int i = 0; i < count; i++) {
-                final String username = randomUsername();
-                final Response<UserJson> response;
-                try {
-                    UserJson createdUser = userClient.createUser(username, passwordMain);
-                    response = gatewayApi.sendInvitation(token, createdUser).execute();
-                    outcomeRequests.add(username);
-                } catch (IOException e) {
-                    throw new AssertionError(e);
-                }
-                Assertions.assertEquals(200, response.code(), "Не удалось отправить приглашение о дружбе");
-            }
-        }
-        targetUser.testData().outcomeRequests().addAll(outcomeRequests);
-        return outcomeRequests;
-    }
 
-    @Step("Получить приглашение о дружбе через API")
-    public @Nonnull List<String> getInvitation(UserJson targetUser, int count) {
-        List<String> incomeRequest = new ArrayList<>();
-        if (count > 0) {
-            for (int i = 0; i < count; i++) {
-                final String username = randomUsername();
-                final Response<UserJson> response;
-                try {
-                    userClient.createUser(username, passwordMain);
-                    String createdUserToken = authApiClient.login(username, passwordMain);
-                    response = gatewayApi.sendInvitation(createdUserToken, targetUser).execute();
-                    incomeRequest.add(username);
-                } catch (IOException e) {
-                    throw new AssertionError(e);
-                }
-                Assertions.assertEquals(200, response.code(), "Не удалось получить приглашение о дружбе");
-            }
+    @Step("Отправить приглашение о дружбе пользователю через API")
+    public @Nonnull UserJson sendInvitation(String token, UserJson targetUser) {
+        final Response<UserJson> response;
+        try {
+            response = gatewayApi.sendInvitation(token, targetUser).execute();
+        } catch (IOException e) {
+            throw new AssertionError(e);
         }
-        targetUser.testData().incomeRequests().addAll(incomeRequest);
-        return incomeRequest;
+        Assertions.assertEquals(200, response.code(), "Не удалось отправить приглашение о дружбе");
+        return Objects.requireNonNull(response.body());
     }
 
     @Step("Добавить в друзья пользователя через API")
-    public @Nonnull List<String> addFriend(UserJson targetUser, int count, String token) {
-        List<String> friends = new ArrayList<>();
-        if (count > 0) {
-            for (int i = 0; i < count; i++) {
-                final Response<UserJson> response;
-                try {
-                    String username = sendInvitation(targetUser, 1, token).get(0);
-                    targetUser.testData().outcomeRequests().remove(username); //todo протестить
-                    String createdUserToken = authApiClient.login(username, passwordMain);
-                    UserJson createdUser = Objects.requireNonNull(gatewayApi.getCurrentUser(createdUserToken).execute().body());
-                    response = gatewayApi.acceptInvitation(createdUserToken, createdUser).execute();
-                    friends.add(username);
-                } catch (IOException e) {
-                    throw new AssertionError(e);
-                }
-                Assertions.assertEquals(200, response.code(), "Не удалось добавить пользователя в друзья");
-            }
+    public @Nonnull UserJson addFriend(String token, UserJson targetUser) {
+        final Response<UserJson> response;
+        try {
+            response = gatewayApi.acceptInvitation(token, targetUser).execute();
+        } catch (IOException e) {
+            throw new AssertionError(e);
         }
-
-        targetUser.testData().friends().addAll(friends);
-        return friends;
+        Assertions.assertEquals(200, response.code(), "Не удалось добавить пользователя в друзья");
+        return Objects.requireNonNull(response.body());
     }
 
-//    @Step("Отклонить запрос о дружбе")
-//    public @Nonnull List<String> declineFriendshipInvitation(UserJson targetUser, int count, String token) {
-//        List<String> friends = new ArrayList<>();
-//        if (count > 0) {
-//            for (int i = 0; i < count; i++) {
-//                final Response<UserJson> response;
-//                try {
-//                    getInvitation(targetUser, 1);
-//                    String createdUserToken = authApiClient.login(username, passwordMain);
-//                } catch (IOException e) {
-//                    throw new AssertionError(e);
-//                }
-//                Assertions.assertEquals(200, response.code(), "Не удалось добавить пользователя в друзья");
-//            }
-//        }
-//
-//        targetUser.testData().friends().addAll(friends);
-//        return friends;
-//    }
+   @Step("Отклонить заявку в друзья через API")
+    public @Nonnull UserJson declineFriendship(String token, UserJson targetUser) {
+        final Response<UserJson> response;
+        try {
+            response = gatewayApi.declineInvitation(token, targetUser).execute();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+        Assertions.assertEquals(200, response.code(), "Не удалось отклонить заявку в друзья");
+        return Objects.requireNonNull(response.body());
+    }
 
     @Step("Обновить пользователя через API")
     public @Nullable UserJson updateUser(UserJson user, String token) {
@@ -315,7 +260,7 @@ public class GatewayApiClient {
         return response.body() == null ? Collections.emptyList() : response.body();
     }
 
-    
+
     @Step("Найти всех друзей через API")
     public @Nonnull List<UserJson> findAllFriends(String token) {
         Response<List<UserJson>> response;
@@ -326,5 +271,16 @@ public class GatewayApiClient {
         }
         Assertions.assertEquals(200, response.code(), "Не удалось получить всех друзей");
         return response.body() == null ? Collections.emptyList() : response.body();
+    }
+
+    @Step("Удалить из друзей через API")
+    public void removeFriend(String token, String username) {
+        Response<Void> response;
+        try {
+            response = gatewayApi.removeFriend(token, username).execute();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+        Assertions.assertEquals(200, response.code(), "Не удалось удалить из друзей");
     }
 }

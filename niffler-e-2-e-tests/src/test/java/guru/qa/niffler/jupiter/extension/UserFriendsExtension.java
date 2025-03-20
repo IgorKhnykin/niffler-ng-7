@@ -13,21 +13,11 @@ public class UserFriendsExtension implements BeforeEachCallback {
 
     private final UserClient userClient = UserClient.getInstance();
 
-    private static final String password = "12345";
-
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
         AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), User.class).ifPresent(
                 userAnno -> {
                     UserJson userJson = context.getStore(UserExtension.NAMESPACE).get(context.getUniqueId(), UserJson.class);
-
-                    if (userJson == null) {
-                        userJson = userClient.findAllUsers(userAnno.username())
-                                .stream()
-                                .filter(user -> user.username().equals(userAnno.username()))
-                                .findFirst()
-                                .orElseGet(() -> userClient.createUser(userAnno.username(), password));
-                    }
                     if (userAnno.withFriend() > 0) {
                         userClient.addFriend(userJson, userAnno.withFriend());
                     } if (userAnno.incomeRequest() > 0) {
