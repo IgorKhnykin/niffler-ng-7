@@ -4,6 +4,7 @@ import guru.qa.niffler.jupiter.annotation.ApiLogin;
 import guru.qa.niffler.jupiter.annotation.ScreenshotTest;
 import guru.qa.niffler.jupiter.annotation.Spending;
 import guru.qa.niffler.jupiter.annotation.User;
+import guru.qa.niffler.jupiter.annotation.meta.WebTest;
 import guru.qa.niffler.model.rest.SpendJson;
 import guru.qa.niffler.model.rest.UserJson;
 import guru.qa.niffler.page.MainPage;
@@ -15,6 +16,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
 
+@WebTest
 public class ScreenshotWebTest {
 
     @DisplayName("Проверка изменения статистики при добавлении траты")

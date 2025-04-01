@@ -11,7 +11,7 @@ public class BrowserConverter implements ArgumentConverter {
 
     @Override
     public Object convert(Object source, ParameterContext context) throws ArgumentConversionException {
-        if (context.getParameter().getType().isAssignableFrom(SelenideDriver.class)) {
+        if (!context.getParameter().getType().isAssignableFrom(SelenideDriver.class)) {
             throw new ArgumentConversionException("Can only convert SelenideDriver.class");
         }
         return new SelenideDriver(getConfigByBrowserName((Browser) source));

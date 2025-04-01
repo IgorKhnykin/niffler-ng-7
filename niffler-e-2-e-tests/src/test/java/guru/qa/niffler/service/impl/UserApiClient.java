@@ -38,7 +38,7 @@ public class UserApiClient implements UserClient {
         try {
             authApi.requestRegisterForm().execute();
 
-            response = authApi.register(ThreadSafeCookieStore.INSTANCE.xsrfCookieValue(), username, password, password)
+            response = authApi.register(username, password, password, ThreadSafeCookieStore.INSTANCE.xsrfCookieValue())
                     .execute();
 
             createdUser = Objects.requireNonNull(userApi.getCurrentUser(username).execute().body())
@@ -149,11 +149,11 @@ public class UserApiClient implements UserClient {
     public @Nullable UserJson findById(UUID id) {
         Response<List<UserJson>> response;
         try {
-            response = userApi.getAllUsers("username,ASC").execute();
+            response = userApi.getAllUsers("Igor").execute();
         } catch (IOException e) {
             throw new AssertionError(e);
         }
-        Assertions.assertEquals(200, response.code(), "Не удалось получить всех пользователей");
+        Assertions.assertEquals(200, response.code(), "Не удалось получить пользователя по id");
         return response.body() == null ?
                 null :
                 response.body().stream()
@@ -184,7 +184,7 @@ public class UserApiClient implements UserClient {
         } catch (IOException e) {
             throw new AssertionError(e);
         }
-        Assertions.assertEquals(200, response.code(), "Не удалось получить всех пользователей");
+        Assertions.assertEquals(200, response.code(), "Не удалось получить всех друзей");
         return response.body() == null ? Collections.emptyList() : response.body();
     }
 }

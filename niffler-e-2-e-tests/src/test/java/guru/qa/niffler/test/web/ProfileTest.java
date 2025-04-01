@@ -14,7 +14,7 @@ public class ProfileTest {
 
     @Test
     @User(categories = @Category(
-                    archived = true)
+                    archived = false)
     )
     @ApiLogin
     @DisplayName("Проверка отображения архивной категории")

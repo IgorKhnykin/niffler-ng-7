@@ -5,8 +5,6 @@ import guru.qa.niffler.data.entity.spend.SpendEntity;
 import guru.qa.niffler.data.repository.impl.SpendRepositoryHibernate;
 import guru.qa.niffler.data.repository.impl.SpendRepositoryJdbc;
 import guru.qa.niffler.data.repository.impl.SpendRepositorySpringJdbc;
-import guru.qa.niffler.model.rest.CategoryJson;
-import guru.qa.niffler.model.rest.SpendJson;
 
 import java.util.List;
 import java.util.Optional;

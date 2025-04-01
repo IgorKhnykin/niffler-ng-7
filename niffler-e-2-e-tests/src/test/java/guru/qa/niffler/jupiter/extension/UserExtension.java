@@ -1,6 +1,7 @@
 package guru.qa.niffler.jupiter.extension;
 
 import guru.qa.niffler.jupiter.annotation.User;
+import guru.qa.niffler.model.rest.TestData;
 import guru.qa.niffler.model.rest.UserJson;
 import guru.qa.niffler.service.UserClient;
 import org.junit.jupiter.api.extension.*;
@@ -19,14 +20,22 @@ public class UserExtension implements BeforeEachCallback, ParameterResolver {
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
         AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), User.class)
-                .ifPresent(user -> {
+                .ifPresent(userAnno -> {
+                    final UserJson userJson;
                     final String username = randomUsername();
-                    if ("".equals(user.username())) {
-                        UserJson userJson = userClient.createUser(username, defaultPassword);
-                        context.getStore(NAMESPACE)
-                                .put(context.getUniqueId(), userJson);
+                    if ("".equals(userAnno.username())) {
+                        userJson = userClient.createUser(username, defaultPassword);
+                    } else {
+                        userJson = userClient.findAllUsers("allen.davis")
+                                .stream()
+                                .filter(user -> user.username().equals(userAnno.username()))
+                                .findFirst()
+                                .orElseGet(() -> userClient.createUser(userAnno.username(), defaultPassword));
                     }
-        });
+
+                    context.getStore(NAMESPACE)
+                            .put(context.getUniqueId(), userJson.addTestData(new TestData("1234")));
+                });
     }
 
     @Override

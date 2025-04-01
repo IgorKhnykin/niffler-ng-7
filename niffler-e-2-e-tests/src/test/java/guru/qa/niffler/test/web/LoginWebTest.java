@@ -2,6 +2,7 @@ package guru.qa.niffler.test.web;
 
 import com.codeborne.selenide.SelenideDriver;
 import guru.qa.niffler.jupiter.annotation.User;
+import guru.qa.niffler.jupiter.annotation.meta.LoginTest;
 import guru.qa.niffler.jupiter.converters.Browser;
 import guru.qa.niffler.jupiter.converters.BrowserConverter;
 import guru.qa.niffler.jupiter.extension.NonStaticBrowserExtension;
@@ -15,6 +16,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 import static guru.qa.niffler.utils.RandomDataUtils.usernameMain;
 
+@LoginTest
 public class LoginWebTest {
 
     @RegisterExtension

@@ -6,13 +6,8 @@ import guru.qa.niffler.jupiter.annotation.meta.WebTest;
 import guru.qa.niffler.model.rest.UserJson;
 import guru.qa.niffler.page.AllPeoplePage;
 import guru.qa.niffler.page.FriendsPage;
-import guru.qa.niffler.service.UserClient;
-import guru.qa.niffler.service.impl.UserApiClient;
-import guru.qa.niffler.service.impl.UserDbClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 @WebTest
 public class FriendsWebTest {

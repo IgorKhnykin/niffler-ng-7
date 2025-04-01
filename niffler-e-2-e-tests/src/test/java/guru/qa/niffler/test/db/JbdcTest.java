@@ -1,4 +1,4 @@
-package guru.qa.niffler.test.web;
+package guru.qa.niffler.test.db;
 
 import guru.qa.niffler.model.rest.CategoryJson;
 import guru.qa.niffler.model.rest.CurrencyValues;
