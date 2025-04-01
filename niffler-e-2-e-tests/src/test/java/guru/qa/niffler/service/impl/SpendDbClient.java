@@ -103,4 +103,20 @@ public class SpendDbClient implements SpendClient {
         return xaTransactionTemplate.execute(
                 () -> CategoryJson.fromEntity(spendRepository.updateCategory(CategoryEntity.fromJson(categoryJson))));
     }
+
+    @Override
+    @Step("Получить все траты по имени пользователя")
+    public List<SpendJson> getAllSpendsByUsername(String username) {
+        return xaTransactionTemplate.execute(
+                () -> spendRepository.findAllSpendsByUsername(username).stream().map(SpendJson::fromEntity).toList());
+    }
+
+    @Override
+    @Step("Получить все категории по имени пользователя")
+    public List<CategoryJson> getAllActiveCategoriesByUsername(String username) {
+        return xaTransactionTemplate.execute(
+                () -> spendRepository.findAllCategoriesByUsername(username).stream()
+                        .filter(CategoryEntity::isArchived)
+                        .map(CategoryJson::fromEntity).toList());
+    }
 }

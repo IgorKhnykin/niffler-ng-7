@@ -38,4 +38,14 @@ public class UserExtension implements BeforeEachCallback, ParameterResolver {
     public UserJson resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
         return extensionContext.getStore(NAMESPACE).get(extensionContext.getUniqueId(), UserJson.class);
     }
+
+    public static UserJson getUserFromContext() {
+        final ExtensionContext context = TestMethodContextExtension.getContext();
+        return context.getStore(UserExtension.NAMESPACE).get(context.getUniqueId(), UserJson.class);
+    }
+
+    public static void setUserToContext(UserJson userToLogin) {
+        final ExtensionContext context = TestMethodContextExtension.getContext();
+        context.getStore(UserExtension.NAMESPACE).put(context.getUniqueId(), userToLogin);
+    }
 }

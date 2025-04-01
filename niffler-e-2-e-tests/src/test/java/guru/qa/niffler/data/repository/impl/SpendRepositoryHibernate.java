@@ -116,6 +116,19 @@ public class SpendRepositoryHibernate implements SpendRepository {
             Optional<CategoryEntity> categoryFromBack = Optional.ofNullable(entityManager.find(CategoryEntity.class, categoryEntity.getId()));
             categoryFromBack.ifPresent(category -> entityManager.remove(category));
         }
+    }
 
+    @Override
+    public @Nonnull List<SpendEntity> findAllSpendsByUsername(String username) {
+        return entityManager.createQuery("select s from SpendEntity s where s.username =: username", SpendEntity.class)
+                .setParameter("username", username)
+                .getResultList();
+    }
+
+    @Override
+    public @Nonnull List<CategoryEntity> findAllCategoriesByUsername(String username) {
+        return entityManager.createQuery("select s from CategoryEntity s where s.username =: username", CategoryEntity.class)
+                .setParameter("username", username)
+                .getResultList();
     }
 }

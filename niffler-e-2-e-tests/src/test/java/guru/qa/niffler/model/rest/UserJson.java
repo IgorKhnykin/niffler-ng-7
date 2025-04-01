@@ -49,6 +49,10 @@ public record UserJson(
     public UserJson addTestData(TestData testData) {
         return new UserJson(id, username, firstname, surname, fullname, currency, photo, photoSmall, friendshipStatus, testData);
     }
+
+    public UserJson(String username, TestData testData) {
+        this(null, username, null, null, null, null, null, null, null, testData);
+    }
 }
 
 

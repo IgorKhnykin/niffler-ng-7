@@ -153,4 +153,32 @@ public class SpendApiClient implements SpendClient {
         assertEquals(200, response.code(), "Не удалось обновить категорию");
         return response.body();
     }
+
+    @Override
+    @Step("Получить все траты по имени пользователя")
+    public @Nullable List<SpendJson> getAllSpendsByUsername(String username) {
+        final Response<List<SpendJson>> response;
+        try {
+            response = spendApi.getSpends(username)
+                    .execute();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+        assertEquals(200, response.code(), "Не удалось обновить категорию");
+        return response.body();
+    }
+
+    @Override
+    @Step("Получить все траты по имени пользователя")
+    public @Nullable List<CategoryJson> getAllActiveCategoriesByUsername(String username) {
+        final Response<List<CategoryJson>> response;
+        try {
+            response = spendApi.getCategories(username, true)
+                    .execute();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+        assertEquals(200, response.code(), "Не удалось обновить категорию");
+        return response.body();
+    }
 }
